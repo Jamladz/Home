@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="متجر Jamla الإلكتروني - أفضل الملابس الرجالية والأحذية بأسعار تنافسية">
+    <meta name="keywords" content="ملابس رجالية, أحذية, موضة, تسوق إلكتروني, جملة">
+    <title>Jamla - متجرك الإلكتروني للملابس الرجالية والأحذية</title>
+    <style>
+        :root {
+            --primary-color: #FFD700; /* أصفر ذهبي */
+            --secondary-color: #FFF8E1;
+            --accent-color: #FFC107;
+            --text-color: #333;
+            --light-text: #777;
+            --bg-color: #FFF;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --glass-effect: rgba(255, 255, 255, 0.2);
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        /* هيدر التطبيق */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .app-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+        
+        /* زر كبار التجار */
+        .traders-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-left: 10px;
+        }
+        
+        .traders-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* سلايدر الصور */
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            height: 200px;
+            background-color: var(--secondary-color);
+        }
+        
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .slide-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+        }
+        
+        .slide-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .slide-subtitle {
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+        
+        /* ايقونات الأقسام */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+        }
+        
+        .category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: transform 0.3s;
+        }
+        
+        .category:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .category-icon i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        
+        .category-name {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        /* قسم المنتجات */
+        .section-title {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--secondary-color);
+            margin-top: 10px;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .product-card:active {
+            transform: scale(0.98);
+        }
+        
+        .product-image {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-title {
+            font-size: 14px;
+            margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            font-size: 12px;
+            color: var(--light-text);
+            margin-right: 5px;
+        }
+        
+        /* ميزات التطبيق */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            margin-top: 10px;
+        }
+        
+        .feature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .feature-icon i {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        .feature-text {
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        /* فوتر التطبيق */
+        .app-footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            padding: 20px 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .social-icon i {
+            font-size: 20px;
+            color: white;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: white;
+            margin-top: 10px;
+        }
+        
+        /* تأثيرات التحميل */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- هيدر التطبيق -->
+        <header class="app-header">
+            <button class="traders-btn" onclick="window.location.href='go:kibartojar'">كبار التجار</button>
+            <h1>Jamla</h1>
+        </header>
+        
+        <!-- سلايدر الصور -->
+        <div class="slider-container">
+            <div class="slider" id="slider">
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="slide-overlay">
+                        <h3 class="slide-title">خصومات تصل إلى 50%</h3>
+                        <p class="slide-subtitle">على تشكيلة الملابس الصيفية</p>
+                    </div>
+                </div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="slide-overlay">
+                        <h3 class="slide-title">تشكيلة الأحذية الجديدة</h3>
+                        <p class="slide-subtitle">أفضل الموديلات لعام 2025</p>
+                    </div>
+                </div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <div class="slide-overlay">
+                        <h3 class="slide-title">عروض خاصة</h3>
+                        <p class="slide-subtitle">لمدة 3 أيام فقط</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ايقونات الأقسام -->
+        <div class="categories">
+            <a href="go:ma7lya" class="category">
+                <div class="category-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <span class="category-name">ملابس محلية</span>
+            </a>
+            <a href="go:tarkya" class="category">
+                <div class="category-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <span class="category-name">ملابس تركية</span>
+            </a>
+            <a href="go:china" class="category">
+                <div class="category-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <span class="category-name">ملابس صينية</span>
+            </a>
+            <a href="category.html?type=shoes" class="category">
+                <div class="category-icon">
+                    <i class="fas fa-shoe-prints"></i>
+                </div>
+                <span class="category-name">أحذية</span>
+            </a>
+        </div>
+        
+        <!-- المنتجات الرائجة -->
+        <div class="section-title">
+            <span>المنتجات الرائجة</span>
+            <a href="go:Raj" filter=popular" style="font-size: 14px; color: var(--primary-color);">عرض الكل</a>
+        </div>
+        
+        <div class="products">
+            <!-- منتج 1 -->
+            <a href="go:pro1" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">الأكثر مبيعاً</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">جاكيت رجالي جلد طبيعي</h3>
+                    <p class="product-price">
+                        <span class="old-price">4500 د.ج</span>
+                        3990 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 2 -->
+            <a href="product.html?id=2" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">جديد</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">قميص رجالي قطني</h3>
+                    <p class="product-price">
+                        <span class="old-price">2500 د.ج</span>
+                        1990 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 3 -->
+            <a href="product.html?id=3" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80')">
+                    <span class="product-badge">خصم 20%</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">حذاء رياضي مريح</h3>
+                    <p class="product-price">
+                        <span class="old-price">3800 د.ج</span>
+                        3200 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 4 -->
+            <a href="product.html?id=4" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">الأكثر طلباً</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">بنطال جينز رجالي</h3>
+                    <p class="product-price">
+                        <span class="old-price">3200 د.ج</span>
+                        2800 د.ج
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- المنتجات الجديدة -->
+        <div class="section-title">
+            <span>منتجات جديدة</span>
+            <a href="products.html?filter=new" style="font-size: 14px; color: var(--primary-color);">عرض الكل</a>
+        </div>
+        
+        <div class="products">
+            <!-- منتج 1 -->
+            <a href="product.html?id=5" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1539533018447-63fcce2678e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">جديد</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">بدلة رجالية أنيقة</h3>
+                    <p class="product-price">
+                        <span class="old-price">6500 د.ج</span>
+                        5900 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 2 -->
+            <a href="product.html?id=6" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
+                    <span class="product-badge">جديد</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">جاكيت شتوي دافئ</h3>
+                    <p class="product-price">
+                        <span class="old-price">4800 د.ج</span>
+                        4200 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 3 -->
+            <a href="product.html?id=7" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">جديد</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">حذاء رسمي جلد طبيعي</h3>
+                    <p class="product-price">
+                        <span class="old-price">4200 د.ج</span>
+                        3600 د.ج
+                    </p>
+                </div>
+            </a>
+            
+            <!-- منتج 4 -->
+            <a href="product.html?id=8" class="product-card fade-in">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
+                    <span class="product-badge">جديد</span>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">تيشيرت قطني مريح</h3>
+                    <p class="product-price">
+                        <span class="old-price">1800 د.ج</span>
+                        1500 د.ج
+                    </p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- ميزات التطبيق -->
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <span class="feature-text">توصيل لـ 58 ولاية</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <span class="feature-text">دفع عند الاستلام</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <span class="feature-text">تأكد من المنتج</span>
+            </div>
+        </div>
+        
+        <!-- فوتر التطبيق -->
+        <footer class="app-footer">
+            <div class="footer-links">
+                <a href="go:na7n" class="footer-link">من نحن</a>
+                <a href="go:kho1" class="footer-link">الشروط والأحكام</a>
+                <a href="privacy.html" class="footer-link">سياسة الخصوصية</a>
+                <a href="contact.html" class="footer-link">اتصل بنا</a>
+            </div>
+            
+            <div class="social-icons">
+                <a href="https://facebook.com/jamla" class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://instagram.com/jamla" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://t.me/jamla" class="social-icon">
+                    <i class="fab fa-telegram"></i>
+                </a>
+                <a href="https://youtube.com/jamla" class="social-icon">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a href="tel:+123456789" class="social-icon">
+                    <i class="fas fa-headset"></i>
+                </a>
+            </div>
+            <p class="copyright">© 2025 Jamla. جميع الحقوق محفوظة</p>
+        </footer>
+    </div>
+    
+    <script>
+        // سكريبت السلايدر
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.getElementById('slider');
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let slideInterval;
+            
+            function startSlider() {
+                slideInterval = setInterval(() => {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    updateSlider();
+                }, 5000);
+            }
+            
+            // بدء السلايدر
+            startSlider();
+            
+            // إيقاف السلايدر عند التفاعل
+            slider.addEventListener('mouseenter', () => {
+                clearInterval(slideInterval);
+            });
+            
+            slider.addEventListener('mouseleave', startSlider);
+            
+            // دعم السحب بالإصبع
+            slider.addEventListener('touchstart', (e) => {
+                clearInterval(slideInterval);
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            slider.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+                startSlider();
+            }, false);
+            
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) {
+                    // سحب لليسار - التالي
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    updateSlider();
+                } else if (touchEndX > touchStartX + 50) {
+                    // سحب لليمين - السابق
+                    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                    updateSlider();
+                }
+            }
+            
+            function updateSlider() {
+                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+            
+            // تأثيرات التحميل
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
