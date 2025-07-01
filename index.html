@@ -566,6 +566,32 @@
       opacity: 1;
     }
     
+    .referral-stats {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(156, 39, 176, 0.1);
+      padding: 15px;
+      border-radius: 16px;
+      margin: 15px 0;
+    }
+    
+    .referral-stats span {
+      color: var(--referral-color);
+      font-weight: 600;
+    }
+    
+    .referral-stats .calculating {
+      animation: pulse 1.5s infinite;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+    
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -740,21 +766,6 @@
       background: rgba(239, 68, 68, 0.1);
       border-radius: 12px;
       color: var(--danger);
-    }
-    
-    /* Referral Earnings */
-    .referral-earnings {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(156, 39, 176, 0.1);
-      padding: 15px;
-      border-radius: 16px;
-      margin: 15px 0;
-    }
-    
-    .referral-earnings span {
-      color: var(--referral-color);
-      font-weight: 600;
     }
     
     /* Notification */
@@ -1038,6 +1049,38 @@
             Next ad available in: <span id="countdown">30</span> seconds
           </div>
         </div>
+        
+        <!-- NEW REFERRAL TASK CARD -->
+        <div class="task-card">
+          <div class="task-header">
+            <div class="task-icon" style="background: rgba(156, 39, 176, 0.1); color: var(--referral-color);">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="task-title">Refer Friends</div>
+          </div>
+          <div class="task-description">
+            Invite friends using your referral link and earn 10% of their rewards for life!
+          </div>
+          <div class="task-reward">
+            <div class="reward-icon">TQH</div>
+            <span>10 TQH per referral</span>
+          </div>
+          
+          <div class="referral-stats">
+            <div>
+              <span>Total Referrals:</span>
+              <span class="calculating">Calculating...</span>
+            </div>
+            <div>
+              <span>Referral Earnings:</span>
+              <span class="calculating">Calculating...</span>
+            </div>
+          </div>
+          
+          <button class="swap-button" id="referral-task-btn" style="background: var(--referral-color);">
+            <i class="fas fa-share-alt"></i> Copy Referral Link
+          </button>
+        </div>
       </div>
     </div>
     
@@ -1132,12 +1175,12 @@
             Earn <strong>10%</strong> of their rewards for life! Share your link and grow your earnings.
           </div>
           
-          <div class="referral-earnings">
+          <div class="referral-stats">
             <div>Total Referrals:</div>
             <div><span id="referral-count">0</span> users</div>
           </div>
           
-          <div class="referral-earnings">
+          <div class="referral-stats">
             <div>Referral Earnings:</div>
             <div><span id="referral-earnings">0.000</span> TQH</div>
           </div>
@@ -1352,6 +1395,9 @@
     const adCloseBtn = document.getElementById('ad-close-btn');
     const adProgressBar = document.getElementById('ad-progress-bar');
     
+    // Referral task elements
+    const referralTaskBtn = document.getElementById('referral-task-btn');
+    
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
@@ -1504,6 +1550,9 @@
         setTimeout(() => {
           copySuccessEl.classList.remove('show');
         }, 3000);
+        
+        // Show notification
+        showNotification('Referral link copied to clipboard!', 'success');
       }).catch(err => {
         console.error('Failed to copy: ', err);
         showNotification('Failed to copy referral link. Please try again.', 'error');
@@ -1846,8 +1895,9 @@
       // Update referral link
       updateReferralLink();
       
-      // Setup referral copy button
+      // Setup referral copy buttons
       copyReferralBtn.addEventListener('click', copyReferralLink);
+      referralTaskBtn.addEventListener('click', copyReferralLink);
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
