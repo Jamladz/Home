@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TonQash - محفظة TON الإلكترونية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -274,6 +275,25 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .action-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-card.disabled::after {
+            content: "قريباً";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
         }
 
         .action-card:hover {
@@ -600,20 +620,35 @@
             font-weight: 600;
         }
 
-        .connect-wallet-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            padding: 12px;
-            width: 100%;
-            font-weight: 600;
-            cursor: pointer;
+        .referral-section {
             margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .referral-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Wallet Connect Button */
+        #ton-connect {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .wallet-connected {
+            width: 100%;
+            padding: 12px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
         }
 
         /* Bottom Navigation */
@@ -743,6 +778,21 @@
             font-weight: 600;
         }
 
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive Design */
         @media (max-width: 500px) {
             .balance-amount {
@@ -804,22 +854,22 @@
         <div class="price-tickers">
             <div class="price-ticker">
                 <div class="ticker-header">
-                    <div class="coin-icon ton-icon">TON</div>
-                    <div class="coin-name">The Open Network</div>
+                    <div class="coin-icon ton-icon"></div>
+                    <div class="coin-name">TON</div>
                 </div>
                 <div class="price-info">
-                    <div class="coin-price">$<span id="ton-price">5.83</span></div>
-                    <div class="price-change positive">+<span id="ton-change">2.4</span>%</div>
+                    <div class="coin-price">$<span id="ton-price">3.10</span></div>
+                    <div class="price-change positive">+<span id="ton-change">1.2</span>%</div>
                 </div>
             </div>
             <div class="price-ticker">
                 <div class="ticker-header">
-                    <div class="coin-icon tqh-icon">TQH</div>
-                    <div class="coin-name">TonQash Token</div>
+                    <div class="coin-icon tqh-icon"></div>
+                    <div class="coin-name">TQH</div>
                 </div>
                 <div class="price-info">
                     <div class="coin-price">$<span id="tqh-price">0.25</span></div>
-                    <div class="price-change positive">+<span id="tqh-change">1.8</span>%</div>
+                    <div class="price-change positive">+<span id="tqh-change">0.8</span>%</div>
                 </div>
             </div>
         </div>
@@ -827,25 +877,25 @@
         <!-- Quick Actions -->
         <div class="section-title">العمليات السريعة</div>
         <div class="quick-actions">
-            <div class="action-card" id="send-btn">
+            <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-paper-plane"></i>
                 </div>
                 <div class="action-text">إرسال</div>
             </div>
-            <div class="action-card" id="receive-btn">
+            <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-qrcode"></i>
                 </div>
                 <div class="action-text">استقبال</div>
             </div>
-            <div class="action-card" id="buy-btn">
+            <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="action-text">شراء</div>
             </div>
-            <div class="action-card" id="convert-btn">
+            <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-exchange-alt"></i>
                 </div>
@@ -856,32 +906,26 @@
         <!-- Recent Transactions -->
         <div class="section-title">آخر المعاملات</div>
         <div class="transactions" id="transactions-container">
-            <div class="transaction">
-                <div class="transaction-icon">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <div class="transaction-details">
-                    <div class="transaction-title">مرحباً في محفظة TonQash</div>
-                    <div class="transaction-date">ابدأ بإجراء معاملاتك الأولى</div>
-                </div>
-            </div>
+            <div class="spinner" id="loading-spinner"></div>
+            <div id="transactions-list"></div>
         </div>
 
         <!-- Tasks Section -->
         <div class="tasks-container" id="tasks-container">
             <div class="section-title">المهام المتاحة</div>
             
-            <!-- Task 1: Connect Wallet -->
+            <!-- Task 1: Daily Reward -->
             <div class="task-item">
                 <div class="task-icon">
-                    <i class="fas fa-link"></i>
+                    <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="task-details">
-                    <div class="task-title">اتصل بمحفظة TON</div>
-                    <div class="task-description">قم بتوصيل محفظتك عبر نظام Ton Connect</div>
-                    <div class="task-reward">مكافأة: 5 TQH</div>
+                    <div class="task-title">تسجيل يومي</div>
+                    <div class="task-description">ادفع 0.1 TON لتحصل على 20 TQH</div>
+                    <div class="task-reward">مكافأة: 20 TQH</div>
+                    <div id="daily-timer" class="timer-text"></div>
                 </div>
-                <button class="task-btn" id="connect-wallet-task-btn">إكمال</button>
+                <button class="task-btn" id="daily-reward-btn">احصل على المكافأة</button>
             </div>
             
             <!-- Task 2: Watch Ad -->
@@ -896,20 +940,6 @@
                     <div id="ad-timer" class="timer-text"></div>
                 </div>
                 <button class="task-btn" id="watch-ad-btn">شاهد الآن</button>
-            </div>
-            
-            <!-- Daily Reward -->
-            <div class="task-item">
-                <div class="task-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="task-details">
-                    <div class="task-title">تسجيل يومي</div>
-                    <div class="task-description">ادخل يوميًا لتحصل على 0.1 TON</div>
-                    <div class="task-reward">مكافأة: 0.1 TON</div>
-                    <div id="daily-timer" class="timer-text"></div>
-                </div>
-                <button class="task-btn" id="daily-reward-btn">احصل على المكافأة</button>
             </div>
         </div>
         
@@ -927,19 +957,20 @@
                 </div>
             </div>
             
-            <button class="connect-wallet-btn" id="connect-wallet-btn">
-                <i class="fas fa-wallet"></i> اتصل بمحفظة TON
-            </button>
+            <!-- TON Connect Button -->
+            <div id="ton-connect"></div>
+            
+            <div class="referral-section">
+                <div class="section-title">إحالة الأصدقاء</div>
+                <div class="form-group">
+                    <label class="form-label">رابط الإحالة الخاص بك</label>
+                    <input type="text" class="form-input" id="referral-link" readonly>
+                </div>
+                <button class="form-btn" id="copy-referral">نسخ الرابط</button>
+                <p class="referral-status" id="referral-status">Calculating...</p>
+            </div>
             
             <div class="account-info">
-                <div class="info-item">
-                    <span class="info-label">رقم المحفظة:</span>
-                    <span class="info-value" id="wallet-address">غير متصل</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">تاريخ الانضمام:</span>
-                    <span class="info-value" id="join-date">1 يوليو 2025</span>
-                </div>
                 <div class="info-item">
                     <span class="info-label">المهام المكتملة:</span>
                     <span class="info-value" id="completed-tasks">0</span>
@@ -948,79 +979,11 @@
                     <span class="info-label">إجمالي الأرباح:</span>
                     <span class="info-value" id="total-earnings">0.00 TQH</span>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Modals -->
-    <div class="modal" id="send-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">إرسال أموال</div>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">العنوان</label>
-                <input type="text" class="form-input" id="send-address" placeholder="أدخل عنوان المحفظة">
-            </div>
-            <div class="form-group">
-                <label class="form-label">المبلغ</label>
-                <input type="number" class="form-input" id="send-amount" placeholder="0.00">
-            </div>
-            <button class="form-btn" id="confirm-send">إرسال</button>
-        </div>
-    </div>
-
-    <div class="modal" id="receive-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">استقبال أموال</div>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="form-group" style="text-align: center;">
-                <div style="background: white; padding: 20px; border-radius: 10px; display: inline-block;">
-                    <i class="fas fa-qrcode" style="font-size: 150px; color: black;"></i>
+                <div class="info-item">
+                    <span class="info-label">تاريخ الانضمام:</span>
+                    <span class="info-value" id="join-date">1 يوليو 2025</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="form-label">عنوان محفظتك</label>
-                <input type="text" class="form-input" value="TQ1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8" readonly>
-            </div>
-            <button class="form-btn" onclick="copyAddress()">نسخ العنوان</button>
-        </div>
-    </div>
-
-    <div class="modal" id="convert-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">تحويل العملات</div>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="form-group">
-                <label class="form-label">من</label>
-                <select class="form-input" id="convert-from">
-                    <option value="ton">TON</option>
-                    <option value="tqh">TQH</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">إلى</label>
-                <select class="form-input" id="convert-to">
-                    <option value="tqh">TQH</option>
-                    <option value="ton">TON</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="form-label">المبلغ</label>
-                <input type="number" class="form-input" id="convert-amount" placeholder="0.00">
-            </div>
-            <div class="form-group">
-                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; font-size: 14px;">
-                    <div>سعر الصرف: <span id="exchange-rate">1 TON = 23.32 TQH</span></div>
-                    <div>ستستلم: <span id="receive-amount">0.00</span> <span id="receive-currency">TQH</span></div>
-                </div>
-            </div>
-            <button class="form-btn" id="confirm-convert">تحويل</button>
         </div>
     </div>
 
@@ -1064,9 +1027,9 @@
     <script>
         // State management
         const state = {
-            tonBalance: 0,
-            tqhBalance: 0,
-            tonPrice: 5.83,
+            tonBalance: 0.5,
+            tqhBalance: 10,
+            tonPrice: 3.10,
             tqhPrice: 0.25,
             transactions: [],
             lastAdTime: 0,
@@ -1087,29 +1050,85 @@
         const balanceCurrencyEl = document.getElementById('balance-currency');
         const balanceValueEl = document.getElementById('balance-value');
         const transactionsContainer = document.getElementById('transactions-container');
+        const transactionsList = document.getElementById('transactions-list');
+        const loadingSpinner = document.getElementById('loading-spinner');
         const tasksContainer = document.getElementById('tasks-container');
         const accountContainer = document.getElementById('account-container');
         const tabs = document.querySelectorAll('.tab');
         const navItems = document.querySelectorAll('.nav-item');
-        const modals = document.querySelectorAll('.modal');
-        const closeBtns = document.querySelectorAll('.close-btn');
         const adContainer = document.getElementById('ad-container');
         const adCountdownEl = document.getElementById('ad-countdown');
         const adCloseBtn = document.getElementById('ad-close');
+        const referralLinkEl = document.getElementById('referral-link');
+        const copyReferralBtn = document.getElementById('copy-referral');
+        const referralStatusEl = document.getElementById('referral-status');
         
-        // Telegram user data (simulated for the demo)
+        // Telegram user data
         const telegramUsernameEl = document.getElementById('telegram-username');
         const telegramUseridEl = document.getElementById('telegram-userid');
-        const walletAddressEl = document.getElementById('wallet-address');
         const completedTasksEl = document.getElementById('completed-tasks');
         const totalEarningsEl = document.getElementById('total-earnings');
         const joinDateEl = document.getElementById('join-date');
         
+        // TON Connect
+        let tonConnectUI;
+        let wallet = null;
+
         // Initialize the wallet
         function initWallet() {
+            // Initialize Telegram WebApp
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Set Telegram user info
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                state.telegramUser = {
+                    id: user.id,
+                    username: user.username || `user_${user.id}`,
+                    firstName: user.first_name || "مستخدم",
+                    lastName: user.last_name || ""
+                };
+            }
+            
+            // Update UI with Telegram user data
+            telegramUsernameEl.textContent = state.telegramUser.username;
+            telegramUseridEl.textContent = `ID: ${state.telegramUser.id}`;
+            
+            // Generate referral link
+            const referralLink = `https://t.me/TonQashBot?start=ref_${state.telegramUser.id}`;
+            referralLinkEl.value = referralLink;
+            
+            // Initialize TON Connect
+            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect'
+            });
+
+            tonConnectUI.onStatusChange(userWallet => {
+                wallet = userWallet;
+                state.walletConnected = !!wallet;
+                
+                if (wallet) {
+                    document.getElementById('ton-connect').innerHTML = '<div class="wallet-connected">✅ متصل بالمحفظة</div>';
+                    document.getElementById('daily-reward-btn').disabled = false;
+                    document.getElementById('watch-ad-btn').disabled = false;
+                } else {
+                    document.getElementById('daily-reward-btn').disabled = true;
+                    document.getElementById('watch-ad-btn').disabled = true;
+                }
+            });
+            
+            // Add initial transactions
+            setTimeout(() => {
+                addTransaction('receive', 0.5, 'TON', 'رصيد ترحيبي');
+                addTransaction('receive', 10, 'TQH', 'مكافأة التسجيل');
+                loadingSpinner.style.display = 'none';
+            }, 1500);
+            
             updateBalanceDisplay();
             updatePriceDisplays();
-            updateTransactions();
             updateAccountInfo();
             setupEventListeners();
             updateAdTimer();
@@ -1135,17 +1154,10 @@
         function updatePriceDisplays() {
             document.getElementById('ton-price').textContent = state.tonPrice.toFixed(2);
             document.getElementById('tqh-price').textContent = state.tqhPrice.toFixed(2);
-            
-            // Update exchange rate
-            const rate = (state.tonPrice / state.tqhPrice).toFixed(2);
-            document.getElementById('exchange-rate').textContent = `1 TON = ${rate} TQH`;
         }
 
         // Update account info
         function updateAccountInfo() {
-            telegramUsernameEl.textContent = state.telegramUser.username;
-            telegramUseridEl.textContent = `ID: ${state.telegramUser.id}`;
-            walletAddressEl.textContent = state.walletConnected ? "TQC...xYz" : "غير متصل";
             completedTasksEl.textContent = state.completedTasks;
             totalEarningsEl.textContent = `${state.totalEarnings.toFixed(2)} TQH`;
             
@@ -1162,7 +1174,7 @@
         // Update transactions list
         function updateTransactions() {
             if (state.transactions.length === 0) {
-                transactionsContainer.innerHTML = `
+                transactionsList.innerHTML = `
                     <div class="transaction">
                         <div class="transaction-icon">
                             <i class="fas fa-info-circle"></i>
@@ -1176,7 +1188,7 @@
                 return;
             }
             
-            transactionsContainer.innerHTML = '';
+            transactionsList.innerHTML = '';
             
             state.transactions.slice().reverse().forEach(transaction => {
                 const transactionEl = document.createElement('div');
@@ -1217,7 +1229,7 @@
                     <div class="transaction-amount ${amountClass}">${transaction.amount > 0 ? '+' : ''}${transaction.amount.toFixed(2)} ${transaction.currency}</div>
                 `;
                 
-                transactionsContainer.appendChild(transactionEl);
+                transactionsList.appendChild(transactionEl);
             });
         }
 
@@ -1322,36 +1334,51 @@
             alert('تهانينا! لقد كسبت 1 TQH من مشاهدة الإعلان');
         }
 
-        // Claim daily reward
-        function claimDailyReward() {
-            state.lastDailyClaim = Date.now();
-            state.tonBalance += 0.1;
-            state.completedTasks += 1;
-            
-            addTransaction('daily', 0.1, 'TON', 'مكافأة تسجيل يومي');
-            updateBalanceDisplay();
-            updateAccountInfo();
-            updateDailyTimer();
-            
-            alert('تهانينا! لقد حصلت على 0.1 TON كمكافأة تسجيل يومي');
-        }
+        // Send payment for daily reward
+        async function sendDailyPayment() {
+            if (!wallet) {
+                alert('يرجى توصيل محفظتك أولاً');
+                return;
+            }
 
-        // Connect wallet
-        function connectWallet() {
-            state.walletConnected = true;
-            state.tqhBalance += 5;
-            state.totalEarnings += 5;
-            state.completedTasks += 1;
-            
-            addTransaction('task', 5, 'TQH', 'مكافأة توصيل المحفظة');
-            updateBalanceDisplay();
-            updateAccountInfo();
-            
-            document.getElementById('connect-wallet-task-btn').textContent = 'مكتمل';
-            document.getElementById('connect-wallet-task-btn').disabled = true;
-            document.getElementById('connect-wallet-task-btn').style.opacity = '0.7';
-            
-            alert('تم توصيل محفظتك بنجاح! لقد كسبت 5 TQH');
+            const tx = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3',
+                        amount: '100000000' // 0.1 TON
+                    }
+                ]
+            };
+
+            try {
+                // Show processing state
+                const btn = document.getElementById('daily-reward-btn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
+                btn.disabled = true;
+                
+                // Simulate processing delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                state.lastDailyClaim = Date.now();
+                state.tqhBalance += 20;
+                state.completedTasks += 1;
+                state.totalEarnings += 20;
+                
+                addTransaction('daily', 20, 'TQH', 'مكافأة تسجيل يومي');
+                updateBalanceDisplay();
+                updateAccountInfo();
+                updateDailyTimer();
+                
+                btn.innerHTML = 'احصل على المكافأة';
+                btn.disabled = false;
+                
+                alert('تم الدفع بنجاح! لقد حصلت على 20 TQH كمكافأة تسجيل يومي');
+            } catch (error) {
+                alert(`فشل الدفع: ${error.message}`);
+                btn.innerHTML = 'احصل على المكافأة';
+                btn.disabled = false;
+            }
         }
 
         // Setup event listeners
@@ -1393,131 +1420,6 @@
                 });
             });
             
-            // Action buttons
-            document.getElementById('send-btn').addEventListener('click', () => {
-                document.getElementById('send-modal').classList.add('active');
-            });
-            
-            document.getElementById('receive-btn').addEventListener('click', () => {
-                document.getElementById('receive-modal').classList.add('active');
-            });
-            
-            document.getElementById('convert-btn').addEventListener('click', () => {
-                document.getElementById('convert-modal').classList.add('active');
-            });
-            
-            // Close modals
-            closeBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    modals.forEach(modal => modal.classList.remove('active'));
-                });
-            });
-            
-            // Confirm send
-            document.getElementById('confirm-send').addEventListener('click', () => {
-                const amount = parseFloat(document.getElementById('send-amount').value);
-                const address = document.getElementById('send-address').value;
-                const activeCurrency = document.querySelector('.tab.active').dataset.currency;
-                
-                if (!address || address.length < 10) {
-                    alert('يرجى إدخال عنوان محفظة صحيح');
-                    return;
-                }
-                
-                if (!amount || amount <= 0) {
-                    alert('يرجى إدخال مبلغ صحيح');
-                    return;
-                }
-                
-                if (activeCurrency === 'ton' && amount > state.tonBalance) {
-                    alert('رصيدك لا يكفي لإتمام هذه العملية');
-                    return;
-                }
-                
-                if (activeCurrency === 'tqh' && amount > state.tqhBalance) {
-                    alert('رصيدك لا يكفي لإتمام هذه العملية');
-                    return;
-                }
-                
-                // Update balance
-                if (activeCurrency === 'ton') {
-                    state.tonBalance -= amount;
-                } else {
-                    state.tqhBalance -= amount;
-                }
-                
-                // Add transaction
-                addTransaction('send', -amount, activeCurrency.toUpperCase(), `إرسال إلى ${address.substring(0, 6)}...${address.substring(address.length-4)}`);
-                
-                // Update display
-                updateBalanceDisplay();
-                
-                // Close modal
-                document.getElementById('send-modal').classList.remove('active');
-                
-                // Reset form
-                document.getElementById('send-amount').value = '';
-                document.getElementById('send-address').value = '';
-                
-                alert(`تم إرسال ${amount} ${activeCurrency.toUpperCase()} بنجاح!`);
-            });
-            
-            // Confirm convert
-            document.getElementById('confirm-convert').addEventListener('click', () => {
-                const amount = parseFloat(document.getElementById('convert-amount').value);
-                const from = document.getElementById('convert-from').value;
-                const to = document.getElementById('convert-to').value;
-                
-                if (!amount || amount <= 0) {
-                    alert('يرجى إدخال مبلغ صحيح');
-                    return;
-                }
-                
-                if (from === 'ton' && amount > state.tonBalance) {
-                    alert('رصيد TON لا يكفي لإتمام هذه العملية');
-                    return;
-                }
-                
-                if (from === 'tqh' && amount > state.tqhBalance) {
-                    alert('رصيد TQH لا يكفي لإتمام هذه العملية');
-                    return;
-                }
-                
-                // Calculate conversion
-                const exchangeRate = state.tonPrice / state.tqhPrice;
-                let receivedAmount;
-                
-                if (from === 'ton') {
-                    receivedAmount = amount * exchangeRate;
-                    state.tonBalance -= amount;
-                    state.tqhBalance += receivedAmount;
-                } else {
-                    receivedAmount = amount / exchangeRate;
-                    state.tqhBalance -= amount;
-                    state.tonBalance += receivedAmount;
-                }
-                
-                // Add transaction
-                addTransaction('convert', receivedAmount, to.toUpperCase(), `تحويل من ${from.toUpperCase()} إلى ${to.toUpperCase()}`);
-                
-                // Update display
-                updateBalanceDisplay();
-                
-                // Close modal
-                document.getElementById('convert-modal').classList.remove('active');
-                
-                // Reset form
-                document.getElementById('convert-amount').value = '';
-                
-                alert(`تم تحويل ${amount} ${from.toUpperCase()} إلى ${receivedAmount.toFixed(2)} ${to.toUpperCase()} بنجاح!`);
-            });
-            
-            // Connect wallet button (tasks)
-            document.getElementById('connect-wallet-task-btn').addEventListener('click', connectWallet);
-            
-            // Connect wallet button (account)
-            document.getElementById('connect-wallet-btn').addEventListener('click', connectWallet);
-            
             // Watch ad button
             document.getElementById('watch-ad-btn').addEventListener('click', () => {
                 const now = Date.now();
@@ -1543,7 +1445,7 @@
                     return;
                 }
                 
-                claimDailyReward();
+                sendDailyPayment();
             });
             
             // Ad close button
@@ -1552,30 +1454,14 @@
                 alert('لن تحصل على المكافأة لأنك لم تشاهد الإعلان بالكامل');
             });
             
-            // Update conversion details when amount changes
-            document.getElementById('convert-amount').addEventListener('input', () => {
-                const amount = parseFloat(document.getElementById('convert-amount').value) || 0;
-                const from = document.getElementById('convert-from').value;
-                const to = document.getElementById('convert-to').value;
-                const exchangeRate = state.tonPrice / state.tqhPrice;
-                let receivedAmount;
-                
-                if (from === 'ton') {
-                    receivedAmount = amount * exchangeRate;
-                } else {
-                    receivedAmount = amount / exchangeRate;
-                }
-                
-                document.getElementById('receive-amount').textContent = receivedAmount.toFixed(2);
-                document.getElementById('receive-currency').textContent = to.toUpperCase();
+            // Copy referral link
+            copyReferralBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(referralLinkEl.value);
+                referralStatusEl.textContent = 'تم نسخ الرابط!';
+                setTimeout(() => {
+                    referralStatusEl.textContent = 'Calculating...';
+                }, 2000);
             });
-            
-            // Copy address function
-            window.copyAddress = function() {
-                const address = document.querySelector('#receive-modal .form-input').value;
-                navigator.clipboard.writeText(address);
-                alert('تم نسخ العنوان إلى الحافظة!');
-            };
         }
 
         // Simulate price changes
@@ -1583,7 +1469,7 @@
             // TON price simulation
             const tonVariation = (Math.random() - 0.5) * 0.2;
             state.tonPrice += tonVariation;
-            state.tonPrice = Math.max(4.5, Math.min(7.0, state.tonPrice));
+            state.tonPrice = Math.max(2.5, Math.min(4.0, state.tonPrice));
             
             const tonChangeEl = document.getElementById('ton-change');
             tonChangeEl.textContent = (tonVariation > 0 ? '+' : '') + (tonVariation * 100 / state.tonPrice).toFixed(2);
@@ -1608,6 +1494,7 @@
             const savedTransactions = localStorage.getItem('tonqash_transactions');
             if (savedTransactions) {
                 state.transactions = JSON.parse(savedTransactions);
+                updateTransactions();
             }
             
             initWallet();
