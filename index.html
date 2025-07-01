@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TonQash - محفظة TON الإلكترونية</title>
+    <title>TonQash - TON Wallet</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -284,7 +284,7 @@
         }
 
         .action-card.disabled::after {
-            content: "قريباً";
+            content: "Coming Soon";
             position: absolute;
             top: 50%;
             left: 50%;
@@ -641,6 +641,10 @@
             overflow: hidden;
         }
 
+        #ton-connect-main {
+            margin: 20px 0;
+        }
+
         .wallet-connected {
             width: 100%;
             padding: 12px;
@@ -845,10 +849,13 @@
 
         <!-- Balance Card -->
         <div class="balance-card">
-            <div class="balance-label">رصيد محفظتك</div>
+            <div class="balance-label">Your Wallet Balance</div>
             <div class="balance-amount"><span id="balance-amount">0.00</span> <span id="balance-currency">TON</span></div>
             <div class="balance-value">≈ $<span id="balance-value">0.00</span> USD</div>
         </div>
+
+        <!-- Wallet Connect Button (Main Page) -->
+        <div id="ton-connect-main"></div>
 
         <!-- Price Tickers -->
         <div class="price-tickers">
@@ -875,36 +882,36 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="section-title">العمليات السريعة</div>
+        <div class="section-title">Quick Actions</div>
         <div class="quick-actions">
             <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-paper-plane"></i>
                 </div>
-                <div class="action-text">إرسال</div>
+                <div class="action-text">Send</div>
             </div>
             <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-qrcode"></i>
                 </div>
-                <div class="action-text">استقبال</div>
+                <div class="action-text">Receive</div>
             </div>
             <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
-                <div class="action-text">شراء</div>
+                <div class="action-text">Buy</div>
             </div>
             <div class="action-card disabled">
                 <div class="action-icon">
                     <i class="fas fa-exchange-alt"></i>
                 </div>
-                <div class="action-text">تحويل</div>
+                <div class="action-text">Convert</div>
             </div>
         </div>
 
         <!-- Recent Transactions -->
-        <div class="section-title">آخر المعاملات</div>
+        <div class="section-title">Recent Transactions</div>
         <div class="transactions" id="transactions-container">
             <div class="spinner" id="loading-spinner"></div>
             <div id="transactions-list"></div>
@@ -912,7 +919,20 @@
 
         <!-- Tasks Section -->
         <div class="tasks-container" id="tasks-container">
-            <div class="section-title">المهام المتاحة</div>
+            <div class="section-title">Available Tasks</div>
+            
+            <!-- Wallet Connect Task -->
+            <div class="task-item" id="wallet-connect-task">
+                <div class="task-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="task-details">
+                    <div class="task-title">Connect TON Wallet</div>
+                    <div class="task-description">Connect your wallet to start earning rewards</div>
+                    <div class="task-reward">Reward: 5 TQH</div>
+                </div>
+                <div id="ton-connect-tasks"></div>
+            </div>
             
             <!-- Task 1: Daily Reward -->
             <div class="task-item">
@@ -920,12 +940,12 @@
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="task-details">
-                    <div class="task-title">تسجيل يومي</div>
-                    <div class="task-description">ادفع 0.1 TON لتحصل على 20 TQH</div>
-                    <div class="task-reward">مكافأة: 20 TQH</div>
+                    <div class="task-title">Daily Check-in</div>
+                    <div class="task-description">Pay 0.1 TON to receive 20 TQH</div>
+                    <div class="task-reward">Reward: 20 TQH</div>
                     <div id="daily-timer" class="timer-text"></div>
                 </div>
-                <button class="task-btn" id="daily-reward-btn">احصل على المكافأة</button>
+                <button class="task-btn" id="daily-reward-btn">Claim Reward</button>
             </div>
             
             <!-- Task 2: Watch Ad -->
@@ -934,54 +954,54 @@
                     <i class="fas fa-ad"></i>
                 </div>
                 <div class="task-details">
-                    <div class="task-title">شاهد إعلانًا</div>
-                    <div class="task-description">شاهد إعلانًا لمدة 30 ثانية للحصول على مكافأة</div>
-                    <div class="task-reward">مكافأة: 1 TQH</div>
+                    <div class="task-title">Watch an Ad</div>
+                    <div class="task-description">Watch an ad for 30 seconds to earn a reward</div>
+                    <div class="task-reward">Reward: 1 TQH</div>
                     <div id="ad-timer" class="timer-text"></div>
                 </div>
-                <button class="task-btn" id="watch-ad-btn">شاهد الآن</button>
+                <button class="task-btn" id="watch-ad-btn">Watch Now</button>
             </div>
         </div>
         
         <!-- Account Section -->
         <div class="account-container" id="account-container">
-            <div class="section-title">حسابك</div>
+            <div class="section-title">Your Account</div>
             
             <div class="user-profile">
                 <div class="user-avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="user-info">
-                    <div class="user-name" id="telegram-username">المستخدم</div>
+                    <div class="user-name" id="telegram-username">User</div>
                     <div class="user-id" id="telegram-userid">ID: 123456789</div>
                 </div>
             </div>
             
-            <!-- TON Connect Button -->
-            <div id="ton-connect"></div>
+            <!-- Wallet Connect Button (Account Page) -->
+            <div id="ton-connect-account"></div>
             
             <div class="referral-section">
-                <div class="section-title">إحالة الأصدقاء</div>
+                <div class="section-title">Refer Friends</div>
                 <div class="form-group">
-                    <label class="form-label">رابط الإحالة الخاص بك</label>
+                    <label class="form-label">Your Referral Link</label>
                     <input type="text" class="form-input" id="referral-link" readonly>
                 </div>
-                <button class="form-btn" id="copy-referral">نسخ الرابط</button>
+                <button class="form-btn" id="copy-referral">Copy Link</button>
                 <p class="referral-status" id="referral-status">Calculating...</p>
             </div>
             
             <div class="account-info">
                 <div class="info-item">
-                    <span class="info-label">المهام المكتملة:</span>
+                    <span class="info-label">Completed Tasks:</span>
                     <span class="info-value" id="completed-tasks">0</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">إجمالي الأرباح:</span>
+                    <span class="info-label">Total Earnings:</span>
                     <span class="info-value" id="total-earnings">0.00 TQH</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">تاريخ الانضمام:</span>
-                    <span class="info-value" id="join-date">1 يوليو 2025</span>
+                    <span class="info-label">Join Date:</span>
+                    <span class="info-value" id="join-date">July 1, 2025</span>
                 </div>
             </div>
         </div>
@@ -991,8 +1011,8 @@
     <div class="ad-container" id="ad-container">
         <div class="ad-content">
             <div class="ad-close" id="ad-close">✕</div>
-            <div class="ad-title">شاهد هذا الإعلان</div>
-            <div class="ad-description">يرجى مشاهدة الإعلان بالكامل لمدة 30 ثانية للحصول على مكافأتك</div>
+            <div class="ad-title">Watch This Ad</div>
+            <div class="ad-description">Please watch the full ad for 30 seconds to get your reward</div>
             
             <!-- Ad placeholder -->
             <div style="background: #333; height: 180px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 20px 0;">
@@ -1000,7 +1020,7 @@
             </div>
             
             <div class="ad-countdown" id="ad-countdown">30</div>
-            <div class="ad-reward">ستحصل على 1 TQH بعد انتهاء الإعلان</div>
+            <div class="ad-reward">You will receive 1 TQH after the ad ends</div>
         </div>
     </div>
 
@@ -1008,19 +1028,19 @@
     <div class="bottom-nav">
         <div class="nav-item active" data-page="home">
             <i class="fas fa-home"></i>
-            <span>الرئيسية</span>
+            <span>Home</span>
         </div>
         <div class="nav-item" data-page="wallet">
             <i class="fas fa-wallet"></i>
-            <span>المحفظة</span>
+            <span>Wallet</span>
         </div>
         <div class="nav-item" data-page="tasks">
             <i class="fas fa-tasks"></i>
-            <span>المهام</span>
+            <span>Tasks</span>
         </div>
         <div class="nav-item" data-page="account">
             <i class="fas fa-user"></i>
-            <span>الحساب</span>
+            <span>Account</span>
         </div>
     </div>
 
@@ -1040,8 +1060,8 @@
             telegramUser: {
                 id: 123456789,
                 username: "telegram_user",
-                firstName: "مستخدم",
-                lastName: "تلجرام"
+                firstName: "User",
+                lastName: "Telegram"
             }
         };
 
@@ -1087,7 +1107,7 @@
                 state.telegramUser = {
                     id: user.id,
                     username: user.username || `user_${user.id}`,
-                    firstName: user.first_name || "مستخدم",
+                    firstName: user.first_name || "User",
                     lastName: user.last_name || ""
                 };
             }
@@ -1100,30 +1120,15 @@
             const referralLink = `https://t.me/TonQashBot?start=ref_${state.telegramUser.id}`;
             referralLinkEl.value = referralLink;
             
-            // Initialize TON Connect
-            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect'
-            });
-
-            tonConnectUI.onStatusChange(userWallet => {
-                wallet = userWallet;
-                state.walletConnected = !!wallet;
-                
-                if (wallet) {
-                    document.getElementById('ton-connect').innerHTML = '<div class="wallet-connected">✅ متصل بالمحفظة</div>';
-                    document.getElementById('daily-reward-btn').disabled = false;
-                    document.getElementById('watch-ad-btn').disabled = false;
-                } else {
-                    document.getElementById('daily-reward-btn').disabled = true;
-                    document.getElementById('watch-ad-btn').disabled = true;
-                }
-            });
+            // Initialize TON Connect for different sections
+            initTonConnect('ton-connect-main', 'main');
+            initTonConnect('ton-connect-tasks', 'tasks');
+            initTonConnect('ton-connect-account', 'account');
             
             // Add initial transactions
             setTimeout(() => {
-                addTransaction('receive', 0.5, 'TON', 'رصيد ترحيبي');
-                addTransaction('receive', 10, 'TQH', 'مكافأة التسجيل');
+                addTransaction('receive', 0.5, 'TON', 'Welcome Bonus');
+                addTransaction('receive', 10, 'TQH', 'Registration Reward');
                 loadingSpinner.style.display = 'none';
             }, 1500);
             
@@ -1133,6 +1138,53 @@
             setupEventListeners();
             updateAdTimer();
             updateDailyTimer();
+        }
+
+        // Initialize TonConnect
+        function initTonConnect(elementId, context) {
+            const tonConnect = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
+                buttonRootId: elementId,
+                language: 'en'
+            });
+
+            tonConnect.onStatusChange(userWallet => {
+                wallet = userWallet;
+                state.walletConnected = !!wallet;
+                
+                if (wallet) {
+                    // Update all wallet status indicators
+                    document.querySelectorAll('.wallet-status').forEach(el => {
+                        el.innerHTML = '<div class="wallet-connected">✅ Wallet Connected</div>';
+                    });
+                    
+                    // Enable task buttons
+                    document.getElementById('daily-reward-btn').disabled = false;
+                    document.getElementById('watch-ad-btn').disabled = false;
+                    
+                    // Complete wallet connection task
+                    if (!state.walletTaskCompleted) {
+                        state.tqhBalance += 5;
+                        state.completedTasks += 1;
+                        state.totalEarnings += 5;
+                        addTransaction('task', 5, 'TQH', 'Wallet Connection Reward');
+                        updateBalanceDisplay();
+                        updateAccountInfo();
+                        state.walletTaskCompleted = true;
+                    }
+                } else {
+                    document.getElementById('daily-reward-btn').disabled = true;
+                    document.getElementById('watch-ad-btn').disabled = true;
+                }
+            });
+            
+            // Add status indicator
+            const statusEl = document.createElement('div');
+            statusEl.className = 'wallet-status';
+            statusEl.innerHTML = state.walletConnected 
+                ? '<div class="wallet-connected">✅ Wallet Connected</div>' 
+                : '<div class="wallet-status-text">Connect your wallet</div>';
+            document.getElementById(elementId).appendChild(statusEl);
         }
 
         // Update balance display
@@ -1164,7 +1216,7 @@
             const today = new Date();
             const joinDate = new Date(today);
             joinDate.setDate(today.getDate() - 7);
-            joinDateEl.textContent = joinDate.toLocaleDateString('ar-EG', {
+            joinDateEl.textContent = joinDate.toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
@@ -1180,8 +1232,8 @@
                             <i class="fas fa-info-circle"></i>
                         </div>
                         <div class="transaction-details">
-                            <div class="transaction-title">مرحباً في محفظة TonQash</div>
-                            <div class="transaction-date">ابدأ بإجراء معاملاتك الأولى</div>
+                            <div class="transaction-title">Welcome to TonQash Wallet</div>
+                            <div class="transaction-date">Start your first transactions</div>
                         </div>
                     </div>
                 `;
@@ -1236,11 +1288,11 @@
         // Add transaction
         function addTransaction(type, amount, currency, title) {
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-EG', {
+            const dateStr = now.toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric'
-            }) + ' - ' + now.toLocaleTimeString('ar-EG', {
+            }) + ' - ' + now.toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
@@ -1271,7 +1323,7 @@
             
             if (remaining > 0) {
                 const seconds = Math.ceil(remaining / 1000);
-                timerEl.textContent = `متاح بعد: ${seconds} ثانية`;
+                timerEl.textContent = `Available in: ${seconds} seconds`;
                 watchBtn.classList.add('disabled');
             } else {
                 timerEl.textContent = '';
@@ -1292,7 +1344,7 @@
             if (remaining > 0) {
                 const hours = Math.floor(remaining / (1000 * 60 * 60));
                 const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                timerEl.textContent = `متاح بعد: ${hours} ساعة ${minutes} دقيقة`;
+                timerEl.textContent = `Available in: ${hours}h ${minutes}m`;
                 claimBtn.classList.add('disabled');
             } else {
                 timerEl.textContent = '';
@@ -1326,18 +1378,18 @@
             state.totalEarnings += 1;
             state.completedTasks += 1;
             
-            addTransaction('task', 1, 'TQH', 'مكافأة مشاهدة إعلان');
+            addTransaction('task', 1, 'TQH', 'Ad Reward');
             updateBalanceDisplay();
             updateAccountInfo();
             updateAdTimer();
             
-            alert('تهانينا! لقد كسبت 1 TQH من مشاهدة الإعلان');
+            alert('Congratulations! You earned 1 TQH from watching the ad');
         }
 
         // Send payment for daily reward
         async function sendDailyPayment() {
             if (!wallet) {
-                alert('يرجى توصيل محفظتك أولاً');
+                alert('Please connect your wallet first');
                 return;
             }
 
@@ -1354,7 +1406,7 @@
             try {
                 // Show processing state
                 const btn = document.getElementById('daily-reward-btn');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 btn.disabled = true;
                 
                 // Simulate processing delay
@@ -1365,18 +1417,18 @@
                 state.completedTasks += 1;
                 state.totalEarnings += 20;
                 
-                addTransaction('daily', 20, 'TQH', 'مكافأة تسجيل يومي');
+                addTransaction('daily', 20, 'TQH', 'Daily Reward');
                 updateBalanceDisplay();
                 updateAccountInfo();
                 updateDailyTimer();
                 
-                btn.innerHTML = 'احصل على المكافأة';
+                btn.innerHTML = 'Claim Reward';
                 btn.disabled = false;
                 
-                alert('تم الدفع بنجاح! لقد حصلت على 20 TQH كمكافأة تسجيل يومي');
+                alert('Payment successful! You received 20 TQH as a daily reward');
             } catch (error) {
-                alert(`فشل الدفع: ${error.message}`);
-                btn.innerHTML = 'احصل على المكافأة';
+                alert(`Payment failed: ${error.message}`);
+                btn.innerHTML = 'Claim Reward';
                 btn.disabled = false;
             }
         }
@@ -1427,7 +1479,7 @@
                 const cooldown = 30 * 1000; // 30 seconds
                 
                 if (timeSinceLastAd < cooldown) {
-                    alert('يرجى الانتظار 30 ثانية بين مشاهدة الإعلانات');
+                    alert('Please wait 30 seconds between watching ads');
                     return;
                 }
                 
@@ -1441,7 +1493,7 @@
                 const cooldown = 24 * 60 * 60 * 1000; // 24 hours
                 
                 if (timeSinceLastClaim < cooldown) {
-                    alert('يمكنك المطالبة بالمكافأة اليومية مرة واحدة كل 24 ساعة');
+                    alert('You can claim the daily reward once every 24 hours');
                     return;
                 }
                 
@@ -1451,13 +1503,13 @@
             // Ad close button
             adCloseBtn.addEventListener('click', () => {
                 adContainer.style.display = 'none';
-                alert('لن تحصل على المكافأة لأنك لم تشاهد الإعلان بالكامل');
+                alert('You will not receive the reward as you did not complete watching the ad');
             });
             
             // Copy referral link
             copyReferralBtn.addEventListener('click', () => {
                 navigator.clipboard.writeText(referralLinkEl.value);
-                referralStatusEl.textContent = 'تم نسخ الرابط!';
+                referralStatusEl.textContent = 'Link copied!';
                 setTimeout(() => {
                     referralStatusEl.textContent = 'Calculating...';
                 }, 2000);
