@@ -707,6 +707,21 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
+    /* Loading spinner */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     /* Responsive */
     @media (max-width: 480px) {
       .total-amount {
@@ -1022,6 +1037,17 @@
     </div>
   </div>
   
+  <!-- Processing Modal -->
+  <div class="modal" id="processing-modal">
+    <div class="modal-content">
+      <div class="spinner"></div>
+      <div class="modal-header">
+        <h2>Processing Transaction</h2>
+        <p>Please wait while we process your payment</p>
+      </div>
+    </div>
+  </div>
+  
   <script>
     // Initialize wallet data
     let walletData = {
@@ -1047,6 +1073,7 @@
     const txModalClose = document.getElementById('tx-modal-close');
     const transactionModal = document.getElementById('transaction-modal');
     const confirmTxBtn = document.getElementById('confirm-tx-btn');
+    const processingModal = document.getElementById('processing-modal');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -1240,8 +1267,17 @@
     
     // Daily task functionality
     dailyTaskBtn.addEventListener('click', function() {
+      // Check if wallet is connected
+      if (!wallet) {
+        // Show connect modal and notification
+        connectModal.classList.add('active');
+        showNotification('Please connect your wallet to complete this transaction', 'warning');
+        return;
+      }
+      
+      // Check if user has enough balance
       if (walletData.tonBalance < 0.07) {
-        alert('Insufficient TON balance for daily task');
+        showNotification('Insufficient TON balance for daily task', 'error');
         return;
       }
       
@@ -1253,21 +1289,28 @@
       
       // Set transaction action
       confirmTxBtn.onclick = function() {
-        // Deduct TON and add TQH
-        walletData.tonBalance -= 0.07;
-        walletData.tqhBalance += 30;
-        
-        // Update last claim time
-        walletData.lastDailyClaim = new Date();
-        
-        // Update display
-        updateWalletDisplay();
-        
-        // Close modal
+        // Show processing modal
+        processingModal.classList.add('active');
         transactionModal.classList.remove('active');
         
-        // Show success
-        alert('Daily reward claimed! 30 TQH added to your wallet');
+        // Simulate transaction processing
+        setTimeout(() => {
+          // Deduct TON and add TQH
+          walletData.tonBalance -= 0.07;
+          walletData.tqhBalance += 30;
+          
+          // Update last claim time
+          walletData.lastDailyClaim = new Date();
+          
+          // Update display
+          updateWalletDisplay();
+          
+          // Close processing modal
+          processingModal.classList.remove('active');
+          
+          // Show success notification
+          showNotification('Daily reward claimed! 30 TQH added to your wallet', 'success');
+        }, 2000);
       };
     });
     
@@ -1313,8 +1356,15 @@
     
     // Stake TQH functionality
     stakeButton.addEventListener('click', function() {
+      // Check if wallet is connected
+      if (!wallet) {
+        connectModal.classList.add('active');
+        showNotification('Please connect your wallet to stake tokens', 'warning');
+        return;
+      }
+      
       if (walletData.tqhBalance <= 0) {
-        alert('You need TQH tokens to stake');
+        showNotification('You need TQH tokens to stake', 'error');
         return;
       }
       
@@ -1325,7 +1375,7 @@
       // Update display
       updateWalletDisplay();
       
-      alert(`Staked ${walletData.stakedTQH.toFixed(2)} TQH! You'll earn 1% daily rewards`);
+      showNotification(`Staked ${walletData.stakedTQH.toFixed(2)} TQH! You'll earn 1% daily rewards`, 'success');
     });
     
     // Modal functionality
@@ -1340,6 +1390,28 @@
     txModalClose.addEventListener('click', () => {
       transactionModal.classList.remove('active');
     });
+    
+    // Show notification function
+    function showNotification(message, type) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+      `;
+      
+      // Add to body
+      document.body.appendChild(notification);
+      
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
     
     // Claim daily rewards automatically
     function claimDailyRewards() {
@@ -1383,6 +1455,47 @@
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
+      
+      // Add notification styles
+      const style = document.createElement('style');
+      style.innerHTML = `
+        .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 15px 20px;
+          border-radius: 12px;
+          background: var(--card-bg);
+          border: 1px solid var(--card-border);
+          backdrop-filter: blur(10px);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+          z-index: 2000;
+          transition: opacity 0.3s ease;
+        }
+        
+        .notification.success {
+          color: var(--success);
+          border-left: 4px solid var(--success);
+        }
+        
+        .notification.error {
+          color: var(--danger);
+          border-left: 4px solid var(--danger);
+        }
+        
+        .notification.warning {
+          color: var(--warning);
+          border-left: 4px solid var(--warning);
+        }
+        
+        .notification i {
+          font-size: 1.2rem;
+        }
+      `;
+      document.head.appendChild(style);
     }
     
     // Start the app
