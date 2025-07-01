@@ -1,1568 +1,1392 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TonQash - TON Wallet</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #0088cc;
-            --primary-dark: #0077b3;
-            --secondary: #1e1e1e;
-            --background: #121212;
-            --card-bg: #1e1e1e;
-            --text: #ffffff;
-            --text-secondary: #b0b0b0;
-            --success: #00c853;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --tqh-color: #9c27b0;
-            --ton-color: #0098EA;
-            --border-radius: 16px;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--background), #0a0a0a);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-            padding-bottom: 100px;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* Header Styles */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #006699);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            overflow: hidden;
-        }
-
-        .logo-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary), #00ccff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        /* Balance Card */
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .balance-card::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            z-index: 0;
-        }
-
-        .balance-label {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .balance-amount {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .balance-value {
-            font-size: 18px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Currency Tabs */
-        .currency-tabs {
-            display: flex;
-            background: var(--card-bg);
-            border-radius: 50px;
-            padding: 5px;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        }
-
-        /* Price Tickers */
-        .price-tickers {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .price-ticker {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .ticker-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .coin-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .ton-icon {
-            background-color: var(--ton-color);
-            background-image: url('https://ton.org/download/ton_symbol.png');
-        }
-
-        .tqh-icon {
-            background-color: var(--tqh-color);
-            background-image: url('https://i.suar.me/vpO26/l');
-        }
-
-        .coin-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .price-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .coin-price {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .price-change {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .positive {
-            color: var(--success);
-        }
-
-        .negative {
-            color: var(--danger);
-        }
-
-        /* Quick Actions */
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 25px 0 15px 0;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .action-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 18px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-
-        .action-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-card.disabled::after {
-            content: "Coming Soon";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
-
-        .action-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .action-icon {
-            font-size: 24px;
-            margin-bottom: 12px;
-            color: var(--primary);
-        }
-
-        .action-text {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Transactions */
-        .transactions {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .transaction {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .transaction:last-child {
-            border-bottom: none;
-        }
-
-        .transaction-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(0, 136, 204, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-left: 15px;
-            color: var(--primary);
-        }
-
-        .transaction-details {
-            flex: 1;
-        }
-
-        .transaction-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .transaction-date {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .transaction-amount {
-            font-weight: 700;
-        }
-
-        .receive {
-            color: var(--success);
-        }
-
-        .send {
-            color: var(--danger);
-        }
-
-        .task {
-            color: var(--tqh-color);
-        }
-
-        /* Action Modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: var(--text);
-            font-size: 16px;
-        }
-
-        .form-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
-        }
-
-        /* Tasks Section */
-        .tasks-container {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .task-item:last-child {
-            border-bottom: none;
-        }
-
-        .task-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(156, 39, 176, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-left: 15px;
-            color: var(--tqh-color);
-        }
-
-        .task-details {
-            flex: 1;
-        }
-
-        .task-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .task-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .task-reward {
-            font-size: 14px;
-            color: var(--tqh-color);
-            font-weight: 600;
-        }
-
-        .task-btn {
-            padding: 8px 15px;
-            background: rgba(156, 39, 176, 0.2);
-            border: none;
-            border-radius: 20px;
-            color: var(--tqh-color);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .task-btn:hover {
-            background: rgba(156, 39, 176, 0.3);
-        }
-
-        .task-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .timer-text {
-            font-size: 12px;
-            color: var(--warning);
-            margin-top: 5px;
-        }
-
-        /* Account Section */
-        .account-container {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .user-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--tqh-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .user-id {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .account-info {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: var(--text-secondary);
-        }
-
-        .info-value {
-            font-weight: 600;
-        }
-
-        .referral-section {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--border-radius);
-            padding: 20px;
-        }
-
-        .referral-status {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* Wallet Connect Button */
-        #ton-connect {
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #ton-connect-main {
-            margin: 20px 0;
-        }
-
-        .wallet-connected {
-            width: 100%;
-            padding: 12px;
-            background: var(--success);
-            color: white;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            opacity: 0.7;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .nav-item.active {
-            opacity: 1;
-            color: var(--primary);
-        }
-
-        .nav-item i {
-            font-size: 20px;
-        }
-
-        .nav-item:hover {
-            opacity: 1;
-        }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
-
-        .balance-card {
-            animation: pulse 4s infinite ease-in-out;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Ad Container */
-        .ad-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .ad-content {
-            max-width: 400px;
-            width: 100%;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            position: relative;
-        }
-
-        .ad-close {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--danger);
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .ad-title {
-            font-size: 20px;
-            margin: 20px 0;
-            color: var(--primary);
-        }
-
-        .ad-description {
-            margin-bottom: 20px;
-            color: var(--text-secondary);
-        }
-
-        .ad-countdown {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 20px 0;
-            color: var(--warning);
-        }
-
-        .ad-reward {
-            background: rgba(0, 200, 83, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-weight: 600;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 500px) {
-            .balance-amount {
-                font-size: 32px;
-            }
-            
-            .quick-actions {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .action-card {
-                padding: 15px 5px;
-            }
-            
-            .action-icon {
-                font-size: 20px;
-            }
-            
-            .price-tickers {
-                flex-direction: column;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TonQash - Professional TON Wallet</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* الألوان والأساسيات */
+    :root {
+      --primary: #0078ff;
+      --primary-dark: #005fcc;
+      --secondary: #1c2e4a;
+      --background: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(51, 65, 85, 0.5);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --ton-gradient: linear-gradient(135deg, #0088cc, #3f8ae0);
+      --tqh-gradient: linear-gradient(135deg, #1e5799, #0078ff);
+      --surface: rgba(30, 41, 59, 0.9);
+      --glass: rgba(255, 255, 255, 0.05);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(30, 41, 59, 0.5) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(0, 120, 255, 0.15) 0%, transparent 30%),
+        linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+    
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+    
+    /* Header Styles */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0 25px;
+      position: relative;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+    
+    .logo img {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .logo h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, var(--text-primary), #a5d8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .connect-btn {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: 18px;
+      padding: 12px 22px;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 120, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .connect-btn.connected {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+    
+    /* Page Container */
+    .page {
+      display: none;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    /* Home Page */
+    .total-balance {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 28px;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .total-label {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .total-amount {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 4px;
+      background: linear-gradient(to right, #ffffff, #c7d2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(0, 120, 255, 0.3);
+    }
+    
+    .total-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    /* Tokens Section */
+    .tokens-section {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    
+    .section-header {
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .section-header h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+    
+    .token-list {
+      list-style: none;
+    }
+    
+    .token-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--card-border);
+      position: relative;
+    }
+    
+    .token-item:last-child {
+      border-bottom: none;
+    }
+    
+    .token-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .token-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    
+    .ton-icon {
+      background-color: #0088cc;
+      background-image: url('https://ton.org/download/ton_symbol.png');
+    }
+    
+    .tqh-icon {
+      background-color: #1e5799;
+      background-image: url('https://i.suar.me/vpO26/l');
+    }
+    
+    .token-details h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .token-details p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .token-balance {
+      text-align: right;
+    }
+    
+    .token-balance .amount {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    
+    .token-balance .value {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    /* Swap Section */
+    .swap-section {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+    
+    .swap-header {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .swap-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .swap-input-group {
+      position: relative;
+    }
+    
+    .swap-input {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    
+    .swap-label {
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      background: var(--card-bg);
+      padding: 0 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .swap-button {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 120, 255, 0.3);
+      margin-top: 10px;
+    }
+    
+    .swap-button:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+    }
+    
+    /* Tasks Page */
+    .tasks-container {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .task-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+    }
+    
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .task-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: rgba(0, 120, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--primary);
+    }
+    
+    .task-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    
+    .task-description {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .task-reward {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .reward-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--tqh-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+    }
+    
+    /* TQH Page */
+    .tqh-stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    
+    .stat-card {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .stake-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 25px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .stake-title {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+    }
+    
+    .stake-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+    }
+    
+    .stake-button {
+      background: var(--tqh-gradient);
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    /* Profile Page */
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--ton-gradient);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      color: white;
+    }
+    
+    .profile-name {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+    
+    .profile-wallet {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+    
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .profile-stat {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+    }
+    
+    /* Referral Section - الجديد */
+    .referral-section {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    
+    .referral-content {
+      padding: 22px 24px;
+    }
+    
+    .referral-description {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .referral-link-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .referral-link {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .copy-btn {
+      background: var(--primary);
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+    
+    .copy-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    .copy-success {
+      text-align: center;
+      color: var(--success);
+      font-weight: 500;
+      height: 20px;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .copy-success.show {
+      opacity: 1;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(25px);
+      display: flex;
+      justify-content: space-around;
+      padding: 18px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      z-index: 100;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4);
+      border-radius: 30px 30px 0 0;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+      padding: 10px 20px;
+      border-radius: 20px;
+      position: relative;
+    }
+    
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    .nav-item.active {
+      color: var(--primary);
+      background: rgba(0, 120, 255, 0.15);
+    }
+    
+    .nav-item.active::after {
+      width: 30px;
+    }
+    
+    .nav-item i {
+      font-size: 1.4rem;
+    }
+    
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.97);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 30px;
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      text-align: center;
+      transform: translateY(30px);
+      transition: transform 0.3s ease;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+    }
+    
+    .modal-header h2 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    
+    .modal-header p {
+      color: var(--text-secondary);
+    }
+    
+    #ton-connect {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .total-amount {
+        font-size: 2.5rem;
+      }
+      
+      .token-item {
+        padding: 18px 20px;
+      }
+      
+      .referral-link-container {
+        flex-direction: column;
+      }
+      
+      .copy-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-img">
-                    <img src="https://i.suar.me/rplEz/l" alt="TonQash Logo">
-                </div>
-                <div class="logo-text">TonQash</div>
-            </div>
-            <div class="user-actions">
-                <div class="action-btn">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="action-btn">
-                    <i class="fas fa-cog"></i>
-                </div>
-            </div>
+  <div class="container">
+    <!-- Header with Connect Button -->
+    <div class="header">
+      <div class="logo">
+        <img src="https://i.suar.me/rplEz/l" alt="TonQash Logo">
+        <h1>TonQash</h1>
+      </div>
+      <button class="connect-btn" id="connect-button">
+        <i class="fas fa-wallet"></i>
+        <span id="connect-text">Connect Wallet</span>
+      </button>
+    </div>
+    
+    <!-- Home Page -->
+    <div class="page active" id="home-page">
+      <div class="total-balance">
+        <div class="total-label">Total Balance</div>
+        <div class="total-amount" id="total-balance">$0.00</div>
+        <div class="total-subtitle" id="ton-balance">0.000 TON</div>
+      </div>
+      
+      <div class="tokens-section">
+        <div class="section-header">
+          <h2>Tokens</h2>
         </div>
-
-        <!-- Currency Tabs -->
-        <div class="currency-tabs">
-            <div class="tab active" data-currency="ton">TON</div>
-            <div class="tab" data-currency="tqh">TQH</div>
+        <ul class="token-list">
+          <li class="token-item">
+            <div class="token-info">
+              <div class="token-icon ton-icon"></div>
+              <div class="token-details">
+                <h3>Toncoin</h3>
+                <p>TON</p>
+              </div>
+            </div>
+            <div class="token-balance">
+              <div class="amount" id="ton-amount">0.000</div>
+              <div class="value" id="ton-value">$0.00</div>
+            </div>
+          </li>
+          <li class="token-item">
+            <div class="token-info">
+              <div class="token-icon tqh-icon"></div>
+              <div class="token-details">
+                <h3>TonQash</h3>
+                <p>TQH</p>
+              </div>
+            </div>
+            <div class="token-balance">
+              <div class="amount" id="tqh-amount">0.000</div>
+              <div class="value" id="tqh-value">$0.00</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="swap-section">
+        <div class="swap-header">Convert TQH to TON</div>
+        <div class="swap-form">
+          <div class="swap-input-group">
+            <label class="swap-label">You Pay</label>
+            <input type="number" class="swap-input" id="tqh-input" placeholder="0.00" min="0" step="0.001">
+            <div class="token-info" style="position: absolute; top: 15px; right: 15px;">
+              <span class="token-icon tqh-icon" style="width: 30px; height: 30px;"></span>
+              <span style="margin-left: 8px; font-weight: 600;">TQH</span>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin: 10px 0;">
+            <i class="fas fa-exchange-alt" style="color: var(--primary); font-size: 1.5rem;"></i>
+          </div>
+          
+          <div class="swap-input-group">
+            <label class="swap-label">You Receive</label>
+            <input type="text" class="swap-input" id="ton-output" placeholder="0.00" readonly>
+            <div class="token-info" style="position: absolute; top: 15px; right: 15px;">
+              <span class="token-icon ton-icon" style="width: 30px; height: 30px;"></span>
+              <span style="margin-left: 8px; font-weight: 600;">TON</span>
+            </div>
+          </div>
+          
+          <div style="margin: 10px 0; color: var(--text-secondary);">
+            Exchange Rate: 1 TQH = 0.5 TON
+          </div>
+          
+          <button class="swap-button" id="swap-button" disabled>
+            Convert Now
+          </button>
         </div>
-
-        <!-- Balance Card -->
-        <div class="balance-card">
-            <div class="balance-label">Your Wallet Balance</div>
-            <div class="balance-amount"><span id="balance-amount">0.00</span> <span id="balance-currency">TON</span></div>
-            <div class="balance-value">≈ $<span id="balance-value">0.00</span> USD</div>
-        </div>
-
-        <!-- Wallet Connect Button (Main Page) -->
-        <div id="ton-connect-main"></div>
-
-        <!-- Price Tickers -->
-        <div class="price-tickers">
-            <div class="price-ticker">
-                <div class="ticker-header">
-                    <div class="coin-icon ton-icon"></div>
-                    <div class="coin-name">TON</div>
-                </div>
-                <div class="price-info">
-                    <div class="coin-price">$<span id="ton-price">3.10</span></div>
-                    <div class="price-change positive">+<span id="ton-change">1.2</span>%</div>
-                </div>
+      </div>
+    </div>
+    
+    <!-- Tasks Page -->
+    <div class="page" id="tasks-page">
+      <div class="tasks-container">
+        <div class="task-card">
+          <div class="task-header">
+            <div class="task-icon">
+              <i class="fas fa-calendar-day"></i>
             </div>
-            <div class="price-ticker">
-                <div class="ticker-header">
-                    <div class="coin-icon tqh-icon"></div>
-                    <div class="coin-name">TQH</div>
-                </div>
-                <div class="price-info">
-                    <div class="coin-price">$<span id="tqh-price">0.25</span></div>
-                    <div class="price-change positive">+<span id="tqh-change">0.8</span>%</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section-title">Quick Actions</div>
-        <div class="quick-actions">
-            <div class="action-card disabled">
-                <div class="action-icon">
-                    <i class="fas fa-paper-plane"></i>
-                </div>
-                <div class="action-text">Send</div>
-            </div>
-            <div class="action-card disabled">
-                <div class="action-icon">
-                    <i class="fas fa-qrcode"></i>
-                </div>
-                <div class="action-text">Receive</div>
-            </div>
-            <div class="action-card disabled">
-                <div class="action-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <div class="action-text">Buy</div>
-            </div>
-            <div class="action-card disabled">
-                <div class="action-icon">
-                    <i class="fas fa-exchange-alt"></i>
-                </div>
-                <div class="action-text">Convert</div>
-            </div>
-        </div>
-
-        <!-- Recent Transactions -->
-        <div class="section-title">Recent Transactions</div>
-        <div class="transactions" id="transactions-container">
-            <div class="spinner" id="loading-spinner"></div>
-            <div id="transactions-list"></div>
-        </div>
-
-        <!-- Tasks Section -->
-        <div class="tasks-container" id="tasks-container">
-            <div class="section-title">Available Tasks</div>
-            
-            <!-- Wallet Connect Task -->
-            <div class="task-item" id="wallet-connect-task">
-                <div class="task-icon">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <div class="task-details">
-                    <div class="task-title">Connect TON Wallet</div>
-                    <div class="task-description">Connect your wallet to start earning rewards</div>
-                    <div class="task-reward">Reward: 5 TQH</div>
-                </div>
-                <div id="ton-connect-tasks"></div>
-            </div>
-            
-            <!-- Task 1: Daily Reward -->
-            <div class="task-item">
-                <div class="task-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="task-details">
-                    <div class="task-title">Daily Check-in</div>
-                    <div class="task-description">Pay 0.1 TON to receive 20 TQH</div>
-                    <div class="task-reward">Reward: 20 TQH</div>
-                    <div id="daily-timer" class="timer-text"></div>
-                </div>
-                <button class="task-btn" id="daily-reward-btn">Claim Reward</button>
-            </div>
-            
-            <!-- Task 2: Watch Ad -->
-            <div class="task-item">
-                <div class="task-icon">
-                    <i class="fas fa-ad"></i>
-                </div>
-                <div class="task-details">
-                    <div class="task-title">Watch an Ad</div>
-                    <div class="task-description">Watch an ad for 30 seconds to earn a reward</div>
-                    <div class="task-reward">Reward: 1 TQH</div>
-                    <div id="ad-timer" class="timer-text"></div>
-                </div>
-                <button class="task-btn" id="watch-ad-btn">Watch Now</button>
-            </div>
+            <div class="task-title">Daily Check-in</div>
+          </div>
+          <div class="task-description">
+            Pay 0.07 TON to claim your daily reward of 30 TQH tokens. This reward can be claimed once every 24 hours.
+          </div>
+          <div class="task-reward">
+            <div class="reward-icon">TQH</div>
+            <span>+30 TQH</span>
+          </div>
+          <button class="swap-button" id="daily-task-btn">
+            <i class="fas fa-gift"></i> Claim Reward (0.07 TON)
+          </button>
         </div>
         
-        <!-- Account Section -->
-        <div class="account-container" id="account-container">
-            <div class="section-title">Your Account</div>
-            
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-info">
-                    <div class="user-name" id="telegram-username">User</div>
-                    <div class="user-id" id="telegram-userid">ID: 123456789</div>
-                </div>
+        <div class="task-card">
+          <div class="task-header">
+            <div class="task-icon">
+              <i class="fas fa-ad"></i>
             </div>
-            
-            <!-- Wallet Connect Button (Account Page) -->
-            <div id="ton-connect-account"></div>
-            
-            <div class="referral-section">
-                <div class="section-title">Refer Friends</div>
-                <div class="form-group">
-                    <label class="form-label">Your Referral Link</label>
-                    <input type="text" class="form-input" id="referral-link" readonly>
-                </div>
-                <button class="form-btn" id="copy-referral">Copy Link</button>
-                <p class="referral-status" id="referral-status">Calculating...</p>
-            </div>
-            
-            <div class="account-info">
-                <div class="info-item">
-                    <span class="info-label">Completed Tasks:</span>
-                    <span class="info-value" id="completed-tasks">0</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Total Earnings:</span>
-                    <span class="info-value" id="total-earnings">0.00 TQH</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Join Date:</span>
-                    <span class="info-value" id="join-date">July 1, 2025</span>
-                </div>
-            </div>
+            <div class="task-title">Watch Ad</div>
+          </div>
+          <div class="task-description">
+            Watch a short advertisement to earn 10 TQH tokens. You can watch ads multiple times a day.
+          </div>
+          <div class="task-reward">
+            <div class="reward-icon">TQH</div>
+            <span>+10 TQH</span>
+          </div>
+          <button class="swap-button" id="ad-task-btn">
+            <i class="fas fa-play-circle"></i> Watch Ad
+          </button>
+          <div id="ad-timer" style="margin-top: 15px; color: var(--text-secondary); display: none;">
+            Next ad available in: <span id="countdown">30</span> seconds
+          </div>
         </div>
+      </div>
     </div>
-
-    <!-- Ad Container -->
-    <div class="ad-container" id="ad-container">
-        <div class="ad-content">
-            <div class="ad-close" id="ad-close">✕</div>
-            <div class="ad-title">Watch This Ad</div>
-            <div class="ad-description">Please watch the full ad for 30 seconds to get your reward</div>
-            
-            <!-- Ad placeholder -->
-            <div style="background: #333; height: 180px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 20px 0;">
-                <i class="fas fa-ad" style="font-size: 50px; color: #666;"></i>
-            </div>
-            
-            <div class="ad-countdown" id="ad-countdown">30</div>
-            <div class="ad-reward">You will receive 1 TQH after the ad ends</div>
+    
+    <!-- TQH Page -->
+    <div class="page" id="tqh-page">
+      <div class="tqh-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="tqh-balance">0.000</div>
+          <div class="stat-label">TQH Balance</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-value" id="daily-reward">1%</div>
+          <div class="stat-label">Daily Reward</div>
+        </div>
+      </div>
+      
+      <div class="stake-card">
+        <div class="stake-title">Stake Your TQH</div>
+        <div class="stake-subtitle">
+          Stake your TQH tokens to earn 1% daily rewards. Your tokens remain liquid and can be unstaked at any time.
+        </div>
+        <button class="stake-button" id="stake-button">
+          <i class="fas fa-lock"></i> Stake TQH Tokens
+        </button>
+      </div>
+      
+      <div class="tokens-section">
+        <div class="section-header">
+          <h2>Staking Details</h2>
+        </div>
+        <div style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <span>Staked Amount:</span>
+            <span id="staked-amount">0.000 TQH</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <span>Rewards Earned:</span>
+            <span id="earned-rewards">0.000 TQH</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <span>Next Reward:</span>
+            <span id="next-reward">0.000 TQH</span>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item active" data-page="home">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
+    
+    <!-- Profile Page -->
+    <div class="page" id="profile-page">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <i class="fas fa-user"></i>
         </div>
-        <div class="nav-item" data-page="wallet">
-            <i class="fas fa-wallet"></i>
-            <span>Wallet</span>
+        <div class="profile-name" id="profile-name">Telegram User</div>
+        <div class="profile-wallet" id="wallet-address">Not connected</div>
+      </div>
+      
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="stat-value" id="profile-ton">0.000</div>
+          <div class="stat-label">TON</div>
         </div>
-        <div class="nav-item" data-page="tasks">
-            <i class="fas fa-tasks"></i>
-            <span>Tasks</span>
+        <div class="profile-stat">
+          <div class="stat-value" id="profile-tqh">0.000</div>
+          <div class="stat-label">TQH</div>
         </div>
-        <div class="nav-item" data-page="account">
-            <i class="fas fa-user"></i>
-            <span>Account</span>
+      </div>
+      
+      <!-- Referral Section - الجديد -->
+      <div class="referral-section">
+        <div class="section-header">
+          <h2>Referral Program</h2>
         </div>
+        <div class="referral-content">
+          <div class="referral-description">
+            Invite friends to join TonQash using your unique referral link. 
+            Earn 10% of their rewards for life! Share your link and grow your earnings.
+          </div>
+          <div class="referral-link-container">
+            <div class="referral-link" id="referral-link">https://t.me/TonQashBot?start=ref_username</div>
+            <button class="copy-btn" id="copy-referral-btn">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <div class="copy-success" id="copy-success">
+            <i class="fas fa-check-circle"></i> Link copied to clipboard!
+          </div>
+        </div>
+      </div>
+      
+      <div class="tokens-section">
+        <div class="section-header">
+          <h2>Activity</h2>
+        </div>
+        <div style="padding: 20px; text-align: center;">
+          <i class="fas fa-history" style="font-size: 3rem; color: var(--text-secondary); opacity: 0.5; margin-bottom: 15px;"></i>
+          <p style="color: var(--text-secondary);">No activity yet</p>
+        </div>
+      </div>
     </div>
-
-    <script>
-        // State management
-        const state = {
-            tonBalance: 0.5,
-            tqhBalance: 10,
-            tonPrice: 3.10,
-            tqhPrice: 0.25,
-            transactions: [],
-            lastAdTime: 0,
-            lastDailyClaim: 0,
-            walletConnected: false,
-            completedTasks: 0,
-            totalEarnings: 0,
-            telegramUser: {
-                id: 123456789,
-                username: "telegram_user",
-                firstName: "User",
-                lastName: "Telegram"
-            }
-        };
-
-        // DOM Elements
-        const balanceAmountEl = document.getElementById('balance-amount');
-        const balanceCurrencyEl = document.getElementById('balance-currency');
-        const balanceValueEl = document.getElementById('balance-value');
-        const transactionsContainer = document.getElementById('transactions-container');
-        const transactionsList = document.getElementById('transactions-list');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const tasksContainer = document.getElementById('tasks-container');
-        const accountContainer = document.getElementById('account-container');
-        const tabs = document.querySelectorAll('.tab');
-        const navItems = document.querySelectorAll('.nav-item');
-        const adContainer = document.getElementById('ad-container');
-        const adCountdownEl = document.getElementById('ad-countdown');
-        const adCloseBtn = document.getElementById('ad-close');
-        const referralLinkEl = document.getElementById('referral-link');
-        const copyReferralBtn = document.getElementById('copy-referral');
-        const referralStatusEl = document.getElementById('referral-status');
+  </div>
+  
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="#" class="nav-item active" data-page="home-page">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item" data-page="tasks-page">
+      <i class="fas fa-tasks"></i>
+      <span>Tasks</span>
+    </a>
+    <a href="#" class="nav-item" data-page="tqh-page">
+      <i class="fas fa-coins"></i>
+      <span>TQH</span>
+    </a>
+    <a href="#" class="nav-item" data-page="profile-page">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </a>
+  </div>
+  
+  <!-- Connect Modal -->
+  <div class="modal" id="connect-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Connect Wallet</h2>
+        <p>Secure connection to manage your crypto assets</p>
+      </div>
+      <div id="ton-connect"></div>
+      <div id="status" class="connect-status">Select a wallet provider</div>
+    </div>
+  </div>
+  
+  <!-- Transaction Modal -->
+  <div class="modal" id="transaction-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="tx-modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Confirm Transaction</h2>
+        <p id="tx-description">Sending 0.07 TON for daily reward</p>
+      </div>
+      <div style="text-align: center; margin: 25px 0;">
+        <div style="font-size: 3rem; margin-bottom: 20px;">
+          <i class="fas fa-paper-plane" style="color: var(--primary);"></i>
+        </div>
+        <div style="font-size: 1.5rem; margin-bottom: 10px;" id="tx-amount">0.07 TON</div>
+        <div style="color: var(--text-secondary);" id="tx-recipient">To: TonQash Rewards</div>
+      </div>
+      <button class="swap-button" id="confirm-tx-btn">
+        Confirm Transaction
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    // Initialize wallet data
+    let walletData = {
+      tonBalance: 0,
+      tqhBalance: 0,
+      stakedTQH: 0,
+      earnedRewards: 0,
+      lastDailyClaim: null,
+      lastAdClaim: null,
+      tonPrice: 2.82, // TON price in USD
+      tqhPrice: 0.50 // TQH price in USD
+    };
+    
+    // Initialize TonConnect
+    let tonConnectUI = null;
+    let wallet = null;
+    
+    // DOM Elements
+    const connectButton = document.getElementById('connect-button');
+    const connectText = document.getElementById('connect-text');
+    const connectModal = document.getElementById('connect-modal');
+    const modalClose = document.getElementById('modal-close');
+    const txModalClose = document.getElementById('tx-modal-close');
+    const transactionModal = document.getElementById('transaction-modal');
+    const confirmTxBtn = document.getElementById('confirm-tx-btn');
+    
+    const totalBalanceEl = document.getElementById('total-balance');
+    const tonBalanceEl = document.getElementById('ton-balance');
+    const tonAmountEl = document.getElementById('ton-amount');
+    const tonValueEl = document.getElementById('ton-value');
+    const tqhAmountEl = document.getElementById('tqh-amount');
+    const tqhValueEl = document.getElementById('tqh-value');
+    const tqhInputEl = document.getElementById('tqh-input');
+    const tonOutputEl = document.getElementById('ton-output');
+    const swapButtonEl = document.getElementById('swap-button');
+    const dailyTaskBtn = document.getElementById('daily-task-btn');
+    const adTaskBtn = document.getElementById('ad-task-btn');
+    const adTimerEl = document.getElementById('ad-timer');
+    const countdownEl = document.getElementById('countdown');
+    const stakeButton = document.getElementById('stake-button');
+    const stakedAmountEl = document.getElementById('staked-amount');
+    const earnedRewardsEl = document.getElementById('earned-rewards');
+    const nextRewardEl = document.getElementById('next-reward');
+    const profileNameEl = document.getElementById('profile-name');
+    const walletAddressEl = document.getElementById('wallet-address');
+    const profileTonEl = document.getElementById('profile-ton');
+    const profileTqhEl = document.getElementById('profile-tqh');
+    
+    // Referral elements - الجديد
+    const referralLinkEl = document.getElementById('referral-link');
+    const copyReferralBtn = document.getElementById('copy-referral-btn');
+    const copySuccessEl = document.getElementById('copy-success');
+    
+    // Navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    
+    // Navigation functionality
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetPage = this.getAttribute('data-page');
         
-        // Telegram user data
-        const telegramUsernameEl = document.getElementById('telegram-username');
-        const telegramUseridEl = document.getElementById('telegram-userid');
-        const completedTasksEl = document.getElementById('completed-tasks');
-        const totalEarningsEl = document.getElementById('total-earnings');
-        const joinDateEl = document.getElementById('join-date');
+        navItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
         
-        // TON Connect
-        let tonConnectUI;
-        let wallet = null;
-
-        // Initialize the wallet
-        function initWallet() {
-            // Initialize Telegram WebApp
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
-            
-            // Set Telegram user info
-            if (tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                state.telegramUser = {
-                    id: user.id,
-                    username: user.username || `user_${user.id}`,
-                    firstName: user.first_name || "User",
-                    lastName: user.last_name || ""
-                };
-            }
-            
-            // Update UI with Telegram user data
-            telegramUsernameEl.textContent = state.telegramUser.username;
-            telegramUseridEl.textContent = `ID: ${state.telegramUser.id}`;
-            
-            // Generate referral link
-            const referralLink = `https://t.me/TonQashBot?start=ref_${state.telegramUser.id}`;
-            referralLinkEl.value = referralLink;
-            
-            // Initialize TON Connect for different sections
-            initTonConnect('ton-connect-main', 'main');
-            initTonConnect('ton-connect-tasks', 'tasks');
-            initTonConnect('ton-connect-account', 'account');
-            
-            // Add initial transactions
-            setTimeout(() => {
-                addTransaction('receive', 0.5, 'TON', 'Welcome Bonus');
-                addTransaction('receive', 10, 'TQH', 'Registration Reward');
-                loadingSpinner.style.display = 'none';
-            }, 1500);
-            
-            updateBalanceDisplay();
-            updatePriceDisplays();
-            updateAccountInfo();
-            setupEventListeners();
-            updateAdTimer();
-            updateDailyTimer();
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById(targetPage).classList.add('active');
+        
+        // Update referral link when profile page is opened - الجديد
+        if (targetPage === 'profile-page') {
+          updateReferralLink();
         }
-
-        // Initialize TonConnect
-        function initTonConnect(elementId, context) {
-            const tonConnect = new TON_CONNECT_UI.TonConnectUI({
-                manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
-                buttonRootId: elementId,
-                language: 'en'
-            });
-
-            tonConnect.onStatusChange(userWallet => {
-                wallet = userWallet;
-                state.walletConnected = !!wallet;
-                
-                if (wallet) {
-                    // Update all wallet status indicators
-                    document.querySelectorAll('.wallet-status').forEach(el => {
-                        el.innerHTML = '<div class="wallet-connected">✅ Wallet Connected</div>';
-                    });
-                    
-                    // Enable task buttons
-                    document.getElementById('daily-reward-btn').disabled = false;
-                    document.getElementById('watch-ad-btn').disabled = false;
-                    
-                    // Complete wallet connection task
-                    if (!state.walletTaskCompleted) {
-                        state.tqhBalance += 5;
-                        state.completedTasks += 1;
-                        state.totalEarnings += 5;
-                        addTransaction('task', 5, 'TQH', 'Wallet Connection Reward');
-                        updateBalanceDisplay();
-                        updateAccountInfo();
-                        state.walletTaskCompleted = true;
-                    }
-                } else {
-                    document.getElementById('daily-reward-btn').disabled = true;
-                    document.getElementById('watch-ad-btn').disabled = true;
-                }
-            });
-            
-            // Add status indicator
-            const statusEl = document.createElement('div');
-            statusEl.className = 'wallet-status';
-            statusEl.innerHTML = state.walletConnected 
-                ? '<div class="wallet-connected">✅ Wallet Connected</div>' 
-                : '<div class="wallet-status-text">Connect your wallet</div>';
-            document.getElementById(elementId).appendChild(statusEl);
+      });
+    });
+    
+    // Initialize TonConnect
+    function initTonConnect() {
+      tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect',
+        language: 'en'
+      });
+      
+      tonConnectUI.onStatusChange(userWallet => {
+        wallet = userWallet;
+        
+        if (wallet) {
+          // Update UI for connected state
+          connectText.textContent = 'Connected';
+          connectButton.classList.add('connected');
+          
+          // Get Telegram username from URL (simulated)
+          const urlParams = new URLSearchParams(window.location.search);
+          const tgUsername = urlParams.get('username') || 'Telegram User';
+          
+          // Update profile
+          profileNameEl.textContent = tgUsername;
+          walletAddressEl.textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
+          
+          // Update referral link - الجديد
+          updateReferralLink();
+          
+          // Simulate wallet balance
+          walletData.tonBalance = 0.5;
+          updateWalletDisplay();
+          
+          // Close modal
+          connectModal.classList.remove('active');
+        } else {
+          // Reset to disconnected state
+          connectText.textContent = 'Connect Wallet';
+          connectButton.classList.remove('connected');
+          profileNameEl.textContent = 'Telegram User';
+          walletAddressEl.textContent = 'Not connected';
+          
+          // Reset balances
+          walletData.tonBalance = 0;
+          walletData.tqhBalance = 0;
+          updateWalletDisplay();
+          
+          // Reset referral link - الجديد
+          updateReferralLink();
         }
-
-        // Update balance display
-        function updateBalanceDisplay() {
-            const activeCurrency = document.querySelector('.tab.active').dataset.currency;
-            
-            if (activeCurrency === 'ton') {
-                balanceAmountEl.textContent = state.tonBalance.toFixed(2);
-                balanceCurrencyEl.textContent = 'TON';
-                balanceValueEl.textContent = (state.tonBalance * state.tonPrice).toFixed(2);
-            } else {
-                balanceAmountEl.textContent = state.tqhBalance.toFixed(2);
-                balanceCurrencyEl.textContent = 'TQH';
-                balanceValueEl.textContent = (state.tqhBalance * state.tqhPrice).toFixed(2);
-            }
+      });
+    }
+    
+    // Update wallet display
+    function updateWalletDisplay() {
+      const totalUSD = (walletData.tonBalance * walletData.tonPrice) + (walletData.tqhBalance * walletData.tqhPrice);
+      
+      totalBalanceEl.textContent = `$${totalUSD.toFixed(2)}`;
+      tonBalanceEl.textContent = `${walletData.tonBalance.toFixed(3)} TON`;
+      tonAmountEl.textContent = walletData.tonBalance.toFixed(3);
+      tonValueEl.textContent = `$${(walletData.tonBalance * walletData.tonPrice).toFixed(2)}`;
+      tqhAmountEl.textContent = walletData.tqhBalance.toFixed(3);
+      tqhValueEl.textContent = `$${(walletData.tqhBalance * walletData.tqhPrice).toFixed(2)}`;
+      
+      // Update profile page
+      profileTonEl.textContent = walletData.tonBalance.toFixed(3);
+      profileTqhEl.textContent = walletData.tqhBalance.toFixed(3);
+      
+      // Update TQH page
+      stakedAmountEl.textContent = `${walletData.stakedTQH.toFixed(3)} TQH`;
+      earnedRewardsEl.textContent = `${walletData.earnedRewards.toFixed(3)} TQH`;
+      nextRewardEl.textContent = `${(walletData.stakedTQH * 0.01).toFixed(3)} TQH`;
+    }
+    
+    // Generate and update referral link - الجديد
+    function updateReferralLink() {
+      const username = profileNameEl.textContent;
+      // Clean username for URL
+      const cleanUsername = username.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      // Generate referral link
+      const referralLink = `https://t.me/TonQashBot?start=ref_${cleanUsername}`;
+      referralLinkEl.textContent = referralLink;
+    }
+    
+    // Copy referral link to clipboard - الجديد
+    function copyReferralLink() {
+      const referralLink = referralLinkEl.textContent;
+      navigator.clipboard.writeText(referralLink).then(() => {
+        // Show success message
+        copySuccessEl.classList.add('show');
+        setTimeout(() => {
+          copySuccessEl.classList.remove('show');
+        }, 3000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy referral link. Please try again.');
+      });
+    }
+    
+    // Swap functionality
+    tqhInputEl.addEventListener('input', function() {
+      const tqhAmount = parseFloat(this.value) || 0;
+      
+      // Validate available balance
+      if (tqhAmount > walletData.tqhBalance) {
+        this.value = walletData.tqhBalance.toFixed(3);
+        tqhAmount = walletData.tqhBalance;
+      }
+      
+      // Calculate TON amount (1 TQH = 0.5 TON)
+      const tonAmount = tqhAmount * 0.5;
+      tonOutputEl.value = tonAmount.toFixed(3);
+      
+      // Enable/disable swap button
+      swapButtonEl.disabled = tqhAmount <= 0 || tqhAmount > walletData.tqhBalance;
+    });
+    
+    swapButtonEl.addEventListener('click', function() {
+      const tqhAmount = parseFloat(tqhInputEl.value);
+      const tonAmount = tqhAmount * 0.5;
+      
+      if (tqhAmount > walletData.tqhBalance) {
+        alert('Insufficient TQH balance');
+        return;
+      }
+      
+      // Update balances
+      walletData.tqhBalance -= tqhAmount;
+      walletData.tonBalance += tonAmount;
+      
+      // Reset form
+      tqhInputEl.value = '';
+      tonOutputEl.value = '';
+      swapButtonEl.disabled = true;
+      
+      // Update display
+      updateWalletDisplay();
+      
+      // Show success message
+      alert(`Successfully converted ${tqhAmount.toFixed(2)} TQH to ${tonAmount.toFixed(2)} TON!`);
+    });
+    
+    // Daily task functionality
+    dailyTaskBtn.addEventListener('click', function() {
+      if (walletData.tonBalance < 0.07) {
+        alert('Insufficient TON balance for daily task');
+        return;
+      }
+      
+      // Show transaction modal
+      document.getElementById('tx-description').textContent = 'Sending 0.07 TON for daily reward';
+      document.getElementById('tx-amount').textContent = '0.07 TON';
+      document.getElementById('tx-recipient').textContent = 'To: TonQash Rewards';
+      transactionModal.classList.add('active');
+      
+      // Set transaction action
+      confirmTxBtn.onclick = function() {
+        // Deduct TON and add TQH
+        walletData.tonBalance -= 0.07;
+        walletData.tqhBalance += 30;
+        
+        // Update last claim time
+        walletData.lastDailyClaim = new Date();
+        
+        // Update display
+        updateWalletDisplay();
+        
+        // Close modal
+        transactionModal.classList.remove('active');
+        
+        // Show success
+        alert('Daily reward claimed! 30 TQH added to your wallet');
+      };
+    });
+    
+    // Ad task functionality
+    adTaskBtn.addEventListener('click', function() {
+      if (walletData.lastAdClaim && (new Date() - walletData.lastAdClaim) < 30000) {
+        return;
+      }
+      
+      // Show ad simulation
+      alert('Advertisement playing...');
+      
+      // Start cooldown timer
+      adTimerEl.style.display = 'block';
+      adTaskBtn.disabled = true;
+      
+      let seconds = 30;
+      countdownEl.textContent = seconds;
+      
+      const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(timer);
+          adTimerEl.style.display = 'none';
+          adTaskBtn.disabled = false;
         }
-
-        // Update price displays
-        function updatePriceDisplays() {
-            document.getElementById('ton-price').textContent = state.tonPrice.toFixed(2);
-            document.getElementById('tqh-price').textContent = state.tqhPrice.toFixed(2);
-        }
-
-        // Update account info
-        function updateAccountInfo() {
-            completedTasksEl.textContent = state.completedTasks;
-            totalEarningsEl.textContent = `${state.totalEarnings.toFixed(2)} TQH`;
-            
-            const today = new Date();
-            const joinDate = new Date(today);
-            joinDate.setDate(today.getDate() - 7);
-            joinDateEl.textContent = joinDate.toLocaleDateString('en-US', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-        }
-
-        // Update transactions list
-        function updateTransactions() {
-            if (state.transactions.length === 0) {
-                transactionsList.innerHTML = `
-                    <div class="transaction">
-                        <div class="transaction-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="transaction-details">
-                            <div class="transaction-title">Welcome to TonQash Wallet</div>
-                            <div class="transaction-date">Start your first transactions</div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            transactionsList.innerHTML = '';
-            
-            state.transactions.slice().reverse().forEach(transaction => {
-                const transactionEl = document.createElement('div');
-                transactionEl.className = 'transaction fade-in';
-                
-                let iconClass, amountClass, icon;
-                
-                if (transaction.type === 'receive') {
-                    iconClass = 'receive';
-                    amountClass = 'receive';
-                    icon = '<i class="fas fa-arrow-down"></i>';
-                } else if (transaction.type === 'send') {
-                    iconClass = 'send';
-                    amountClass = 'send';
-                    icon = '<i class="fas fa-arrow-up"></i>';
-                } else if (transaction.type === 'convert') {
-                    iconClass = 'task';
-                    amountClass = 'task';
-                    icon = '<i class="fas fa-exchange-alt"></i>';
-                } else if (transaction.type === 'task') {
-                    iconClass = 'task';
-                    amountClass = 'task';
-                    icon = '<i class="fas fa-trophy"></i>';
-                } else if (transaction.type === 'daily') {
-                    iconClass = 'task';
-                    amountClass = 'task';
-                    icon = '<i class="fas fa-calendar-check"></i>';
-                }
-                
-                transactionEl.innerHTML = `
-                    <div class="transaction-icon ${iconClass}">
-                        ${icon}
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-title">${transaction.title}</div>
-                        <div class="transaction-date">${transaction.date}</div>
-                    </div>
-                    <div class="transaction-amount ${amountClass}">${transaction.amount > 0 ? '+' : ''}${transaction.amount.toFixed(2)} ${transaction.currency}</div>
-                `;
-                
-                transactionsList.appendChild(transactionEl);
-            });
-        }
-
-        // Add transaction
-        function addTransaction(type, amount, currency, title) {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            }) + ' - ' + now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            state.transactions.push({
-                type,
-                amount,
-                currency,
-                title,
-                date: dateStr
-            });
-            
-            // Save to localStorage
-            localStorage.setItem('tonqash_transactions', JSON.stringify(state.transactions));
-            
-            updateTransactions();
-        }
-
-        // Update ad timer
-        function updateAdTimer() {
-            const now = Date.now();
-            const timeSinceLastAd = now - state.lastAdTime;
-            const cooldown = 30 * 1000; // 30 seconds
-            const remaining = Math.max(0, cooldown - timeSinceLastAd);
-            
-            const timerEl = document.getElementById('ad-timer');
-            const watchBtn = document.getElementById('watch-ad-btn');
-            
-            if (remaining > 0) {
-                const seconds = Math.ceil(remaining / 1000);
-                timerEl.textContent = `Available in: ${seconds} seconds`;
-                watchBtn.classList.add('disabled');
-            } else {
-                timerEl.textContent = '';
-                watchBtn.classList.remove('disabled');
-            }
-        }
-
-        // Update daily reward timer
-        function updateDailyTimer() {
-            const now = Date.now();
-            const timeSinceLastClaim = now - state.lastDailyClaim;
-            const cooldown = 24 * 60 * 60 * 1000; // 24 hours
-            const remaining = Math.max(0, cooldown - timeSinceLastClaim);
-            
-            const timerEl = document.getElementById('daily-timer');
-            const claimBtn = document.getElementById('daily-reward-btn');
-            
-            if (remaining > 0) {
-                const hours = Math.floor(remaining / (1000 * 60 * 60));
-                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                timerEl.textContent = `Available in: ${hours}h ${minutes}m`;
-                claimBtn.classList.add('disabled');
-            } else {
-                timerEl.textContent = '';
-                claimBtn.classList.remove('disabled');
-            }
-        }
-
-        // Show ad
-        function showAd() {
-            adContainer.style.display = 'flex';
-            let count = 30;
-            
-            adCountdownEl.textContent = count;
-            
-            const countdown = setInterval(() => {
-                count--;
-                adCountdownEl.textContent = count;
-                
-                if (count <= 0) {
-                    clearInterval(countdown);
-                    completeAd();
-                }
-            }, 1000);
-        }
-
-        // Complete ad watching
-        function completeAd() {
-            adContainer.style.display = 'none';
-            state.lastAdTime = Date.now();
-            state.tqhBalance += 1;
-            state.totalEarnings += 1;
-            state.completedTasks += 1;
-            
-            addTransaction('task', 1, 'TQH', 'Ad Reward');
-            updateBalanceDisplay();
-            updateAccountInfo();
-            updateAdTimer();
-            
-            alert('Congratulations! You earned 1 TQH from watching the ad');
-        }
-
-        // Send payment for daily reward
-        async function sendDailyPayment() {
-            if (!wallet) {
-                alert('Please connect your wallet first');
-                return;
-            }
-
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [
-                    {
-                        address: 'UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3',
-                        amount: '100000000' // 0.1 TON
-                    }
-                ]
-            };
-
-            try {
-                // Show processing state
-                const btn = document.getElementById('daily-reward-btn');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                btn.disabled = true;
-                
-                // Simulate processing delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                state.lastDailyClaim = Date.now();
-                state.tqhBalance += 20;
-                state.completedTasks += 1;
-                state.totalEarnings += 20;
-                
-                addTransaction('daily', 20, 'TQH', 'Daily Reward');
-                updateBalanceDisplay();
-                updateAccountInfo();
-                updateDailyTimer();
-                
-                btn.innerHTML = 'Claim Reward';
-                btn.disabled = false;
-                
-                alert('Payment successful! You received 20 TQH as a daily reward');
-            } catch (error) {
-                alert(`Payment failed: ${error.message}`);
-                btn.innerHTML = 'Claim Reward';
-                btn.disabled = false;
-            }
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Currency tabs
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    updateBalanceDisplay();
-                });
-            });
-            
-            // Navigation
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    navItems.forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    
-                    const page = item.dataset.page;
-                    
-                    if (page === 'home') {
-                        document.querySelector('.transactions').style.display = 'block';
-                        tasksContainer.style.display = 'none';
-                        accountContainer.style.display = 'none';
-                    } else if (page === 'wallet') {
-                        document.querySelector('.transactions').style.display = 'block';
-                        tasksContainer.style.display = 'none';
-                        accountContainer.style.display = 'none';
-                    } else if (page === 'tasks') {
-                        document.querySelector('.transactions').style.display = 'none';
-                        tasksContainer.style.display = 'block';
-                        accountContainer.style.display = 'none';
-                    } else if (page === 'account') {
-                        document.querySelector('.transactions').style.display = 'none';
-                        tasksContainer.style.display = 'none';
-                        accountContainer.style.display = 'block';
-                    }
-                });
-            });
-            
-            // Watch ad button
-            document.getElementById('watch-ad-btn').addEventListener('click', () => {
-                const now = Date.now();
-                const timeSinceLastAd = now - state.lastAdTime;
-                const cooldown = 30 * 1000; // 30 seconds
-                
-                if (timeSinceLastAd < cooldown) {
-                    alert('Please wait 30 seconds between watching ads');
-                    return;
-                }
-                
-                showAd();
-            });
-            
-            // Daily reward button
-            document.getElementById('daily-reward-btn').addEventListener('click', () => {
-                const now = Date.now();
-                const timeSinceLastClaim = now - state.lastDailyClaim;
-                const cooldown = 24 * 60 * 60 * 1000; // 24 hours
-                
-                if (timeSinceLastClaim < cooldown) {
-                    alert('You can claim the daily reward once every 24 hours');
-                    return;
-                }
-                
-                sendDailyPayment();
-            });
-            
-            // Ad close button
-            adCloseBtn.addEventListener('click', () => {
-                adContainer.style.display = 'none';
-                alert('You will not receive the reward as you did not complete watching the ad');
-            });
-            
-            // Copy referral link
-            copyReferralBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(referralLinkEl.value);
-                referralStatusEl.textContent = 'Link copied!';
-                setTimeout(() => {
-                    referralStatusEl.textContent = 'Calculating...';
-                }, 2000);
-            });
-        }
-
-        // Simulate price changes
-        function simulatePriceChanges() {
-            // TON price simulation
-            const tonVariation = (Math.random() - 0.5) * 0.2;
-            state.tonPrice += tonVariation;
-            state.tonPrice = Math.max(2.5, Math.min(4.0, state.tonPrice));
-            
-            const tonChangeEl = document.getElementById('ton-change');
-            tonChangeEl.textContent = (tonVariation > 0 ? '+' : '') + (tonVariation * 100 / state.tonPrice).toFixed(2);
-            tonChangeEl.className = tonVariation >= 0 ? 'price-change positive' : 'price-change negative';
-            
-            // TQH price simulation
-            const tqhVariation = (Math.random() - 0.5) * 0.1;
-            state.tqhPrice += tqhVariation;
-            state.tqhPrice = Math.max(0.15, Math.min(0.35, state.tqhPrice));
-            
-            const tqhChangeEl = document.getElementById('tqh-change');
-            tqhChangeEl.textContent = (tqhVariation > 0 ? '+' : '') + (tqhVariation * 100 / state.tqhPrice).toFixed(2);
-            tqhChangeEl.className = tqhVariation >= 0 ? 'price-change positive' : 'price-change negative';
-            
-            updatePriceDisplays();
-            updateBalanceDisplay();
-        }
-
-        // Initialize the wallet when page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            // Load transactions from localStorage if available
-            const savedTransactions = localStorage.getItem('tonqash_transactions');
-            if (savedTransactions) {
-                state.transactions = JSON.parse(savedTransactions);
-                updateTransactions();
-            }
-            
-            initWallet();
-            
-            // Start price simulation
-            setInterval(simulatePriceChanges, 10000);
-            
-            // Update timers every second
-            setInterval(() => {
-                updateAdTimer();
-                updateDailyTimer();
-            }, 1000);
-            
-            // Initial price update
-            simulatePriceChanges();
-        });
-    </script>
+      }, 1000);
+      
+      // Add TQH
+      walletData.tqhBalance += 10;
+      walletData.lastAdClaim = new Date();
+      
+      // Update display
+      updateWalletDisplay();
+      
+      // Show success
+      setTimeout(() => {
+        alert('Ad completed! 10 TQH added to your wallet');
+      }, 2000);
+    });
+    
+    // Stake TQH functionality
+    stakeButton.addEventListener('click', function() {
+      if (walletData.tqhBalance <= 0) {
+        alert('You need TQH tokens to stake');
+        return;
+      }
+      
+      // Stake all available TQH
+      walletData.stakedTQH += walletData.tqhBalance;
+      walletData.tqhBalance = 0;
+      
+      // Update display
+      updateWalletDisplay();
+      
+      alert(`Staked ${walletData.stakedTQH.toFixed(2)} TQH! You'll earn 1% daily rewards`);
+    });
+    
+    // Modal functionality
+    connectButton.addEventListener('click', () => {
+      connectModal.classList.add('active');
+    });
+    
+    modalClose.addEventListener('click', () => {
+      connectModal.classList.remove('active');
+    });
+    
+    txModalClose.addEventListener('click', () => {
+      transactionModal.classList.remove('active');
+    });
+    
+    // Claim daily rewards automatically
+    function claimDailyRewards() {
+      if (!walletData.stakedTQH) return;
+      
+      // Calculate rewards (1% per day)
+      const now = new Date();
+      const lastClaim = walletData.lastRewardClaim || new Date();
+      const hoursPassed = (now - lastClaim) / (1000 * 60 * 60);
+      
+      if (hoursPassed >= 24) {
+        const rewards = walletData.stakedTQH * 0.01;
+        walletData.earnedRewards += rewards;
+        walletData.tqhBalance += rewards;
+        walletData.lastRewardClaim = now;
+        updateWalletDisplay();
+      }
+    }
+    
+    // Initialize app
+    function initApp() {
+      // Check for Telegram username in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const tgUsername = urlParams.get('username');
+      
+      if (tgUsername) {
+        profileNameEl.textContent = tgUsername;
+      }
+      
+      // Initialize TonConnect
+      initTonConnect();
+      
+      // Update wallet display
+      updateWalletDisplay();
+      
+      // Update referral link - الجديد
+      updateReferralLink();
+      
+      // Setup referral copy button - الجديد
+      copyReferralBtn.addEventListener('click', copyReferralLink);
+      
+      // Claim rewards every 5 seconds (for demo)
+      setInterval(claimDailyRewards, 5000);
+    }
+    
+    // Start the app
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
 </body>
 </html>
