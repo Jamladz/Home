@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TonQash - Professional TON Wallet</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -25,7 +25,7 @@
       --tqh-gradient: linear-gradient(135deg, #1e5799, #0078ff);
       --surface: rgba(30, 41, 59, 0.9);
       --glass: rgba(255, 255, 255, 0.05);
-      --ad-color: #ff5722;
+      --referral-color: #9c27b0;
     }
     
     * {
@@ -705,82 +705,55 @@
       to { transform: rotate(360deg); }
     }
     
-    /* Ad Modal */
-    #ad-modal {
-      z-index: 2000;
+    /* Withdrawal Section */
+    .withdrawal-section {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      text-align: center;
     }
     
-    #ad-modal-content {
-      background: black;
-      border-radius: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      max-width: none;
-      position: relative;
+    .withdrawal-header {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
     }
     
-    #ad-container {
-      width: 100%;
-      height: 100%;
+    .withdrawal-info {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .withdrawal-min {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 12px;
+      color: var(--danger);
     }
     
-    #ad-close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 100;
-      display: none;
-    }
-    
-    .ad-progress {
-      width: 100%;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.2);
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    
-    .ad-progress-bar {
-      height: 100%;
-      background: var(--ad-color);
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    .ad-message {
-      position: absolute;
-      bottom: 20px;
-      color: white;
-      font-size: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      border-radius: 20px;
-    }
-    
-    .ad-loading {
+    /* Referral Earnings */
+    .referral-earnings {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      color: white;
+      justify-content: space-between;
+      background: rgba(156, 39, 176, 0.1);
+      padding: 15px;
+      border-radius: 16px;
+      margin: 15px 0;
     }
     
-    .ad-loading .spinner {
-      border-left-color: var(--ad-color);
+    .referral-earnings span {
+      color: var(--referral-color);
+      font-weight: 600;
     }
     
     /* Notification */
@@ -816,9 +789,9 @@
       border-left: 4px solid var(--warning);
     }
     
-    .notification.ad {
-      color: var(--ad-color);
-      border-left: 4px solid var(--ad-color);
+    .notification.info {
+      color: var(--primary);
+      border-left: 4px solid var(--primary);
     }
     
     .notification i {
@@ -925,7 +898,7 @@
           </div>
           
           <div style="margin: 10px 0; color: var(--text-secondary);">
-            Exchange Rate: 1 TQH = 0.5 TON
+            Exchange Rate: 30 TQH = 0.1 TON
           </div>
           
           <button class="swap-button" id="swap-button" disabled>
@@ -1049,6 +1022,22 @@
         </div>
       </div>
       
+      <div class="withdrawal-section">
+        <div class="withdrawal-header">
+          <i class="fas fa-money-bill-wave"></i> Withdraw TON
+        </div>
+        <div class="withdrawal-info">
+          Withdraw your TON tokens to your wallet. Minimum withdrawal amount is 30 TON.
+        </div>
+        <div class="withdrawal-min">
+          <i class="fas fa-exclamation-circle"></i>
+          Minimum: 30 TON ($93.00)
+        </div>
+        <button class="swap-button" id="withdraw-button" disabled>
+          <i class="fas fa-paper-plane"></i> Withdraw TON
+        </button>
+      </div>
+      
       <div class="referral-section">
         <div class="section-header">
           <h2>Referral Program</h2>
@@ -1056,8 +1045,19 @@
         <div class="referral-content">
           <div class="referral-description">
             Invite friends to join TonQash using your unique referral link. 
-            Earn 10% of their rewards for life! Share your link and grow your earnings.
+            Earn <strong>10%</strong> of their rewards for life! Share your link and grow your earnings.
           </div>
+          
+          <div class="referral-earnings">
+            <div>Total Referrals:</div>
+            <div><span id="referral-count">0</span> users</div>
+          </div>
+          
+          <div class="referral-earnings">
+            <div>Referral Earnings:</div>
+            <div><span id="referral-earnings">0.000</span> TQH</div>
+          </div>
+          
           <div class="referral-link-container">
             <div class="referral-link" id="referral-link">https://t.me/TonQashBot?start=ref_username</div>
             <button class="copy-btn" id="copy-referral-btn">
@@ -1145,6 +1145,29 @@
     </div>
   </div>
   
+  <!-- Withdrawal Modal -->
+  <div class="modal" id="withdrawal-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="withdrawal-modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Withdraw TON</h2>
+        <p>Withdraw your TON tokens to your wallet</p>
+      </div>
+      <div style="text-align: center; margin: 25px 0;">
+        <div style="font-size: 3rem; margin-bottom: 20px; color: var(--success);">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div style="font-size: 1.5rem; margin-bottom: 10px;" id="withdrawal-amount">30 TON</div>
+        <div style="color: var(--text-secondary);">≈ $93.00</div>
+      </div>
+      <button class="swap-button" id="confirm-withdrawal-btn">
+        Confirm Withdrawal
+      </button>
+    </div>
+  </div>
+  
   <!-- Processing Modal -->
   <div class="modal" id="processing-modal">
     <div class="modal-content">
@@ -1153,23 +1176,6 @@
         <h2>Processing Transaction</h2>
         <p>Please wait while we process your payment</p>
       </div>
-    </div>
-  </div>
-  
-  <!-- Ad Modal -->
-  <div class="modal" id="ad-modal">
-    <div class="modal-content" id="ad-modal-content">
-      <button id="ad-close-btn">✕</button>
-      <div class="ad-progress">
-        <div class="ad-progress-bar" id="ad-progress-bar"></div>
-      </div>
-      <div id="ad-container">
-        <div class="ad-loading">
-          <div class="spinner"></div>
-          <p>Loading advertisement...</p>
-        </div>
-      </div>
-      <div class="ad-message">Watch the ad to earn 10 TQH tokens</div>
     </div>
   </div>
   
@@ -1183,8 +1189,10 @@
       lastDailyClaim: null,
       lastAdClaim: null,
       lastRewardClaim: null,
-      tonPrice: 2.82, // TON price in USD
-      tqhPrice: 0.0033 // 30 TQH = $0.1 -> 1 TQH = $0.0033
+      tonPrice: 3.10, // TON price in USD
+      referralCount: 0,
+      referralEarnings: 0,
+      referrals: []
     };
     
     // Initialize TonConnect
@@ -1201,6 +1209,10 @@
     const confirmTxBtn = document.getElementById('confirm-tx-btn');
     const processingModal = document.getElementById('processing-modal');
     const disconnectButton = document.getElementById('disconnect-button');
+    const withdrawButton = document.getElementById('withdraw-button');
+    const withdrawalModal = document.getElementById('withdrawal-modal');
+    const withdrawalModalClose = document.getElementById('withdrawal-modal-close');
+    const confirmWithdrawalBtn = document.getElementById('confirm-withdrawal-btn');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -1225,21 +1237,39 @@
     const walletAddressEl = document.getElementById('wallet-address');
     const profileTonEl = document.getElementById('profile-ton');
     const profileTqhEl = document.getElementById('profile-tqh');
+    const referralCountEl = document.getElementById('referral-count');
+    const referralEarningsEl = document.getElementById('referral-earnings');
     
     // Referral elements
     const referralLinkEl = document.getElementById('referral-link');
     const copyReferralBtn = document.getElementById('copy-referral-btn');
     const copySuccessEl = document.getElementById('copy-success');
     
-    // Ad elements
-    const adModal = document.getElementById('ad-modal');
-    const adContainer = document.getElementById('ad-container');
-    const adCloseBtn = document.getElementById('ad-close-btn');
-    const adProgressBar = document.getElementById('ad-progress-bar');
-    
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
     const pages = document.querySelectorAll('.page');
+    
+    // Get Telegram username if launched from Telegram
+    function getTelegramUser() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const user = window.Telegram.WebApp.initDataUnsafe.user;
+        if (user) {
+          const username = user.username ? `@${user.username}` : `${user.first_name} ${user.last_name || ''}`.trim();
+          profileNameEl.textContent = username;
+          return username;
+        }
+      }
+      
+      // Check URL parameters as fallback
+      const urlParams = new URLSearchParams(window.location.search);
+      const tgUsername = urlParams.get('username');
+      if (tgUsername) {
+        profileNameEl.textContent = tgUsername;
+        return tgUsername;
+      }
+      
+      return "Telegram User";
+    }
     
     // Navigation functionality
     navItems.forEach(item => {
@@ -1276,19 +1306,18 @@
           connectText.textContent = 'Connected';
           connectButton.classList.add('connected');
           
-          // Get Telegram username from URL (simulated)
-          const urlParams = new URLSearchParams(window.location.search);
-          const tgUsername = urlParams.get('username') || 'Telegram User';
+          // Get Telegram username
+          const tgUsername = getTelegramUser();
           
           // Update profile
-          profileNameEl.textContent = tgUsername;
           walletAddressEl.textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
           
           // Update referral link
           updateReferralLink();
           
           // Simulate wallet balance
-          walletData.tonBalance = 0.5;
+          walletData.tonBalance = 35;
+          walletData.tqhBalance = 1500;
           updateWalletDisplay();
           
           // Update modal to show connected state
@@ -1322,14 +1351,14 @@
     
     // Update wallet display
     function updateWalletDisplay() {
-      const totalUSD = (walletData.tonBalance * walletData.tonPrice) + (walletData.tqhBalance * walletData.tqhPrice);
+      const totalUSD = (walletData.tonBalance * walletData.tonPrice) + (walletData.tqhBalance * (0.1 / 30 * walletData.tonPrice));
       
       totalBalanceEl.textContent = `$${totalUSD.toFixed(2)}`;
       tonBalanceEl.textContent = `${walletData.tonBalance.toFixed(3)} TON`;
       tonAmountEl.textContent = walletData.tonBalance.toFixed(3);
       tonValueEl.textContent = `$${(walletData.tonBalance * walletData.tonPrice).toFixed(2)}`;
       tqhAmountEl.textContent = walletData.tqhBalance.toFixed(3);
-      tqhValueEl.textContent = `$${(walletData.tqhBalance * walletData.tqhPrice).toFixed(2)}`;
+      tqhValueEl.textContent = `$${(walletData.tqhBalance * (0.1 / 30 * walletData.tonPrice)).toFixed(2)}`;
       
       // Update profile page
       profileTonEl.textContent = walletData.tonBalance.toFixed(3);
@@ -1340,6 +1369,13 @@
       stakedAmountEl.textContent = `${walletData.stakedTQH.toFixed(3)} TQH`;
       earnedRewardsEl.textContent = `${walletData.earnedRewards.toFixed(3)} TQH`;
       nextRewardEl.textContent = `${(walletData.stakedTQH * 0.01).toFixed(3)} TQH`;
+      
+      // Update referral stats
+      referralCountEl.textContent = walletData.referralCount;
+      referralEarningsEl.textContent = walletData.referralEarnings.toFixed(3);
+      
+      // Update withdrawal button state
+      withdrawButton.disabled = walletData.tonBalance < 30;
     }
     
     // Generate and update referral link
@@ -1367,7 +1403,7 @@
       });
     }
     
-    // Swap functionality
+    // Swap functionality - 30 TQH = 0.1 TON
     tqhInputEl.addEventListener('input', function() {
       const tqhAmount = parseFloat(this.value) || 0;
       
@@ -1377,9 +1413,9 @@
         tqhAmount = walletData.tqhBalance;
       }
       
-      // Calculate TON amount (1 TQH = 0.5 TON)
-      const tonAmount = tqhAmount * 0.5;
-      tonOutputEl.value = tonAmount.toFixed(3);
+      // Calculate TON amount (30 TQH = 0.1 TON)
+      const tonAmount = tqhAmount * (0.1 / 30);
+      tonOutputEl.value = tonAmount.toFixed(6);
       
       // Enable/disable swap button
       swapButtonEl.disabled = tqhAmount <= 0 || tqhAmount > walletData.tqhBalance;
@@ -1387,7 +1423,7 @@
     
     swapButtonEl.addEventListener('click', function() {
       const tqhAmount = parseFloat(tqhInputEl.value);
-      const tonAmount = tqhAmount * 0.5;
+      const tonAmount = tqhAmount * (0.1 / 30);
       
       if (tqhAmount > walletData.tqhBalance) {
         showNotification('Insufficient TQH balance', 'error');
@@ -1407,7 +1443,7 @@
       updateWalletDisplay();
       
       // Show success message
-      showNotification(`Successfully converted ${tqhAmount.toFixed(2)} TQH to ${tonAmount.toFixed(2)} TON!`, 'success');
+      showNotification(`Successfully converted ${tqhAmount.toFixed(2)} TQH to ${tonAmount.toFixed(6)} TON!`, 'success');
     });
     
     // Daily task functionality
@@ -1506,58 +1542,44 @@
       }, 1000);
     }
     
-    // Ad task functionality with Adsgram integration
-    adTaskBtn.addEventListener('click', async function() {
-      // Check if ad is on cooldown
+    // Ad task functionality
+    adTaskBtn.addEventListener('click', function() {
       if (walletData.lastAdClaim && (new Date() - walletData.lastAdClaim) < 30000) {
         return;
       }
       
-      // Show ad modal
-      adModal.classList.add('active');
-      adContainer.innerHTML = '<div class="ad-loading"><div class="spinner"></div><p>Loading advertisement...</p></div>';
+      // Show ad simulation
+      showNotification('Ad playing...', 'info');
       
-      try {
-        // Initialize Adsgram
-        await window.Adsgram.init({ blockId: "int-12037" });
+      // Start cooldown timer
+      adTimerEl.style.display = 'block';
+      adTaskBtn.disabled = true;
+      
+      let seconds = 30;
+      countdownEl.textContent = seconds;
+      
+      const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
         
-        // Show the ad
-        await window.Adsgram.show();
-        
-        // Update progress bar
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-          progress += 1;
-          adProgressBar.style.width = `${progress}%`;
-          
-          if (progress >= 100) {
-            clearInterval(progressInterval);
-            adCloseBtn.style.display = 'block';
-          }
-        }, 100);
-        
-        // Add TQH after ad completes
-        walletData.tqhBalance += 10;
-        walletData.lastAdClaim = new Date();
-        
-        // Update display
-        updateWalletDisplay();
-        
-        // Show success notification after ad closes
-        showNotification('Ad completed! 10 TQH added to your wallet', 'ad');
-        
-      } catch (error) {
-        console.error('Ad error:', error);
-        showNotification('Ad failed to load. Please try again.', 'error');
-        adModal.classList.remove('active');
-      }
-    });
-    
-    // Close ad modal
-    adCloseBtn.addEventListener('click', function() {
-      adModal.classList.remove('active');
-      adCloseBtn.style.display = 'none';
-      adProgressBar.style.width = '0%';
+        if (seconds <= 0) {
+          clearInterval(timer);
+          adTimerEl.style.display = 'none';
+          adTaskBtn.disabled = false;
+        }
+      }, 1000);
+      
+      // Add TQH
+      walletData.tqhBalance += 10;
+      walletData.lastAdClaim = new Date();
+      
+      // Update display
+      updateWalletDisplay();
+      
+      // Show success
+      setTimeout(() => {
+        showNotification('Ad completed! 10 TQH added to your wallet', 'success');
+      }, 2000);
     });
     
     // Stake TQH functionality
@@ -1584,6 +1606,39 @@
       showNotification(`Staked ${walletData.stakedTQH.toFixed(2)} TQH! You'll earn 1% daily rewards`, 'success');
     });
     
+    // Withdrawal functionality
+    withdrawButton.addEventListener('click', function() {
+      if (walletData.tonBalance < 30) {
+        showNotification('Minimum withdrawal amount is 30 TON', 'error');
+        return;
+      }
+      
+      // Show withdrawal modal
+      document.getElementById('withdrawal-amount').textContent = '30 TON';
+      withdrawalModal.classList.add('active');
+    });
+    
+    confirmWithdrawalBtn.addEventListener('click', function() {
+      // Show processing modal
+      processingModal.classList.add('active');
+      withdrawalModal.classList.remove('active');
+      
+      // Simulate withdrawal processing
+      setTimeout(() => {
+        // Deduct TON
+        walletData.tonBalance -= 30;
+        
+        // Update display
+        updateWalletDisplay();
+        
+        // Close processing modal
+        processingModal.classList.remove('active');
+        
+        // Show success notification
+        showNotification('Withdrawal successful! 30 TON sent to your wallet', 'success');
+      }, 2000);
+    });
+    
     // Modal functionality
     connectButton.addEventListener('click', () => {
       connectModal.classList.add('active');
@@ -1595,6 +1650,10 @@
     
     txModalClose.addEventListener('click', () => {
       transactionModal.classList.remove('active');
+    });
+    
+    withdrawalModalClose.addEventListener('click', () => {
+      withdrawalModal.classList.remove('active');
     });
     
     // Disconnect functionality
@@ -1611,7 +1670,7 @@
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
       notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'ad'}"></i>
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
         <span>${message}</span>
       `;
       
@@ -1645,15 +1704,24 @@
       }
     }
     
+    // Add referral earnings
+    function addReferralEarnings() {
+      // Simulate referral activity
+      if (Math.random() > 0.8) {
+        const earnings = Math.random() * 10;
+        walletData.referralEarnings += earnings;
+        walletData.tqhBalance += earnings;
+        walletData.referralCount += 1;
+        updateWalletDisplay();
+        
+        showNotification(`New referral earning: ${earnings.toFixed(2)} TQH`, 'info');
+      }
+    }
+    
     // Initialize app
     function initApp() {
-      // Check for Telegram username in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const tgUsername = urlParams.get('username');
-      
-      if (tgUsername) {
-        profileNameEl.textContent = tgUsername;
-      }
+      // Get Telegram username
+      getTelegramUser();
       
       // Initialize TonConnect
       initTonConnect();
@@ -1669,6 +1737,9 @@
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
+      
+      // Add referral earnings periodically
+      setInterval(addReferralEarnings, 10000);
     }
     
     // Start the app
