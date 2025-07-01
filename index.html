@@ -3,659 +3,1626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="متجر Jamla الإلكتروني - أفضل الملابس الرجالية والأحذية بأسعار تنافسية">
-    <meta name="keywords" content="ملابس رجالية, أحذية, موضة, تسوق إلكتروني, جملة">
-    <title>Jamla - متجرك الإلكتروني للملابس الرجالية والأحذية</title>
+    <title>TonQash - محفظة TON الإلكترونية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
-        :root {
-            --primary-color: #FFD700; /* أصفر ذهبي */
-            --secondary-color: #FFF8E1;
-            --accent-color: #FFC107;
-            --text-color: #333;
-            --light-text: #777;
-            --bg-color: #FFF;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --glass-effect: rgba(255, 255, 255, 0.2);
-        }
-        
-        body {
-            font-family: 'Tajawal', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
+        :root {
+            --primary: #0088cc;
+            --primary-dark: #0077b3;
+            --secondary: #1e1e1e;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+            --success: #00c853;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --tqh-color: #9c27b0;
+            --ton-color: #0098EA;
+            --border-radius: 16px;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--background), #0a0a0a);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
         .container {
-            max-width: 100%;
-            overflow-x: hidden;
+            max-width: 500px;
+            margin: 0 auto;
         }
-        
-        /* هيدر التطبيق */
-        .app-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 10;
+
+        /* Header Styles */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
         }
-        
-        .app-header h1 {
-            margin: 0;
-            color: white;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #006699);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .logo-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
             font-size: 24px;
             font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-            flex: 1;
+            background: linear-gradient(to right, var(--primary), #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
-        /* زر كبار التجار */
-        .traders-btn {
-            background-color: white;
-            color: var(--primary-color);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-left: 10px;
-        }
-        
-        .traders-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        /* سلايدر الصور */
-        .slider-container {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            height: 200px;
-            background-color: var(--secondary-color);
-        }
-        
-        .slider {
+
+        .user-actions {
             display: flex;
-            transition: transform 0.5s ease;
-            height: 100%;
+            gap: 15px;
         }
-        
-        .slide {
-            min-width: 100%;
-            height: 100%;
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .balance-label {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-value {
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Currency Tabs */
+        .currency-tabs {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: 50px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        /* Price Tickers */
+        .price-tickers {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .price-ticker {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .ticker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .coin-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
             background-size: cover;
             background-position: center;
-            position: relative;
         }
-        
-        .slide-overlay {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 10px 15px;
-            text-align: center;
+
+        .ton-icon {
+            background-color: var(--ton-color);
+            background-image: url('https://ton.org/download/ton_symbol.png');
         }
-        
-        .slide-title {
+
+        .tqh-icon {
+            background-color: var(--tqh-color);
+            background-image: url('https://i.suar.me/vpO26/l');
+        }
+
+        .coin-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .price-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .coin-price {
             font-size: 18px;
-            font-weight: bold;
-            margin: 0;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
-        
-        .slide-subtitle {
+
+        .price-change {
             font-size: 14px;
-            margin: 5px 0 0;
+            font-weight: 600;
         }
-        
-        /* ايقونات الأقسام */
-        .categories {
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        /* Quick Actions */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+        }
+
+        .quick-actions {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 15px;
-            background-color: var(--secondary-color);
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        
-        .category {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: transform 0.3s;
+
+        .action-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .category:hover {
+
+        .action-card:hover {
             transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
         }
-        
-        .category-icon {
-            width: 50px;
-            height: 50px;
-            background-color: var(--glass-effect);
-            backdrop-filter: blur(10px);
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .action-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Transactions */
+        .transactions {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
+            background: rgba(0, 136, 204, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 5px;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .category-icon i {
-            font-size: 24px;
-            color: var(--primary-color);
-        }
-        
-        .category-name {
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        /* قسم المنتجات */
-        .section-title {
-            padding: 15px;
             font-size: 18px;
+            margin-left: 15px;
+            color: var(--primary);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
             font-weight: 700;
-            color: var(--text-color);
+        }
+
+        .receive {
+            color: var(--success);
+        }
+
+        .send {
+            color: var(--danger);
+        }
+
+        .task {
+            color: var(--tqh-color);
+        }
+
+        /* Action Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--secondary-color);
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        
-        .products {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 10px;
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
         }
-        
-        .product-card {
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
         }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+        .form-group {
+            margin-bottom: 20px;
         }
-        
-        .product-card:active {
-            transform: scale(0.98);
-        }
-        
-        .product-image {
-            height: 150px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        
-        .product-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .product-info {
-            padding: 10px;
-        }
-        
-        .product-title {
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
             font-size: 14px;
-            margin: 0 0 5px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            opacity: 0.8;
         }
-        
-        .product-price {
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text);
             font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 0;
         }
-        
-        .old-price {
-            text-decoration: line-through;
+
+        .form-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+        }
+
+        /* Tasks Section */
+        .tasks-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(156, 39, 176, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-left: 15px;
+            color: var(--tqh-color);
+        }
+
+        .task-details {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .task-reward {
+            font-size: 14px;
+            color: var(--tqh-color);
+            font-weight: 600;
+        }
+
+        .task-btn {
+            padding: 8px 15px;
+            background: rgba(156, 39, 176, 0.2);
+            border: none;
+            border-radius: 20px;
+            color: var(--tqh-color);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-btn:hover {
+            background: rgba(156, 39, 176, 0.3);
+        }
+
+        .task-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timer-text {
             font-size: 12px;
-            color: var(--light-text);
-            margin-right: 5px;
+            color: var(--warning);
+            margin-top: 5px;
         }
-        
-        /* ميزات التطبيق */
-        .features {
+
+        /* Account Section */
+        .account-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--tqh-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .user-id {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .account-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        .connect-wallet-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
             display: flex;
             justify-content: space-around;
-            padding: 15px;
-            background-color: var(--secondary-color);
-            margin-top: 10px;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            z-index: 100;
         }
-        
-        .feature {
+
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-        
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--glass-effect);
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-        
-        .feature-icon i {
-            font-size: 20px;
-            color: var(--primary-color);
-        }
-        
-        .feature-text {
+            gap: 5px;
             font-size: 12px;
-            text-align: center;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        /* فوتر التطبيق */
-        .app-footer {
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            padding: 20px 15px;
-            text-align: center;
-            margin-top: 20px;
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary);
         }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .footer-link {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .footer-link:hover {
-            text-decoration: underline;
-        }
-        
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--glass-effect);
-            backdrop-filter: blur(10px);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s;
-        }
-        
-        .social-icon:hover {
-            transform: scale(1.1);
-        }
-        
-        .social-icon i {
+
+        .nav-item i {
             font-size: 20px;
-            color: white;
         }
-        
-        .copyright {
-            font-size: 12px;
-            color: white;
-            margin-top: 10px;
+
+        .nav-item:hover {
+            opacity: 1;
         }
-        
-        /* تأثيرات التحميل */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
-        
+
+        .balance-card {
+            animation: pulse 4s infinite ease-in-out;
+        }
+
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ad Container */
+        .ad-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .ad-content {
+            max-width: 400px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            position: relative;
+        }
+
+        .ad-close {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--danger);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .ad-title {
+            font-size: 20px;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+
+        .ad-description {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .ad-countdown {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 20px 0;
+            color: var(--warning);
+        }
+
+        .ad-reward {
+            background: rgba(0, 200, 83, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 500px) {
+            .balance-amount {
+                font-size: 32px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .action-card {
+                padding: 15px 5px;
+            }
+            
+            .action-icon {
+                font-size: 20px;
+            }
+            
+            .price-tickers {
+                flex-direction: column;
+            }
+        }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- هيدر التطبيق -->
-        <header class="app-header">
-            <button class="traders-btn" onclick="window.location.href='go:kibartojar'">كبار التجار</button>
-            <h1>Jamla</h1>
-        </header>
-        
-        <!-- سلايدر الصور -->
-        <div class="slider-container">
-            <div class="slider" id="slider">
-                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
-                    <div class="slide-overlay">
-                        <h3 class="slide-title">خصومات تصل إلى 50%</h3>
-                        <p class="slide-subtitle">على تشكيلة الملابس الصيفية</p>
-                    </div>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-img">
+                    <img src="https://i.suar.me/rplEz/l" alt="TonQash Logo">
                 </div>
-                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
-                    <div class="slide-overlay">
-                        <h3 class="slide-title">تشكيلة الأحذية الجديدة</h3>
-                        <p class="slide-subtitle">أفضل الموديلات لعام 2025</p>
-                    </div>
+                <div class="logo-text">TonQash</div>
+            </div>
+            <div class="user-actions">
+                <div class="action-btn">
+                    <i class="fas fa-bell"></i>
                 </div>
-                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
-                    <div class="slide-overlay">
-                        <h3 class="slide-title">عروض خاصة</h3>
-                        <p class="slide-subtitle">لمدة 3 أيام فقط</p>
-                    </div>
+                <div class="action-btn">
+                    <i class="fas fa-cog"></i>
                 </div>
             </div>
         </div>
-        
-        <!-- ايقونات الأقسام -->
-        <div class="categories">
-            <a href="go:ma7lya" class="category">
-                <div class="category-icon">
-                    <i class="fas fa-tshirt"></i>
-                </div>
-                <span class="category-name">ملابس محلية</span>
-            </a>
-            <a href="go:tarkya" class="category">
-                <div class="category-icon">
-                    <i class="fas fa-tshirt"></i>
-                </div>
-                <span class="category-name">ملابس تركية</span>
-            </a>
-            <a href="go:china" class="category">
-                <div class="category-icon">
-                    <i class="fas fa-tshirt"></i>
-                </div>
-                <span class="category-name">ملابس صينية</span>
-            </a>
-            <a href="category.html?type=shoes" class="category">
-                <div class="category-icon">
-                    <i class="fas fa-shoe-prints"></i>
-                </div>
-                <span class="category-name">أحذية</span>
-            </a>
+
+        <!-- Currency Tabs -->
+        <div class="currency-tabs">
+            <div class="tab active" data-currency="ton">TON</div>
+            <div class="tab" data-currency="tqh">TQH</div>
         </div>
-        
-        <!-- المنتجات الرائجة -->
-        <div class="section-title">
-            <span>المنتجات الرائجة</span>
-            <a href="https://jamladz.github.io/Raija/" filter=popular" style="font-size: 14px; color: var(--primary-color);">عرض الكل</a>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-label">رصيد محفظتك</div>
+            <div class="balance-amount"><span id="balance-amount">0.00</span> <span id="balance-currency">TON</span></div>
+            <div class="balance-value">≈ $<span id="balance-value">0.00</span> USD</div>
         </div>
-        
-        <div class="products">
-            <!-- منتج 1 -->
-            <a href="https://jamladz.github.io/3ardmontaj/" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://i.suar.me/Ozqyw/l')">
-                    <span class="product-badge">الأكثر مبيعاً</span>
+
+        <!-- Price Tickers -->
+        <div class="price-tickers">
+            <div class="price-ticker">
+                <div class="ticker-header">
+                    <div class="coin-icon ton-icon">TON</div>
+                    <div class="coin-name">The Open Network</div>
                 </div>
-                <div class="product-info">
-                    <h3 class="product-title">T shirt Demi Zip</h3>
-                    <p class="product-price">
-                        <span class="old-price">2500 د.ج</span>
-                        1900 د.ج
-                    </p>
+                <div class="price-info">
+                    <div class="coin-price">$<span id="ton-price">5.83</span></div>
+                    <div class="price-change positive">+<span id="ton-change">2.4</span>%</div>
                 </div>
-            </a>
-            
-            <!-- منتج 2 -->
-            <a href="product.html?id=2" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
-                    <span class="product-badge">جديد</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">قميص رجالي قطني</h3>
-                    <p class="product-price">
-                        <span class="old-price">2500 د.ج</span>
-                        1990 د.ج
-                    </p>
-                </div>
-            </a>
-            
-            <!-- منتج 3 -->
-            <a href="product.html?id=3" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80')">
-                    <span class="product-badge">خصم 20%</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">حذاء رياضي مريح</h3>
-                    <p class="product-price">
-                        <span class="old-price">3800 د.ج</span>
-                        3200 د.ج
-                    </p>
-                </div>
-            </a>
-            
-            <!-- منتج 4 -->
-            <a href="product.html?id=4" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
-                    <span class="product-badge">الأكثر طلباً</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">بنطال جينز رجالي</h3>
-                    <p class="product-price">
-                        <span class="old-price">3200 د.ج</span>
-                        2800 د.ج
-                    </p>
-                </div>
-            </a>
-        </div>
-        
-        <!-- المنتجات الجديدة -->
-        <div class="section-title">
-            <span>منتجات جديدة</span>
-            <a href="products.html?filter=new" style="font-size: 14px; color: var(--primary-color);">عرض الكل</a>
-        </div>
-        
-        <div class="products">
-            <!-- منتج 1 -->
-            <a href="product.html?id=5" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1539533018447-63fcce2678e4?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
-                    <span class="product-badge">جديد</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">بدلة رجالية أنيقة</h3>
-                    <p class="product-price">
-                        <span class="old-price">6500 د.ج</span>
-                        5900 د.ج
-                    </p>
-                </div>
-            </a>
-            
-            <!-- منتج 2 -->
-            <a href="product.html?id=6" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')">
-                    <span class="product-badge">جديد</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">جاكيت شتوي دافئ</h3>
-                    <p class="product-price">
-                        <span class="old-price">4800 د.ج</span>
-                        4200 د.ج
-                    </p>
-                </div>
-            </a>
-            
-            <!-- منتج 3 -->
-            <a href="product.html?id=7" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
-                    <span class="product-badge">جديد</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">حذاء رسمي جلد طبيعي</h3>
-                    <p class="product-price">
-                        <span class="old-price">4200 د.ج</span>
-                        3600 د.ج
-                    </p>
-                </div>
-            </a>
-            
-            <!-- منتج 4 -->
-            <a href="product.html?id=8" class="product-card fade-in">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1527719327859-c6ce80353573?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80')">
-                    <span class="product-badge">جديد</span>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">تيشيرت قطني مريح</h3>
-                    <p class="product-price">
-                        <span class="old-price">1800 د.ج</span>
-                        1500 د.ج
-                    </p>
-                </div>
-            </a>
-        </div>
-        
-        <!-- ميزات التطبيق -->
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-truck"></i>
-                </div>
-                <span class="feature-text">توصيل لـ 58 ولاية</span>
             </div>
-            <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-money-bill-wave"></i>
+            <div class="price-ticker">
+                <div class="ticker-header">
+                    <div class="coin-icon tqh-icon">TQH</div>
+                    <div class="coin-name">TonQash Token</div>
                 </div>
-                <span class="feature-text">دفع عند الاستلام</span>
+                <div class="price-info">
+                    <div class="coin-price">$<span id="tqh-price">0.25</span></div>
+                    <div class="price-change positive">+<span id="tqh-change">1.8</span>%</div>
+                </div>
             </div>
-            <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-check-circle"></i>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-title">العمليات السريعة</div>
+        <div class="quick-actions">
+            <div class="action-card" id="send-btn">
+                <div class="action-icon">
+                    <i class="fas fa-paper-plane"></i>
                 </div>
-                <span class="feature-text">تأكد من المنتج</span>
+                <div class="action-text">إرسال</div>
+            </div>
+            <div class="action-card" id="receive-btn">
+                <div class="action-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <div class="action-text">استقبال</div>
+            </div>
+            <div class="action-card" id="buy-btn">
+                <div class="action-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="action-text">شراء</div>
+            </div>
+            <div class="action-card" id="convert-btn">
+                <div class="action-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="action-text">تحويل</div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="section-title">آخر المعاملات</div>
+        <div class="transactions" id="transactions-container">
+            <div class="transaction">
+                <div class="transaction-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="transaction-details">
+                    <div class="transaction-title">مرحباً في محفظة TonQash</div>
+                    <div class="transaction-date">ابدأ بإجراء معاملاتك الأولى</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="tasks-container" id="tasks-container">
+            <div class="section-title">المهام المتاحة</div>
+            
+            <!-- Task 1: Connect Wallet -->
+            <div class="task-item">
+                <div class="task-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <div class="task-details">
+                    <div class="task-title">اتصل بمحفظة TON</div>
+                    <div class="task-description">قم بتوصيل محفظتك عبر نظام Ton Connect</div>
+                    <div class="task-reward">مكافأة: 5 TQH</div>
+                </div>
+                <button class="task-btn" id="connect-wallet-task-btn">إكمال</button>
+            </div>
+            
+            <!-- Task 2: Watch Ad -->
+            <div class="task-item">
+                <div class="task-icon">
+                    <i class="fas fa-ad"></i>
+                </div>
+                <div class="task-details">
+                    <div class="task-title">شاهد إعلانًا</div>
+                    <div class="task-description">شاهد إعلانًا لمدة 30 ثانية للحصول على مكافأة</div>
+                    <div class="task-reward">مكافأة: 1 TQH</div>
+                    <div id="ad-timer" class="timer-text"></div>
+                </div>
+                <button class="task-btn" id="watch-ad-btn">شاهد الآن</button>
+            </div>
+            
+            <!-- Daily Reward -->
+            <div class="task-item">
+                <div class="task-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="task-details">
+                    <div class="task-title">تسجيل يومي</div>
+                    <div class="task-description">ادخل يوميًا لتحصل على 0.1 TON</div>
+                    <div class="task-reward">مكافأة: 0.1 TON</div>
+                    <div id="daily-timer" class="timer-text"></div>
+                </div>
+                <button class="task-btn" id="daily-reward-btn">احصل على المكافأة</button>
             </div>
         </div>
         
-        <!-- فوتر التطبيق -->
-        <footer class="app-footer">
-            <div class="footer-links">
-                <a href="go:na7n" class="footer-link">من نحن</a>
-                <a href="go:kho1" class="footer-link">الشروط والأحكام</a>
-                <a href="privacy.html" class="footer-link">سياسة الخصوصية</a>
-                <a href="contact.html" class="footer-link">اتصل بنا</a>
+        <!-- Account Section -->
+        <div class="account-container" id="account-container">
+            <div class="section-title">حسابك</div>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="telegram-username">المستخدم</div>
+                    <div class="user-id" id="telegram-userid">ID: 123456789</div>
+                </div>
             </div>
             
-            <div class="social-icons">
-                <a href="https://facebook.com/jamla" class="social-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://instagram.com/jamla" class="social-icon">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://t.me/jamla" class="social-icon">
-                    <i class="fab fa-telegram"></i>
-                </a>
-                <a href="https://youtube.com/jamla" class="social-icon">
-                    <i class="fab fa-youtube"></i>
-                </a>
-                <a href="tel:+123456789" class="social-icon">
-                    <i class="fas fa-headset"></i>
-                </a>
+            <button class="connect-wallet-btn" id="connect-wallet-btn">
+                <i class="fas fa-wallet"></i> اتصل بمحفظة TON
+            </button>
+            
+            <div class="account-info">
+                <div class="info-item">
+                    <span class="info-label">رقم المحفظة:</span>
+                    <span class="info-value" id="wallet-address">غير متصل</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">تاريخ الانضمام:</span>
+                    <span class="info-value" id="join-date">1 يوليو 2025</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">المهام المكتملة:</span>
+                    <span class="info-value" id="completed-tasks">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">إجمالي الأرباح:</span>
+                    <span class="info-value" id="total-earnings">0.00 TQH</span>
+                </div>
             </div>
-            <p class="copyright">© 2025 Jamla. جميع الحقوق محفوظة</p>
-        </footer>
+        </div>
     </div>
-    
+
+    <!-- Action Modals -->
+    <div class="modal" id="send-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">إرسال أموال</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">العنوان</label>
+                <input type="text" class="form-input" id="send-address" placeholder="أدخل عنوان المحفظة">
+            </div>
+            <div class="form-group">
+                <label class="form-label">المبلغ</label>
+                <input type="number" class="form-input" id="send-amount" placeholder="0.00">
+            </div>
+            <button class="form-btn" id="confirm-send">إرسال</button>
+        </div>
+    </div>
+
+    <div class="modal" id="receive-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">استقبال أموال</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group" style="text-align: center;">
+                <div style="background: white; padding: 20px; border-radius: 10px; display: inline-block;">
+                    <i class="fas fa-qrcode" style="font-size: 150px; color: black;"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">عنوان محفظتك</label>
+                <input type="text" class="form-input" value="TQ1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8" readonly>
+            </div>
+            <button class="form-btn" onclick="copyAddress()">نسخ العنوان</button>
+        </div>
+    </div>
+
+    <div class="modal" id="convert-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">تحويل العملات</div>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">من</label>
+                <select class="form-input" id="convert-from">
+                    <option value="ton">TON</option>
+                    <option value="tqh">TQH</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">إلى</label>
+                <select class="form-input" id="convert-to">
+                    <option value="tqh">TQH</option>
+                    <option value="ton">TON</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">المبلغ</label>
+                <input type="number" class="form-input" id="convert-amount" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; font-size: 14px;">
+                    <div>سعر الصرف: <span id="exchange-rate">1 TON = 23.32 TQH</span></div>
+                    <div>ستستلم: <span id="receive-amount">0.00</span> <span id="receive-currency">TQH</span></div>
+                </div>
+            </div>
+            <button class="form-btn" id="confirm-convert">تحويل</button>
+        </div>
+    </div>
+
+    <!-- Ad Container -->
+    <div class="ad-container" id="ad-container">
+        <div class="ad-content">
+            <div class="ad-close" id="ad-close">✕</div>
+            <div class="ad-title">شاهد هذا الإعلان</div>
+            <div class="ad-description">يرجى مشاهدة الإعلان بالكامل لمدة 30 ثانية للحصول على مكافأتك</div>
+            
+            <!-- Ad placeholder -->
+            <div style="background: #333; height: 180px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 20px 0;">
+                <i class="fas fa-ad" style="font-size: 50px; color: #666;"></i>
+            </div>
+            
+            <div class="ad-countdown" id="ad-countdown">30</div>
+            <div class="ad-reward">ستحصل على 1 TQH بعد انتهاء الإعلان</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item" data-page="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>المحفظة</span>
+        </div>
+        <div class="nav-item" data-page="tasks">
+            <i class="fas fa-tasks"></i>
+            <span>المهام</span>
+        </div>
+        <div class="nav-item" data-page="account">
+            <i class="fas fa-user"></i>
+            <span>الحساب</span>
+        </div>
+    </div>
+
     <script>
-        // سكريبت السلايدر
-        document.addEventListener('DOMContentLoaded', function() {
-            const slider = document.getElementById('slider');
-            const slides = document.querySelectorAll('.slide');
-            let currentSlide = 0;
-            let touchStartX = 0;
-            let touchEndX = 0;
-            let slideInterval;
+        // State management
+        const state = {
+            tonBalance: 0,
+            tqhBalance: 0,
+            tonPrice: 5.83,
+            tqhPrice: 0.25,
+            transactions: [],
+            lastAdTime: 0,
+            lastDailyClaim: 0,
+            walletConnected: false,
+            completedTasks: 0,
+            totalEarnings: 0,
+            telegramUser: {
+                id: 123456789,
+                username: "telegram_user",
+                firstName: "مستخدم",
+                lastName: "تلجرام"
+            }
+        };
+
+        // DOM Elements
+        const balanceAmountEl = document.getElementById('balance-amount');
+        const balanceCurrencyEl = document.getElementById('balance-currency');
+        const balanceValueEl = document.getElementById('balance-value');
+        const transactionsContainer = document.getElementById('transactions-container');
+        const tasksContainer = document.getElementById('tasks-container');
+        const accountContainer = document.getElementById('account-container');
+        const tabs = document.querySelectorAll('.tab');
+        const navItems = document.querySelectorAll('.nav-item');
+        const modals = document.querySelectorAll('.modal');
+        const closeBtns = document.querySelectorAll('.close-btn');
+        const adContainer = document.getElementById('ad-container');
+        const adCountdownEl = document.getElementById('ad-countdown');
+        const adCloseBtn = document.getElementById('ad-close');
+        
+        // Telegram user data (simulated for the demo)
+        const telegramUsernameEl = document.getElementById('telegram-username');
+        const telegramUseridEl = document.getElementById('telegram-userid');
+        const walletAddressEl = document.getElementById('wallet-address');
+        const completedTasksEl = document.getElementById('completed-tasks');
+        const totalEarningsEl = document.getElementById('total-earnings');
+        const joinDateEl = document.getElementById('join-date');
+        
+        // Initialize the wallet
+        function initWallet() {
+            updateBalanceDisplay();
+            updatePriceDisplays();
+            updateTransactions();
+            updateAccountInfo();
+            setupEventListeners();
+            updateAdTimer();
+            updateDailyTimer();
+        }
+
+        // Update balance display
+        function updateBalanceDisplay() {
+            const activeCurrency = document.querySelector('.tab.active').dataset.currency;
             
-            function startSlider() {
-                slideInterval = setInterval(() => {
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    updateSlider();
-                }, 5000);
+            if (activeCurrency === 'ton') {
+                balanceAmountEl.textContent = state.tonBalance.toFixed(2);
+                balanceCurrencyEl.textContent = 'TON';
+                balanceValueEl.textContent = (state.tonBalance * state.tonPrice).toFixed(2);
+            } else {
+                balanceAmountEl.textContent = state.tqhBalance.toFixed(2);
+                balanceCurrencyEl.textContent = 'TQH';
+                balanceValueEl.textContent = (state.tqhBalance * state.tqhPrice).toFixed(2);
+            }
+        }
+
+        // Update price displays
+        function updatePriceDisplays() {
+            document.getElementById('ton-price').textContent = state.tonPrice.toFixed(2);
+            document.getElementById('tqh-price').textContent = state.tqhPrice.toFixed(2);
+            
+            // Update exchange rate
+            const rate = (state.tonPrice / state.tqhPrice).toFixed(2);
+            document.getElementById('exchange-rate').textContent = `1 TON = ${rate} TQH`;
+        }
+
+        // Update account info
+        function updateAccountInfo() {
+            telegramUsernameEl.textContent = state.telegramUser.username;
+            telegramUseridEl.textContent = `ID: ${state.telegramUser.id}`;
+            walletAddressEl.textContent = state.walletConnected ? "TQC...xYz" : "غير متصل";
+            completedTasksEl.textContent = state.completedTasks;
+            totalEarningsEl.textContent = `${state.totalEarnings.toFixed(2)} TQH`;
+            
+            const today = new Date();
+            const joinDate = new Date(today);
+            joinDate.setDate(today.getDate() - 7);
+            joinDateEl.textContent = joinDate.toLocaleDateString('ar-EG', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        // Update transactions list
+        function updateTransactions() {
+            if (state.transactions.length === 0) {
+                transactionsContainer.innerHTML = `
+                    <div class="transaction">
+                        <div class="transaction-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">مرحباً في محفظة TonQash</div>
+                            <div class="transaction-date">ابدأ بإجراء معاملاتك الأولى</div>
+                        </div>
+                    </div>
+                `;
+                return;
             }
             
-            // بدء السلايدر
-            startSlider();
+            transactionsContainer.innerHTML = '';
             
-            // إيقاف السلايدر عند التفاعل
-            slider.addEventListener('mouseenter', () => {
-                clearInterval(slideInterval);
-            });
-            
-            slider.addEventListener('mouseleave', startSlider);
-            
-            // دعم السحب بالإصبع
-            slider.addEventListener('touchstart', (e) => {
-                clearInterval(slideInterval);
-                touchStartX = e.changedTouches[0].screenX;
-            }, false);
-            
-            slider.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-                startSlider();
-            }, false);
-            
-            function handleSwipe() {
-                if (touchEndX < touchStartX - 50) {
-                    // سحب لليسار - التالي
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    updateSlider();
-                } else if (touchEndX > touchStartX + 50) {
-                    // سحب لليمين - السابق
-                    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-                    updateSlider();
+            state.transactions.slice().reverse().forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction fade-in';
+                
+                let iconClass, amountClass, icon;
+                
+                if (transaction.type === 'receive') {
+                    iconClass = 'receive';
+                    amountClass = 'receive';
+                    icon = '<i class="fas fa-arrow-down"></i>';
+                } else if (transaction.type === 'send') {
+                    iconClass = 'send';
+                    amountClass = 'send';
+                    icon = '<i class="fas fa-arrow-up"></i>';
+                } else if (transaction.type === 'convert') {
+                    iconClass = 'task';
+                    amountClass = 'task';
+                    icon = '<i class="fas fa-exchange-alt"></i>';
+                } else if (transaction.type === 'task') {
+                    iconClass = 'task';
+                    amountClass = 'task';
+                    icon = '<i class="fas fa-trophy"></i>';
+                } else if (transaction.type === 'daily') {
+                    iconClass = 'task';
+                    amountClass = 'task';
+                    icon = '<i class="fas fa-calendar-check"></i>';
                 }
-            }
-            
-            function updateSlider() {
-                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
-            }
-            
-            // تأثيرات التحميل
-            const productCards = document.querySelectorAll('.product-card');
-            productCards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-icon ${iconClass}">
+                        ${icon}
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-title">${transaction.title}</div>
+                        <div class="transaction-date">${transaction.date}</div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">${transaction.amount > 0 ? '+' : ''}${transaction.amount.toFixed(2)} ${transaction.currency}</div>
+                `;
+                
+                transactionsContainer.appendChild(transactionEl);
             });
+        }
+
+        // Add transaction
+        function addTransaction(type, amount, currency, title) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }) + ' - ' + now.toLocaleTimeString('ar-EG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            state.transactions.push({
+                type,
+                amount,
+                currency,
+                title,
+                date: dateStr
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('tonqash_transactions', JSON.stringify(state.transactions));
+            
+            updateTransactions();
+        }
+
+        // Update ad timer
+        function updateAdTimer() {
+            const now = Date.now();
+            const timeSinceLastAd = now - state.lastAdTime;
+            const cooldown = 30 * 1000; // 30 seconds
+            const remaining = Math.max(0, cooldown - timeSinceLastAd);
+            
+            const timerEl = document.getElementById('ad-timer');
+            const watchBtn = document.getElementById('watch-ad-btn');
+            
+            if (remaining > 0) {
+                const seconds = Math.ceil(remaining / 1000);
+                timerEl.textContent = `متاح بعد: ${seconds} ثانية`;
+                watchBtn.classList.add('disabled');
+            } else {
+                timerEl.textContent = '';
+                watchBtn.classList.remove('disabled');
+            }
+        }
+
+        // Update daily reward timer
+        function updateDailyTimer() {
+            const now = Date.now();
+            const timeSinceLastClaim = now - state.lastDailyClaim;
+            const cooldown = 24 * 60 * 60 * 1000; // 24 hours
+            const remaining = Math.max(0, cooldown - timeSinceLastClaim);
+            
+            const timerEl = document.getElementById('daily-timer');
+            const claimBtn = document.getElementById('daily-reward-btn');
+            
+            if (remaining > 0) {
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                timerEl.textContent = `متاح بعد: ${hours} ساعة ${minutes} دقيقة`;
+                claimBtn.classList.add('disabled');
+            } else {
+                timerEl.textContent = '';
+                claimBtn.classList.remove('disabled');
+            }
+        }
+
+        // Show ad
+        function showAd() {
+            adContainer.style.display = 'flex';
+            let count = 30;
+            
+            adCountdownEl.textContent = count;
+            
+            const countdown = setInterval(() => {
+                count--;
+                adCountdownEl.textContent = count;
+                
+                if (count <= 0) {
+                    clearInterval(countdown);
+                    completeAd();
+                }
+            }, 1000);
+        }
+
+        // Complete ad watching
+        function completeAd() {
+            adContainer.style.display = 'none';
+            state.lastAdTime = Date.now();
+            state.tqhBalance += 1;
+            state.totalEarnings += 1;
+            state.completedTasks += 1;
+            
+            addTransaction('task', 1, 'TQH', 'مكافأة مشاهدة إعلان');
+            updateBalanceDisplay();
+            updateAccountInfo();
+            updateAdTimer();
+            
+            alert('تهانينا! لقد كسبت 1 TQH من مشاهدة الإعلان');
+        }
+
+        // Claim daily reward
+        function claimDailyReward() {
+            state.lastDailyClaim = Date.now();
+            state.tonBalance += 0.1;
+            state.completedTasks += 1;
+            
+            addTransaction('daily', 0.1, 'TON', 'مكافأة تسجيل يومي');
+            updateBalanceDisplay();
+            updateAccountInfo();
+            updateDailyTimer();
+            
+            alert('تهانينا! لقد حصلت على 0.1 TON كمكافأة تسجيل يومي');
+        }
+
+        // Connect wallet
+        function connectWallet() {
+            state.walletConnected = true;
+            state.tqhBalance += 5;
+            state.totalEarnings += 5;
+            state.completedTasks += 1;
+            
+            addTransaction('task', 5, 'TQH', 'مكافأة توصيل المحفظة');
+            updateBalanceDisplay();
+            updateAccountInfo();
+            
+            document.getElementById('connect-wallet-task-btn').textContent = 'مكتمل';
+            document.getElementById('connect-wallet-task-btn').disabled = true;
+            document.getElementById('connect-wallet-task-btn').style.opacity = '0.7';
+            
+            alert('تم توصيل محفظتك بنجاح! لقد كسبت 5 TQH');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Currency tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateBalanceDisplay();
+                });
+            });
+            
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    const page = item.dataset.page;
+                    
+                    if (page === 'home') {
+                        document.querySelector('.transactions').style.display = 'block';
+                        tasksContainer.style.display = 'none';
+                        accountContainer.style.display = 'none';
+                    } else if (page === 'wallet') {
+                        document.querySelector('.transactions').style.display = 'block';
+                        tasksContainer.style.display = 'none';
+                        accountContainer.style.display = 'none';
+                    } else if (page === 'tasks') {
+                        document.querySelector('.transactions').style.display = 'none';
+                        tasksContainer.style.display = 'block';
+                        accountContainer.style.display = 'none';
+                    } else if (page === 'account') {
+                        document.querySelector('.transactions').style.display = 'none';
+                        tasksContainer.style.display = 'none';
+                        accountContainer.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Action buttons
+            document.getElementById('send-btn').addEventListener('click', () => {
+                document.getElementById('send-modal').classList.add('active');
+            });
+            
+            document.getElementById('receive-btn').addEventListener('click', () => {
+                document.getElementById('receive-modal').classList.add('active');
+            });
+            
+            document.getElementById('convert-btn').addEventListener('click', () => {
+                document.getElementById('convert-modal').classList.add('active');
+            });
+            
+            // Close modals
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modals.forEach(modal => modal.classList.remove('active'));
+                });
+            });
+            
+            // Confirm send
+            document.getElementById('confirm-send').addEventListener('click', () => {
+                const amount = parseFloat(document.getElementById('send-amount').value);
+                const address = document.getElementById('send-address').value;
+                const activeCurrency = document.querySelector('.tab.active').dataset.currency;
+                
+                if (!address || address.length < 10) {
+                    alert('يرجى إدخال عنوان محفظة صحيح');
+                    return;
+                }
+                
+                if (!amount || amount <= 0) {
+                    alert('يرجى إدخال مبلغ صحيح');
+                    return;
+                }
+                
+                if (activeCurrency === 'ton' && amount > state.tonBalance) {
+                    alert('رصيدك لا يكفي لإتمام هذه العملية');
+                    return;
+                }
+                
+                if (activeCurrency === 'tqh' && amount > state.tqhBalance) {
+                    alert('رصيدك لا يكفي لإتمام هذه العملية');
+                    return;
+                }
+                
+                // Update balance
+                if (activeCurrency === 'ton') {
+                    state.tonBalance -= amount;
+                } else {
+                    state.tqhBalance -= amount;
+                }
+                
+                // Add transaction
+                addTransaction('send', -amount, activeCurrency.toUpperCase(), `إرسال إلى ${address.substring(0, 6)}...${address.substring(address.length-4)}`);
+                
+                // Update display
+                updateBalanceDisplay();
+                
+                // Close modal
+                document.getElementById('send-modal').classList.remove('active');
+                
+                // Reset form
+                document.getElementById('send-amount').value = '';
+                document.getElementById('send-address').value = '';
+                
+                alert(`تم إرسال ${amount} ${activeCurrency.toUpperCase()} بنجاح!`);
+            });
+            
+            // Confirm convert
+            document.getElementById('confirm-convert').addEventListener('click', () => {
+                const amount = parseFloat(document.getElementById('convert-amount').value);
+                const from = document.getElementById('convert-from').value;
+                const to = document.getElementById('convert-to').value;
+                
+                if (!amount || amount <= 0) {
+                    alert('يرجى إدخال مبلغ صحيح');
+                    return;
+                }
+                
+                if (from === 'ton' && amount > state.tonBalance) {
+                    alert('رصيد TON لا يكفي لإتمام هذه العملية');
+                    return;
+                }
+                
+                if (from === 'tqh' && amount > state.tqhBalance) {
+                    alert('رصيد TQH لا يكفي لإتمام هذه العملية');
+                    return;
+                }
+                
+                // Calculate conversion
+                const exchangeRate = state.tonPrice / state.tqhPrice;
+                let receivedAmount;
+                
+                if (from === 'ton') {
+                    receivedAmount = amount * exchangeRate;
+                    state.tonBalance -= amount;
+                    state.tqhBalance += receivedAmount;
+                } else {
+                    receivedAmount = amount / exchangeRate;
+                    state.tqhBalance -= amount;
+                    state.tonBalance += receivedAmount;
+                }
+                
+                // Add transaction
+                addTransaction('convert', receivedAmount, to.toUpperCase(), `تحويل من ${from.toUpperCase()} إلى ${to.toUpperCase()}`);
+                
+                // Update display
+                updateBalanceDisplay();
+                
+                // Close modal
+                document.getElementById('convert-modal').classList.remove('active');
+                
+                // Reset form
+                document.getElementById('convert-amount').value = '';
+                
+                alert(`تم تحويل ${amount} ${from.toUpperCase()} إلى ${receivedAmount.toFixed(2)} ${to.toUpperCase()} بنجاح!`);
+            });
+            
+            // Connect wallet button (tasks)
+            document.getElementById('connect-wallet-task-btn').addEventListener('click', connectWallet);
+            
+            // Connect wallet button (account)
+            document.getElementById('connect-wallet-btn').addEventListener('click', connectWallet);
+            
+            // Watch ad button
+            document.getElementById('watch-ad-btn').addEventListener('click', () => {
+                const now = Date.now();
+                const timeSinceLastAd = now - state.lastAdTime;
+                const cooldown = 30 * 1000; // 30 seconds
+                
+                if (timeSinceLastAd < cooldown) {
+                    alert('يرجى الانتظار 30 ثانية بين مشاهدة الإعلانات');
+                    return;
+                }
+                
+                showAd();
+            });
+            
+            // Daily reward button
+            document.getElementById('daily-reward-btn').addEventListener('click', () => {
+                const now = Date.now();
+                const timeSinceLastClaim = now - state.lastDailyClaim;
+                const cooldown = 24 * 60 * 60 * 1000; // 24 hours
+                
+                if (timeSinceLastClaim < cooldown) {
+                    alert('يمكنك المطالبة بالمكافأة اليومية مرة واحدة كل 24 ساعة');
+                    return;
+                }
+                
+                claimDailyReward();
+            });
+            
+            // Ad close button
+            adCloseBtn.addEventListener('click', () => {
+                adContainer.style.display = 'none';
+                alert('لن تحصل على المكافأة لأنك لم تشاهد الإعلان بالكامل');
+            });
+            
+            // Update conversion details when amount changes
+            document.getElementById('convert-amount').addEventListener('input', () => {
+                const amount = parseFloat(document.getElementById('convert-amount').value) || 0;
+                const from = document.getElementById('convert-from').value;
+                const to = document.getElementById('convert-to').value;
+                const exchangeRate = state.tonPrice / state.tqhPrice;
+                let receivedAmount;
+                
+                if (from === 'ton') {
+                    receivedAmount = amount * exchangeRate;
+                } else {
+                    receivedAmount = amount / exchangeRate;
+                }
+                
+                document.getElementById('receive-amount').textContent = receivedAmount.toFixed(2);
+                document.getElementById('receive-currency').textContent = to.toUpperCase();
+            });
+            
+            // Copy address function
+            window.copyAddress = function() {
+                const address = document.querySelector('#receive-modal .form-input').value;
+                navigator.clipboard.writeText(address);
+                alert('تم نسخ العنوان إلى الحافظة!');
+            };
+        }
+
+        // Simulate price changes
+        function simulatePriceChanges() {
+            // TON price simulation
+            const tonVariation = (Math.random() - 0.5) * 0.2;
+            state.tonPrice += tonVariation;
+            state.tonPrice = Math.max(4.5, Math.min(7.0, state.tonPrice));
+            
+            const tonChangeEl = document.getElementById('ton-change');
+            tonChangeEl.textContent = (tonVariation > 0 ? '+' : '') + (tonVariation * 100 / state.tonPrice).toFixed(2);
+            tonChangeEl.className = tonVariation >= 0 ? 'price-change positive' : 'price-change negative';
+            
+            // TQH price simulation
+            const tqhVariation = (Math.random() - 0.5) * 0.1;
+            state.tqhPrice += tqhVariation;
+            state.tqhPrice = Math.max(0.15, Math.min(0.35, state.tqhPrice));
+            
+            const tqhChangeEl = document.getElementById('tqh-change');
+            tqhChangeEl.textContent = (tqhVariation > 0 ? '+' : '') + (tqhVariation * 100 / state.tqhPrice).toFixed(2);
+            tqhChangeEl.className = tqhVariation >= 0 ? 'price-change positive' : 'price-change negative';
+            
+            updatePriceDisplays();
+            updateBalanceDisplay();
+        }
+
+        // Initialize the wallet when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load transactions from localStorage if available
+            const savedTransactions = localStorage.getItem('tonqash_transactions');
+            if (savedTransactions) {
+                state.transactions = JSON.parse(savedTransactions);
+            }
+            
+            initWallet();
+            
+            // Start price simulation
+            setInterval(simulatePriceChanges, 10000);
+            
+            // Update timers every second
+            setInterval(() => {
+                updateAdTimer();
+                updateDailyTimer();
+            }, 1000);
+            
+            // Initial price update
+            simulatePriceChanges();
         });
     </script>
 </body>
