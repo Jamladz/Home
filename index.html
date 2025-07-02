@@ -566,32 +566,6 @@
       opacity: 1;
     }
     
-    .referral-stats {
-      display: flex;
-      justify-content: space-between;
-      background: rgba(156, 39, 176, 0.1);
-      padding: 15px;
-      border-radius: 16px;
-      margin: 15px 0;
-    }
-    
-    .referral-stats span {
-      color: var(--referral-color);
-      font-weight: 600;
-    }
-    
-    .referral-stats .calculating {
-      animation: pulse 1.5s infinite;
-      color: var(--text-secondary);
-      font-style: italic;
-    }
-    
-    @keyframes pulse {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
-    }
-    
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -766,6 +740,21 @@
       background: rgba(239, 68, 68, 0.1);
       border-radius: 12px;
       color: var(--danger);
+    }
+    
+    /* Referral Earnings */
+    .referral-earnings {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(156, 39, 176, 0.1);
+      padding: 15px;
+      border-radius: 16px;
+      margin: 15px 0;
+    }
+    
+    .referral-earnings span {
+      color: var(--referral-color);
+      font-weight: 600;
     }
     
     /* Notification */
@@ -1049,38 +1038,6 @@
             Next ad available in: <span id="countdown">30</span> seconds
           </div>
         </div>
-        
-        <!-- NEW REFERRAL TASK CARD -->
-        <div class="task-card">
-          <div class="task-header">
-            <div class="task-icon" style="background: rgba(156, 39, 176, 0.1); color: var(--referral-color);">
-              <i class="fas fa-user-friends"></i>
-            </div>
-            <div class="task-title">Refer Friends</div>
-          </div>
-          <div class="task-description">
-            Invite friends using your referral link and earn 10% of their rewards for life!
-          </div>
-          <div class="task-reward">
-            <div class="reward-icon">TQH</div>
-            <span>10 TQH per referral</span>
-          </div>
-          
-          <div class="referral-stats">
-            <div>
-              <span>Total Referrals:</span>
-              <span class="calculating">Calculating...</span>
-            </div>
-            <div>
-              <span>Referral Earnings:</span>
-              <span class="calculating">Calculating...</span>
-            </div>
-          </div>
-          
-          <button class="swap-button" id="referral-task-btn" style="background: var(--referral-color);">
-            <i class="fas fa-share-alt"></i> Copy Referral Link
-          </button>
-        </div>
       </div>
     </div>
     
@@ -1175,12 +1132,12 @@
             Earn <strong>10%</strong> of their rewards for life! Share your link and grow your earnings.
           </div>
           
-          <div class="referral-stats">
+          <div class="referral-earnings">
             <div>Total Referrals:</div>
             <div><span id="referral-count">0</span> users</div>
           </div>
           
-          <div class="referral-stats">
+          <div class="referral-earnings">
             <div>Referral Earnings:</div>
             <div><span id="referral-earnings">0.000</span> TQH</div>
           </div>
@@ -1343,6 +1300,9 @@
     let tonConnectUI = null;
     let wallet = null;
     
+    // Define recipient address for daily task payment
+    const DAILY_TASK_RECIPIENT = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"; // Replace with your actual address
+    
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
     const connectText = document.getElementById('connect-text');
@@ -1394,9 +1354,6 @@
     const adContainer = document.getElementById('ad-container');
     const adCloseBtn = document.getElementById('ad-close-btn');
     const adProgressBar = document.getElementById('ad-progress-bar');
-    
-    // Referral task elements
-    const referralTaskBtn = document.getElementById('referral-task-btn');
     
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
@@ -1550,9 +1507,6 @@
         setTimeout(() => {
           copySuccessEl.classList.remove('show');
         }, 3000);
-        
-        // Show notification
-        showNotification('Referral link copied to clipboard!', 'success');
       }).catch(err => {
         console.error('Failed to copy: ', err);
         showNotification('Failed to copy referral link. Please try again.', 'error');
@@ -1602,11 +1556,10 @@
       showNotification(`Successfully converted ${tqhAmount.toFixed(2)} TQH to ${tonAmount.toFixed(6)} TON!`, 'success');
     });
     
-    // Daily task functionality
+    // Daily task functionality using TonConnect for actual payment
     dailyTaskBtn.addEventListener('click', function() {
       // Check if wallet is connected
       if (!wallet) {
-        // Show connect modal and notification
         connectModal.classList.add('active');
         showNotification('Please connect your wallet to complete this transaction', 'warning');
         return;
@@ -1624,28 +1577,35 @@
         }
       }
       
-      // Check if user has enough balance
-      if (walletData.tonBalance < 0.07) {
-        showNotification('Insufficient TON balance for daily task', 'error');
-        return;
-      }
-      
       // Show transaction modal
       document.getElementById('tx-description').textContent = 'Sending 0.07 TON for daily reward';
       document.getElementById('tx-amount').textContent = '0.07 TON';
-      document.getElementById('tx-recipient').textContent = 'To: TonQash Rewards';
+      document.getElementById('tx-recipient').textContent = `To: ${DAILY_TASK_RECIPIENT.slice(0, 6)}...${DAILY_TASK_RECIPIENT.slice(-4)}`;
       transactionModal.classList.add('active');
       
       // Set transaction action
-      confirmTxBtn.onclick = function() {
+      confirmTxBtn.onclick = async function() {
         // Show processing modal
         processingModal.classList.add('active');
         transactionModal.classList.remove('active');
         
-        // Simulate transaction processing
-        setTimeout(() => {
-          // Deduct TON and add TQH
-          walletData.tonBalance -= 0.07;
+        try {
+          // Prepare transaction (0.07 TON = 70000000 nanoTON)
+          const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
+            messages: [
+              {
+                address: DAILY_TASK_RECIPIENT,
+                amount: "70000000" // 0.07 TON in nanoTON
+              }
+            ]
+          };
+          
+          // Send transaction using TonConnect
+          await tonConnectUI.sendTransaction(transaction);
+          
+          // If transaction is successful:
+          // Add TQH reward
           walletData.tqhBalance += 30;
           
           // Update last claim time
@@ -1662,7 +1622,11 @@
           
           // Show success notification
           showNotification('Daily reward claimed! 30 TQH added to your wallet', 'success');
-        }, 2000);
+        } catch (error) {
+          console.error('Transaction error:', error);
+          processingModal.classList.remove('active');
+          showNotification('Transaction failed. Please try again.', 'error');
+        }
       };
     });
     
@@ -1895,9 +1859,8 @@
       // Update referral link
       updateReferralLink();
       
-      // Setup referral copy buttons
+      // Setup referral copy button
       copyReferralBtn.addEventListener('click', copyReferralLink);
-      referralTaskBtn.addEventListener('click', copyReferralLink);
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
