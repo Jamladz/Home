@@ -1301,7 +1301,7 @@
     let wallet = null;
     
     // Define recipient address for daily task payment
-    const DAILY_TASK_RECIPIENT = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"; // Replace with your actual address
+    const DAILY_TASK_RECIPIENT = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3"; // Updated recipient address
     
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
@@ -1831,18 +1831,9 @@
       }
     }
     
-    // Add referral earnings
+    // Add referral earnings - DISABLED AS REQUESTED
     function addReferralEarnings() {
-      // Simulate referral activity
-      if (Math.random() > 0.8) {
-        const earnings = Math.random() * 10;
-        walletData.referralEarnings += earnings;
-        walletData.tqhBalance += earnings;
-        walletData.referralCount += 1;
-        updateWalletDisplay();
-        
-        showNotification(`New referral earning: ${earnings.toFixed(2)} TQH`, 'info');
-      }
+      return; // Referral earnings calculation is disabled
     }
     
     // Initialize app
@@ -1865,8 +1856,7 @@
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
       
-      // Add referral earnings periodically
-      setInterval(addReferralEarnings, 10000);
+      // Referral earnings system is DISABLED as requested
     }
     
     // Start the app
