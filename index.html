@@ -972,6 +972,124 @@
       color: var(--text-primary);
       border: 1px solid rgba(0, 120, 255, 0.3);
     }
+    
+    /* Hourglass animation */
+    .hourglass-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 40px;
+    }
+    
+    .hourglass {
+      display: inline-block;
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .hourglass:after {
+      content: " ";
+      display: block;
+      border-radius: 50%;
+      width: 0;
+      height: 0;
+      margin: 8px;
+      box-sizing: border-box;
+      border: 15px solid #0078ff;
+      border-color: #0078ff transparent #0078ff transparent;
+      animation: hourglass 1.5s infinite;
+    }
+    
+    @keyframes hourglass {
+      0% {
+        transform: rotate(0);
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      }
+      50% {
+        transform: rotate(900deg);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      }
+      100% {
+        transform: rotate(1800deg);
+      }
+    }
+    
+    /* Zero TON Modal */
+    .zero-ton-modal-content {
+      background: var(--card-bg);
+      border-radius: 30px;
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+    
+    .zero-ton-header {
+      margin-bottom: 20px;
+    }
+    
+    .zero-ton-header h2 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    .zero-ton-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    
+    .zero-ton-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 12px;
+      background: rgba(0, 120, 255, 0.1);
+      border-radius: 12px;
+    }
+    
+    .step-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+      min-width: 30px;
+    }
+    
+    .step-content h3 {
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .step-content p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .dont-show-again {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    /* New badge for bonus */
+    .bonus-tag {
+      background: var(--success);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      margin-left: 8px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -996,8 +1114,8 @@
       </div>
       
       <div class="tqh-info">
-        <p><i class="fas fa-gift"></i> New users get 50 TQH bonus!</p>
-        <p><i class="fas fa-link"></i> Connect wallet to get additional 10 TQH</p>
+        <p><i class="fas fa-gift"></i> New users get 50 TQH bonus! <span class="bonus-tag">BONUS</span></p>
+        <p><i class="fas fa-link"></i> Connect wallet to get additional 10 TQH <span class="bonus-tag">+10 TQH</span></p>
       </div>
       
       <div class="tokens-section">
@@ -1212,12 +1330,12 @@
           
           <div class="referral-earnings">
             <div>Total Referrals:</div>
-            <div><span id="referral-count" class="loading-dots"><div></div><div></div><div></div><div></div></span></div>
+            <div><span id="referral-count" class="hourglass-container"><div class="hourglass"></div></span></div>
           </div>
           
           <div class="referral-earnings">
             <div>Referral Earnings:</div>
-            <div><span id="referral-earnings" class="loading-dots"><div></div><div></div><div></div><div></div></span> TQH</div>
+            <div><span id="referral-earnings" class="hourglass-container"><div class="hourglass"></div></span> TQH</div>
           </div>
           
           <div class="referral-link-container">
@@ -1358,6 +1476,60 @@
     </div>
   </div>
   
+  <!-- Zero TON Modal -->
+  <div class="modal" id="zero-ton-modal">
+    <div class="zero-ton-modal-content">
+      <button class="modal-close" id="zero-ton-modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="zero-ton-header">
+        <h2><i class="fas fa-hourglass-half"></i> Get Your First TON</h2>
+        <p>You need TON to transact. Here's how to get started</p>
+      </div>
+      
+      <div class="zero-ton-steps">
+        <div class="zero-ton-step">
+          <div class="step-icon">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <div class="step-content">
+            <h3>Complete Tasks</h3>
+            <p>Earn TQH by completing daily tasks and watching ads</p>
+          </div>
+        </div>
+        
+        <div class="zero-ton-step">
+          <div class="step-icon">
+            <i class="fas fa-exchange-alt"></i>
+          </div>
+          <div class="step-content">
+            <h3>Convert TQH to TON</h3>
+            <p>Swap your earned TQH tokens for TON in the home page</p>
+          </div>
+        </div>
+        
+        <div class="zero-ton-step">
+          <div class="step-icon">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="step-content">
+            <h3>Start Transacting</h3>
+            <p>Use your TON to complete more tasks and earn rewards</p>
+          </div>
+        </div>
+      </div>
+      
+      <button class="swap-button" id="go-to-tasks-btn">
+        <i class="fas fa-play"></i> Start Earning TQH
+      </button>
+      
+      <div class="dont-show-again">
+        <input type="checkbox" id="dont-show">
+        <label for="dont-show">Don't show this message again</label>
+      </div>
+    </div>
+  </div>
+  
   <script>
     // Initialize wallet data with localStorage support
     let walletData = {
@@ -1447,6 +1619,10 @@
     const withdrawalModal = document.getElementById('withdrawal-modal');
     const withdrawalModalClose = document.getElementById('withdrawal-modal-close');
     const confirmWithdrawalBtn = document.getElementById('confirm-withdrawal-btn');
+    const zeroTonModal = document.getElementById('zero-ton-modal');
+    const zeroTonModalClose = document.getElementById('zero-ton-modal-close');
+    const goToTasksBtn = document.getElementById('go-to-tasks-btn');
+    const dontShowAgain = document.getElementById('dont-show');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -1598,6 +1774,19 @@
       });
     }
     
+    // Show zero TON modal if needed
+    function showZeroTonModal() {
+      // Don't show if user has disabled it
+      if (localStorage.getItem('dontShowZeroTonModal')) return;
+      
+      // Show modal if user has zero TON
+      if (walletData.tonBalance === 0) {
+        setTimeout(() => {
+          zeroTonModal.classList.add('active');
+        }, 1000);
+      }
+    }
+    
     // Update wallet display
     function updateWalletDisplay() {
       const totalUSD = (walletData.tonBalance * walletData.tonPrice) + (walletData.tqhBalance * (0.1 / 30 * walletData.tonPrice));
@@ -1625,6 +1814,9 @@
       
       // Update withdrawal button state
       withdrawButton.disabled = walletData.tonBalance < 70;
+      
+      // Check if we should show zero TON modal
+      showZeroTonModal();
     }
     
     // Generate and update referral link
@@ -1953,6 +2145,27 @@
       withdrawalModal.classList.remove('active');
     });
     
+    zeroTonModalClose.addEventListener('click', () => {
+      zeroTonModal.classList.remove('active');
+      if (dontShowAgain.checked) {
+        localStorage.setItem('dontShowZeroTonModal', 'true');
+      }
+    });
+    
+    // Go to tasks button in zero TON modal
+    goToTasksBtn.addEventListener('click', () => {
+      navItems.forEach(i => i.classList.remove('active'));
+      document.querySelector('.nav-item[data-page="tasks-page"]').classList.add('active');
+      
+      pages.forEach(page => page.classList.remove('active'));
+      document.getElementById('tasks-page').classList.add('active');
+      
+      zeroTonModal.classList.remove('active');
+      if (dontShowAgain.checked) {
+        localStorage.setItem('dontShowZeroTonModal', 'true');
+      }
+    });
+    
     // Disconnect functionality
     disconnectButton.addEventListener('click', function() {
       if (tonConnectUI) {
@@ -2019,11 +2232,11 @@
     
     // Simulate loading referral data
     function loadReferralData() {
-      // Show loading state for 2 seconds
+      // Show hourglass animation during loading
+      // After 2 seconds, update with actual values and remove animation
       setTimeout(() => {
-        // Update with actual values
-        referralCountEl.textContent = walletData.referralCount;
-        referralEarningsEl.textContent = walletData.referralEarnings.toFixed(3);
+        referralCountEl.innerHTML = walletData.referralCount;
+        referralEarningsEl.innerHTML = walletData.referralEarnings.toFixed(3);
       }, 2000);
     }
     
