@@ -952,6 +952,26 @@
       0% { transform: translate(0, 0); }
       100% { transform: translate(24px, 0); }
     }
+
+    .bonus-badge {
+      background: var(--success);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+
+    .tqh-info {
+      background: rgba(30, 90, 153, 0.2);
+      border-radius: 16px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: center;
+      color: var(--text-primary);
+      border: 1px solid rgba(0, 120, 255, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -973,6 +993,11 @@
         <div class="total-label">Total Balance</div>
         <div class="total-amount" id="total-balance">$0.00</div>
         <div class="total-subtitle" id="ton-balance">0.000 TON</div>
+      </div>
+      
+      <div class="tqh-info">
+        <p><i class="fas fa-gift"></i> New users get 50 TQH bonus!</p>
+        <p><i class="fas fa-link"></i> Connect wallet to get additional 10 TQH</p>
       </div>
       
       <div class="tokens-section">
@@ -1346,7 +1371,8 @@
       tonPrice: 3.10,
       referralCount: 0,
       referralEarnings: 0,
-      referrals: []
+      referrals: [],
+      walletBonusGiven: false
     };
     
     // Load data from localStorage
@@ -1361,6 +1387,11 @@
           if (walletData.lastDailyClaim) walletData.lastDailyClaim = new Date(walletData.lastDailyClaim);
           if (walletData.lastAdClaim) walletData.lastAdClaim = new Date(walletData.lastAdClaim);
           if (walletData.lastRewardClaim) walletData.lastRewardClaim = new Date(walletData.lastRewardClaim);
+          
+          // Migration for existing users - set walletBonusGiven to true
+          if (walletData.walletBonusGiven === undefined) {
+            walletData.walletBonusGiven = true;
+          }
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -1384,7 +1415,8 @@
           tonPrice: walletData.tonPrice,
           referralCount: walletData.referralCount,
           referralEarnings: walletData.referralEarnings,
-          referrals: walletData.referrals
+          referrals: walletData.referrals,
+          walletBonusGiven: walletData.walletBonusGiven
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1525,7 +1557,15 @@
           
           // Simulate wallet balance
           walletData.tonBalance = 75;
-          walletData.tqhBalance = 2500;
+          
+          // Give 10 TQH bonus for wallet connection (only once)
+          if (!walletData.walletBonusGiven) {
+            walletData.tqhBalance += 10;
+            walletData.walletBonusGiven = true;
+            saveWalletData();
+            showNotification('10 TQH added for connecting your wallet!', 'success');
+          }
+          
           updateWalletDisplay();
           saveWalletData();
           
@@ -1545,7 +1585,6 @@
           
           // Reset balances
           walletData.tonBalance = 0;
-          walletData.tqhBalance = 0;
           updateWalletDisplay();
           saveWalletData();
           
