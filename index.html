@@ -28,6 +28,7 @@
       --glass: rgba(255, 255, 255, 0.05);
       --referral-color: #9c27b0;
       --ad-color: #ff5722;
+      --reset-color: #ff6b6b;
     }
     
     * {
@@ -801,6 +802,11 @@
       border-left: 4px solid var(--ad-color);
     }
     
+    .notification.reset {
+      color: var(--reset-color);
+      border-left: 4px solid var(--reset-color);
+    }
+    
     .notification i {
       font-size: 1.2rem;
     }
@@ -1089,6 +1095,102 @@
       font-size: 0.75rem;
       margin-left: 8px;
       font-weight: 600;
+    }
+    
+    /* Reset Modal */
+    .reset-modal-content {
+      background: var(--card-bg);
+      border-radius: 30px;
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+    
+    .reset-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 107, 107, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      color: var(--reset-color);
+    }
+    
+    .reset-title {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: var(--reset-color);
+    }
+    
+    .reset-message {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    
+    .reset-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .reset-stat {
+      background: rgba(255, 107, 107, 0.1);
+      border-radius: 16px;
+      padding: 15px;
+    }
+    
+    .reset-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--reset-color);
+    }
+    
+    .reset-stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    
+    .reset-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .reset-confirm {
+      background: var(--reset-color);
+      color: white;
+      flex: 1;
+    }
+    
+    .reset-cancel {
+      background: var(--secondary);
+      color: white;
+      flex: 1;
+    }
+    
+    .reset-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: var(--reset-color);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
     }
   </style>
 </head>
@@ -1530,6 +1632,36 @@
     </div>
   </div>
   
+  <!-- Reset Modal -->
+  <div class="modal" id="reset-modal">
+    <div class="reset-modal-content">
+      <div class="reset-badge">NEW START</div>
+      <div class="reset-icon">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+      <h2 class="reset-title">Account Reset</h2>
+      <p class="reset-message">
+        Your TON balance was zero, so we've reset your account to give you a fresh start. 
+        Your referral data has been preserved.
+      </p>
+      
+      <div class="reset-stats">
+        <div class="reset-stat">
+          <div class="reset-stat-value">50 TQH</div>
+          <div class="reset-stat-label">Welcome Bonus</div>
+        </div>
+        <div class="reset-stat">
+          <div class="reset-stat-value" id="preserved-referrals">0</div>
+          <div class="reset-stat-label">Preserved Referrals</div>
+        </div>
+      </div>
+      
+      <button class="swap-button reset-confirm" id="reset-confirm-btn">
+        <i class="fas fa-check"></i> Start Fresh
+      </button>
+    </div>
+  </div>
+  
   <script>
     // Initialize wallet data with localStorage support
     let walletData = {
@@ -1544,7 +1676,8 @@
       referralCount: 0,
       referralEarnings: 0,
       referrals: [],
-      walletBonusGiven: false
+      walletBonusGiven: false,
+      resetCount: 0
     };
     
     // Load data from localStorage
@@ -1553,17 +1686,52 @@
       if (savedData) {
         try {
           const parsedData = JSON.parse(savedData);
-          Object.assign(walletData, parsedData);
+          
+          // Check if we need to reset (user has zero TON balance)
+          if (parsedData.tonBalance === 0 && parsedData.resetCount !== undefined) {
+            console.log("Resetting user with zero TON balance");
+            
+            // Preserve referral data
+            const preservedReferralData = {
+              referralCount: parsedData.referralCount || 0,
+              referralEarnings: parsedData.referralEarnings || 0,
+              referrals: parsedData.referrals || [],
+              resetCount: (parsedData.resetCount || 0) + 1
+            };
+            
+            // Reset other data
+            walletData = {
+              tonBalance: 0,
+              tqhBalance: 0,
+              stakedTQH: 0,
+              earnedRewards: 0,
+              lastDailyClaim: null,
+              lastAdClaim: null,
+              lastRewardClaim: null,
+              tonPrice: parsedData.tonPrice || 3.10,
+              walletBonusGiven: false,
+              ...preservedReferralData
+            };
+            
+            // Show reset modal
+            setTimeout(() => {
+              document.getElementById('preserved-referrals').textContent = preservedReferralData.referralCount;
+              document.getElementById('reset-modal').classList.add('active');
+            }, 1000);
+          } else {
+            // Normal load
+            Object.assign(walletData, parsedData);
+          }
+          
+          // Migration for existing users - set walletBonusGiven to true if undefined
+          if (walletData.walletBonusGiven === undefined) {
+            walletData.walletBonusGiven = true;
+          }
           
           // Convert date strings to Date objects
           if (walletData.lastDailyClaim) walletData.lastDailyClaim = new Date(walletData.lastDailyClaim);
           if (walletData.lastAdClaim) walletData.lastAdClaim = new Date(walletData.lastAdClaim);
           if (walletData.lastRewardClaim) walletData.lastRewardClaim = new Date(walletData.lastRewardClaim);
-          
-          // Migration for existing users - set walletBonusGiven to true
-          if (walletData.walletBonusGiven === undefined) {
-            walletData.walletBonusGiven = true;
-          }
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -1588,7 +1756,8 @@
           referralCount: walletData.referralCount,
           referralEarnings: walletData.referralEarnings,
           referrals: walletData.referrals,
-          walletBonusGiven: walletData.walletBonusGiven
+          walletBonusGiven: walletData.walletBonusGiven,
+          resetCount: walletData.resetCount || 0
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1623,6 +1792,8 @@
     const zeroTonModalClose = document.getElementById('zero-ton-modal-close');
     const goToTasksBtn = document.getElementById('go-to-tasks-btn');
     const dontShowAgain = document.getElementById('dont-show');
+    const resetModal = document.getElementById('reset-modal');
+    const resetConfirmBtn = document.getElementById('reset-confirm-btn');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -2180,7 +2351,7 @@
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
       notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'ad' ? 'ad' : 'info-circle'}"></i>
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'ad' ? 'ad' : type === 'reset' ? 'sync-alt' : 'info-circle'}"></i>
         <span>${message}</span>
       `;
       
@@ -2239,6 +2410,24 @@
         referralEarningsEl.innerHTML = walletData.referralEarnings.toFixed(3);
       }, 2000);
     }
+    
+    // Reset modal functionality
+    resetConfirmBtn.addEventListener('click', function() {
+      // Give welcome bonus
+      walletData.tqhBalance = 50;
+      
+      // Save data
+      saveWalletData();
+      
+      // Update display
+      updateWalletDisplay();
+      
+      // Close modal
+      resetModal.classList.remove('active');
+      
+      // Show notification
+      showNotification('Account reset! You have received 50 TQH to start fresh', 'reset');
+    });
     
     // Initialize app
     function initApp() {
