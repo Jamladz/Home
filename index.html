@@ -6,6 +6,7 @@
   <title>TonQash - Professional TON Wallet</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -1662,52 +1663,70 @@
       }, 1000);
     }
     
-    // Ad task functionality
-    adTaskBtn.addEventListener('click', function() {
-      if (walletData.lastAdClaim && (new Date() - walletData.lastAdClaim) < 30000) {
-        return;
+    // Ad task functionality with Adsgram
+    adTaskBtn.addEventListener('click', async function() {
+      // Check if ad is on cooldown
+      if (walletData.lastAdClaim) {
+        const now = new Date();
+        const secondsSinceLastAd = (now - walletData.lastAdClaim) / 1000;
+        
+        if (secondsSinceLastAd < 30) {
+          showNotification(`Please wait ${Math.ceil(30 - secondsSinceLastAd)} seconds before watching another ad`, 'warning');
+          return;
+        }
       }
       
-      // Show ad modal
-      adModal.classList.add('active');
-      adContainer.innerHTML = '<div class="ad-loading"><div class="spinner"></div><p>Loading advertisement...</p></div>';
+      // Disable button and show loading
+      adTaskBtn.disabled = true;
+      adTaskBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Loading Ad...';
       
-      // Simulate ad loading
-      setTimeout(() => {
-        adContainer.innerHTML = '<div style="width:100%;height:100%;background:url(https://i.imgur.com/3sXhN9y.png) center/cover no-repeat;"></div>';
-        adCloseBtn.style.display = 'block';
+      try {
+        // Initialize and show Adsgram ad
+        await window.Adsgram.init({ blockId: "int-12373" }).show();
         
-        // Update progress bar
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-          progress += 1;
-          adProgressBar.style.width = `${progress}%`;
-          
-          if (progress >= 100) {
-            clearInterval(progressInterval);
-            adCloseBtn.style.display = 'block';
-          }
-        }, 100);
-      }, 2000);
+        // On successful ad completion
+        walletData.tqhBalance += 10;
+        walletData.lastAdClaim = new Date();
+        
+        // Update display
+        updateWalletDisplay();
+        
+        // Show success notification
+        showNotification('Ad completed! 10 TQH added to your wallet', 'ad');
+        
+        // Start cooldown timer
+        startAdCooldown();
+      } catch (error) {
+        console.error('Ad error:', error);
+        showNotification('Ad failed to load. Please try again.', 'error');
+        
+        // Reset button
+        adTaskBtn.disabled = false;
+        adTaskBtn.innerHTML = '<i class="fas fa-play-circle"></i> Watch Ad';
+      }
     });
     
-    // Close ad modal and add reward
-    adCloseBtn.addEventListener('click', function() {
-      // Add TQH
-      walletData.tqhBalance += 10;
-      walletData.lastAdClaim = new Date();
+    // Start ad cooldown timer
+    function startAdCooldown() {
+      adTimerEl.style.display = 'block';
+      adTaskBtn.disabled = true;
+      adTaskBtn.innerHTML = '<i class="fas fa-clock"></i> Cooldown';
       
-      // Update display
-      updateWalletDisplay();
+      let seconds = 30;
+      countdownEl.textContent = seconds;
       
-      // Show success notification
-      showNotification('Ad completed! 10 TQH added to your wallet', 'ad');
-      
-      // Close modal
-      adModal.classList.remove('active');
-      adCloseBtn.style.display = 'none';
-      adProgressBar.style.width = '0%';
-    });
+      const timer = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(timer);
+          adTimerEl.style.display = 'none';
+          adTaskBtn.disabled = false;
+          adTaskBtn.innerHTML = '<i class="fas fa-play-circle"></i> Watch Ad';
+        }
+      }, 1000);
+    }
     
     // Stake TQH functionality
     stakeButton.addEventListener('click', function() {
@@ -1836,6 +1855,15 @@
       return; // Referral earnings calculation is disabled
     }
     
+    // Give 50 TQH on first login
+    function giveFirstLoginBonus() {
+      if (!localStorage.getItem('firstLoginBonusGiven')) {
+        walletData.tqhBalance += 50;
+        localStorage.setItem('firstLoginBonusGiven', 'true');
+        showNotification('Welcome! 50 TQH added to your wallet as a first login bonus!', 'success');
+      }
+    }
+    
     // Initialize app
     function initApp() {
       // Get Telegram username
@@ -1843,6 +1871,9 @@
       
       // Initialize TonConnect
       initTonConnect();
+      
+      // Give first login bonus
+      giveFirstLoginBonus();
       
       // Update wallet display
       updateWalletDisplay();
@@ -1855,8 +1886,6 @@
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
-      
-      // Referral earnings system is DISABLED as requested
     }
     
     // Start the app
