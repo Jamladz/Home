@@ -28,7 +28,6 @@
       --glass: rgba(255, 255, 255, 0.05);
       --referral-color: #9c27b0;
       --ad-color: #ff5722;
-      --reset-color: #ff6b6b;
     }
     
     * {
@@ -86,6 +85,7 @@
       background: linear-gradient(to right, var(--text-primary), #a5d8ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(0, 120, 255, 0.3);
     }
     
     .connect-btn {
@@ -802,11 +802,6 @@
       border-left: 4px solid var(--ad-color);
     }
     
-    .notification.reset {
-      color: var(--reset-color);
-      border-left: 4px solid var(--reset-color);
-    }
-    
     .notification i {
       font-size: 1.2rem;
     }
@@ -1097,8 +1092,8 @@
       font-weight: 600;
     }
     
-    /* Reset Modal */
-    .reset-modal-content {
+    /* Welcome Modal */
+    .welcome-modal-content {
       background: var(--card-bg);
       border-radius: 30px;
       width: 90%;
@@ -1110,87 +1105,38 @@
       position: relative;
     }
     
-    .reset-icon {
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 107, 107, 0.15);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 40px;
-      color: var(--reset-color);
+    .welcome-header {
+      margin-bottom: 20px;
     }
     
-    .reset-title {
+    .welcome-header h2 {
       font-size: 1.8rem;
-      margin-bottom: 15px;
-      color: var(--reset-color);
+      margin-bottom: 10px;
+      color: var(--primary);
+      background: linear-gradient(to right, #0078ff, #00c6ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
-    .reset-message {
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 25px;
-    }
-    
-    .reset-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    
-    .reset-stat {
-      background: rgba(255, 107, 107, 0.1);
+    .welcome-bonus {
+      background: rgba(16, 185, 129, 0.2);
       border-radius: 16px;
-      padding: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid var(--success);
     }
     
-    .reset-stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--reset-color);
+    .welcome-bonus-amount {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--success);
+      margin: 10px 0;
     }
     
-    .reset-stat-label {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-    
-    .reset-buttons {
-      display: flex;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    
-    .reset-confirm {
-      background: var(--reset-color);
-      color: white;
-      flex: 1;
-    }
-    
-    .reset-cancel {
-      background: var(--secondary);
-      color: white;
-      flex: 1;
-    }
-    
-    .reset-badge {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: var(--reset-color);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      z-index: 10;
+    .welcome-icon {
+      font-size: 3.5rem;
+      color: var(--success);
+      margin-bottom: 15px;
     }
   </style>
 </head>
@@ -1217,7 +1163,7 @@
       
       <div class="tqh-info">
         <p><i class="fas fa-gift"></i> New users get 50 TQH bonus! <span class="bonus-tag">BONUS</span></p>
-        <p><i class="fas fa-link"></i> Connect wallet to get additional 10 TQH <span class="bonus-tag">+10 TQH</span></p>
+        <p><i class="fas fa-link"></i> Connect wallet to get 0.5 TON <span class="bonus-tag">+0.5 TON</span></p>
       </div>
       
       <div class="tokens-section">
@@ -1632,32 +1578,33 @@
     </div>
   </div>
   
-  <!-- Reset Modal -->
-  <div class="modal" id="reset-modal">
-    <div class="reset-modal-content">
-      <div class="reset-badge">NEW START</div>
-      <div class="reset-icon">
-        <i class="fas fa-sync-alt"></i>
+  <!-- Welcome Modal -->
+  <div class="modal active" id="welcome-modal">
+    <div class="welcome-modal-content">
+      <div class="welcome-header">
+        <h2>Welcome to TonQash!</h2>
+        <p>Start your crypto journey with us</p>
       </div>
-      <h2 class="reset-title">Account Reset</h2>
-      <p class="reset-message">
-        Your TON balance was zero, so we've reset your account to give you a fresh start. 
-        Your referral data has been preserved.
+      
+      <div class="welcome-bonus">
+        <div class="welcome-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <h3>First Login Bonus</h3>
+        <div class="welcome-bonus-amount">50 TQH</div>
+        <p>Your account has been credited with 50 TQH tokens</p>
+      </div>
+      
+      <p style="margin: 20px 0; color: var(--text-secondary);">
+        Connect your wallet to get an additional 0.5 TON bonus
       </p>
       
-      <div class="reset-stats">
-        <div class="reset-stat">
-          <div class="reset-stat-value">50 TQH</div>
-          <div class="reset-stat-label">Welcome Bonus</div>
-        </div>
-        <div class="reset-stat">
-          <div class="reset-stat-value" id="preserved-referrals">0</div>
-          <div class="reset-stat-label">Preserved Referrals</div>
-        </div>
-      </div>
+      <button class="swap-button" id="welcome-connect-btn">
+        <i class="fas fa-wallet"></i> Connect Wallet
+      </button>
       
-      <button class="swap-button reset-confirm" id="reset-confirm-btn">
-        <i class="fas fa-check"></i> Start Fresh
+      <button class="swap-button" style="background: var(--secondary); margin-top: 15px;" id="welcome-continue-btn">
+        Continue Without Wallet
       </button>
     </div>
   </div>
@@ -1677,7 +1624,8 @@
       referralEarnings: 0,
       referrals: [],
       walletBonusGiven: false,
-      resetCount: 0
+      firstLoginBonusGiven: false,
+      tonBonusGiven: false
     };
     
     // Load data from localStorage
@@ -1686,52 +1634,23 @@
       if (savedData) {
         try {
           const parsedData = JSON.parse(savedData);
-          
-          // Check if we need to reset (user has zero TON balance)
-          if (parsedData.tonBalance === 0 && parsedData.resetCount !== undefined) {
-            console.log("Resetting user with zero TON balance");
-            
-            // Preserve referral data
-            const preservedReferralData = {
-              referralCount: parsedData.referralCount || 0,
-              referralEarnings: parsedData.referralEarnings || 0,
-              referrals: parsedData.referrals || [],
-              resetCount: (parsedData.resetCount || 0) + 1
-            };
-            
-            // Reset other data
-            walletData = {
-              tonBalance: 0,
-              tqhBalance: 0,
-              stakedTQH: 0,
-              earnedRewards: 0,
-              lastDailyClaim: null,
-              lastAdClaim: null,
-              lastRewardClaim: null,
-              tonPrice: parsedData.tonPrice || 3.10,
-              walletBonusGiven: false,
-              ...preservedReferralData
-            };
-            
-            // Show reset modal
-            setTimeout(() => {
-              document.getElementById('preserved-referrals').textContent = preservedReferralData.referralCount;
-              document.getElementById('reset-modal').classList.add('active');
-            }, 1000);
-          } else {
-            // Normal load
-            Object.assign(walletData, parsedData);
-          }
-          
-          // Migration for existing users - set walletBonusGiven to true if undefined
-          if (walletData.walletBonusGiven === undefined) {
-            walletData.walletBonusGiven = true;
-          }
+          Object.assign(walletData, parsedData);
           
           // Convert date strings to Date objects
           if (walletData.lastDailyClaim) walletData.lastDailyClaim = new Date(walletData.lastDailyClaim);
           if (walletData.lastAdClaim) walletData.lastAdClaim = new Date(walletData.lastAdClaim);
           if (walletData.lastRewardClaim) walletData.lastRewardClaim = new Date(walletData.lastRewardClaim);
+          
+          // Migration for existing users
+          if (walletData.walletBonusGiven === undefined) {
+            walletData.walletBonusGiven = true;
+          }
+          if (walletData.firstLoginBonusGiven === undefined) {
+            walletData.firstLoginBonusGiven = true;
+          }
+          if (walletData.tonBonusGiven === undefined) {
+            walletData.tonBonusGiven = true;
+          }
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -1757,7 +1676,8 @@
           referralEarnings: walletData.referralEarnings,
           referrals: walletData.referrals,
           walletBonusGiven: walletData.walletBonusGiven,
-          resetCount: walletData.resetCount || 0
+          firstLoginBonusGiven: walletData.firstLoginBonusGiven,
+          tonBonusGiven: walletData.tonBonusGiven
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1772,7 +1692,7 @@
     let wallet = null;
     
     // Define recipient address for daily task payment
-    const DAILY_TASK_RECIPIENT = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3"; // Updated recipient address
+    const DAILY_TASK_RECIPIENT = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3";
     
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
@@ -1792,8 +1712,9 @@
     const zeroTonModalClose = document.getElementById('zero-ton-modal-close');
     const goToTasksBtn = document.getElementById('go-to-tasks-btn');
     const dontShowAgain = document.getElementById('dont-show');
-    const resetModal = document.getElementById('reset-modal');
-    const resetConfirmBtn = document.getElementById('reset-confirm-btn');
+    const welcomeModal = document.getElementById('welcome-modal');
+    const welcomeConnectBtn = document.getElementById('welcome-connect-btn');
+    const welcomeContinueBtn = document.getElementById('welcome-continue-btn');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -1902,8 +1823,14 @@
           // Update referral link
           updateReferralLink();
           
-          // Simulate wallet balance
-          walletData.tonBalance = 75;
+          // Give 0.5 TON bonus only once
+          if (!walletData.tonBonusGiven) {
+            walletData.tonBalance = 0.5;
+            walletData.tonBonusGiven = true;
+            saveWalletData();
+            updateWalletDisplay();
+            showNotification('0.5 TON added for connecting your wallet!', 'success');
+          }
           
           // Give 10 TQH bonus for wallet connection (only once)
           if (!walletData.walletBonusGiven) {
@@ -1929,11 +1856,6 @@
           connectButton.classList.remove('connected');
           profileNameEl.textContent = 'Telegram User';
           walletAddressEl.textContent = 'Not connected';
-          
-          // Reset balances
-          walletData.tonBalance = 0;
-          updateWalletDisplay();
-          saveWalletData();
           
           // Reset referral link
           updateReferralLink();
@@ -2351,7 +2273,7 @@
       const notification = document.createElement('div');
       notification.className = `notification ${type}`;
       notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'ad' ? 'ad' : type === 'reset' ? 'sync-alt' : 'info-circle'}"></i>
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'ad' ? 'ad' : 'info-circle'}"></i>
         <span>${message}</span>
       `;
       
@@ -2393,11 +2315,11 @@
     
     // Give 50 TQH on first login
     function giveFirstLoginBonus() {
-      if (!localStorage.getItem('firstLoginBonusGiven')) {
+      if (!walletData.firstLoginBonusGiven) {
         walletData.tqhBalance += 50;
-        localStorage.setItem('firstLoginBonusGiven', 'true');
+        walletData.firstLoginBonusGiven = true;
         saveWalletData();
-        showNotification('Welcome! 50 TQH added to your wallet as a first login bonus!', 'success');
+        welcomeModal.classList.add('active');
       }
     }
     
@@ -2410,24 +2332,6 @@
         referralEarningsEl.innerHTML = walletData.referralEarnings.toFixed(3);
       }, 2000);
     }
-    
-    // Reset modal functionality
-    resetConfirmBtn.addEventListener('click', function() {
-      // Give welcome bonus
-      walletData.tqhBalance = 50;
-      
-      // Save data
-      saveWalletData();
-      
-      // Update display
-      updateWalletDisplay();
-      
-      // Close modal
-      resetModal.classList.remove('active');
-      
-      // Show notification
-      showNotification('Account reset! You have received 50 TQH to start fresh', 'reset');
-    });
     
     // Initialize app
     function initApp() {
@@ -2458,6 +2362,17 @@
       // Simulate loading referral data
       loadReferralData();
     }
+    
+    // Welcome modal button handlers
+    welcomeConnectBtn.addEventListener('click', function() {
+      welcomeModal.classList.remove('active');
+      connectModal.classList.add('active');
+    });
+    
+    welcomeContinueBtn.addEventListener('click', function() {
+      welcomeModal.classList.remove('active');
+      updateWalletDisplay();
+    });
     
     // Start the app
     window.addEventListener('DOMContentLoaded', initApp);
