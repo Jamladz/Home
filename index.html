@@ -1378,12 +1378,12 @@
           
           <div class="referral-earnings">
             <div>Total Referrals:</div>
-            <div><span id="referral-count" class="hourglass-container"><div class="hourglass"></div></span></div>
+            <div><span id="referral-count">Hidden</span></div>
           </div>
           
           <div class="referral-earnings">
             <div>Referral Earnings:</div>
-            <div><span id="referral-earnings" class="hourglass-container"><div class="hourglass"></div></span> TQH</div>
+            <div><span id="referral-earnings">Hidden</span> TQH</div>
           </div>
           
           <div class="referral-link-container">
@@ -1579,7 +1579,7 @@
   </div>
   
   <!-- Welcome Modal -->
-  <div class="modal active" id="welcome-modal">
+  <div class="modal" id="welcome-modal">
     <div class="welcome-modal-content">
       <div class="welcome-header">
         <h2>Welcome to TonQash!</h2>
@@ -1739,8 +1739,6 @@
     const walletAddressEl = document.getElementById('wallet-address');
     const profileTonEl = document.getElementById('profile-ton');
     const profileTqhEl = document.getElementById('profile-tqh');
-    const referralCountEl = document.getElementById('referral-count');
-    const referralEarningsEl = document.getElementById('referral-earnings');
     
     // Referral elements
     const referralLinkEl = document.getElementById('referral-link');
@@ -1900,10 +1898,6 @@
       stakedAmountEl.textContent = `${walletData.stakedTQH.toFixed(3)} TQH`;
       earnedRewardsEl.textContent = `${walletData.earnedRewards.toFixed(3)} TQH`;
       nextRewardEl.textContent = `${(walletData.stakedTQH * 0.01).toFixed(3)} TQH`;
-      
-      // Update referral stats
-      referralCountEl.textContent = walletData.referralCount;
-      referralEarningsEl.textContent = walletData.referralEarnings.toFixed(3);
       
       // Update withdrawal button state
       withdrawButton.disabled = walletData.tonBalance < 70;
@@ -2308,29 +2302,15 @@
       }
     }
     
-    // Add referral earnings - DISABLED AS REQUESTED
-    function addReferralEarnings() {
-      return; // Referral earnings calculation is disabled
-    }
-    
     // Give 50 TQH on first login
     function giveFirstLoginBonus() {
       if (!walletData.firstLoginBonusGiven) {
         walletData.tqhBalance += 50;
         walletData.firstLoginBonusGiven = true;
         saveWalletData();
-        welcomeModal.classList.add('active');
+        return true;
       }
-    }
-    
-    // Simulate loading referral data
-    function loadReferralData() {
-      // Show hourglass animation during loading
-      // After 2 seconds, update with actual values and remove animation
-      setTimeout(() => {
-        referralCountEl.innerHTML = walletData.referralCount;
-        referralEarningsEl.innerHTML = walletData.referralEarnings.toFixed(3);
-      }, 2000);
+      return false;
     }
     
     // Initialize app
@@ -2344,8 +2324,15 @@
       // Initialize TonConnect
       initTonConnect();
       
-      // Give first login bonus
-      giveFirstLoginBonus();
+      // Give first login bonus if needed
+      if (giveFirstLoginBonus()) {
+        // Only show welcome modal if it's the first login
+        const welcomeShown = localStorage.getItem('welcomeShown');
+        if (!welcomeShown) {
+          welcomeModal.classList.add('active');
+          localStorage.setItem('welcomeShown', 'true');
+        }
+      }
       
       // Update wallet display
       updateWalletDisplay();
@@ -2358,9 +2345,6 @@
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
-      
-      // Simulate loading referral data
-      loadReferralData();
     }
     
     // Welcome modal button handlers
