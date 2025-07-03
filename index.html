@@ -1282,6 +1282,29 @@
             Next ad available in: <span id="countdown">30</span> seconds
           </div>
         </div>
+        
+        <!-- NEW: Join Telegram Channel Task -->
+        <div class="task-card">
+          <div class="task-header">
+            <div class="task-icon">
+              <i class="fab fa-telegram"></i>
+            </div>
+            <div class="task-title">Join Telegram Channel</div>
+          </div>
+          <div class="task-description">
+            Join our official Telegram channel to get 100 TQH tokens. This reward can be claimed only once.
+          </div>
+          <div class="task-reward">
+            <div class="reward-icon">TQH</div>
+            <span>+100 TQH</span>
+          </div>
+          <button class="swap-button" id="telegram-task-btn">
+            <i class="fab fa-telegram"></i> Join Channel
+          </button>
+          <div id="telegram-task-status" style="margin-top: 15px; color: var(--success); text-align: center; display: none;">
+            <i class="fas fa-check-circle"></i> Task Completed!
+          </div>
+        </div>
       </div>
     </div>
     
@@ -1625,7 +1648,8 @@
       referrals: [],
       walletBonusGiven: false,
       firstLoginBonusGiven: false,
-      tonBonusGiven: false
+      tonBonusGiven: false,
+      telegramTaskCompleted: false // NEW: Track Telegram task completion
     };
     
     // Load data from localStorage
@@ -1650,6 +1674,9 @@
           }
           if (walletData.tonBonusGiven === undefined) {
             walletData.tonBonusGiven = true;
+          }
+          if (walletData.telegramTaskCompleted === undefined) {
+            walletData.telegramTaskCompleted = false;
           }
           
           console.log("Loaded wallet data from localStorage");
@@ -1677,7 +1704,8 @@
           referrals: walletData.referrals,
           walletBonusGiven: walletData.walletBonusGiven,
           firstLoginBonusGiven: walletData.firstLoginBonusGiven,
-          tonBonusGiven: walletData.tonBonusGiven
+          tonBonusGiven: walletData.tonBonusGiven,
+          telegramTaskCompleted: walletData.telegramTaskCompleted // NEW: Save Telegram task status
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1750,6 +1778,10 @@
     const adContainer = document.getElementById('ad-container');
     const adCloseBtn = document.getElementById('ad-close-btn');
     const adProgressBar = document.getElementById('ad-progress-bar');
+    
+    // NEW: Telegram task elements
+    const telegramTaskBtn = document.getElementById('telegram-task-btn');
+    const telegramTaskStatus = document.getElementById('telegram-task-status');
     
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
@@ -2345,6 +2377,34 @@
       
       // Claim rewards every 5 seconds (for demo)
       setInterval(claimDailyRewards, 5000);
+      
+      // NEW: Setup Telegram task button
+      if (walletData.telegramTaskCompleted) {
+        telegramTaskBtn.disabled = true;
+        telegramTaskBtn.textContent = 'Task Completed';
+        telegramTaskStatus.style.display = 'block';
+      }
+      
+      telegramTaskBtn.addEventListener('click', function() {
+        // Open Telegram channel
+        window.open('https://t.me/TonQash', '_blank');
+        
+        // Add reward
+        walletData.tqhBalance += 100;
+        walletData.telegramTaskCompleted = true;
+        
+        // Update UI
+        telegramTaskBtn.disabled = true;
+        telegramTaskBtn.textContent = 'Task Completed';
+        telegramTaskStatus.style.display = 'block';
+        
+        // Save and update
+        saveWalletData();
+        updateWalletDisplay();
+        
+        // Show notification
+        showNotification('100 TQH added for joining our Telegram channel!', 'success');
+      });
     }
     
     // Welcome modal button handlers
