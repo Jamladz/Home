@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TonQash - Professional TON Wallet</title>
+  <title>TonQash - Crypto Quiz</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
@@ -391,66 +391,6 @@
       justify-content: center;
       font-size: 14px;
       color: white;
-    }
-    
-    .tqh-stats {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-    
-    .stat-card {
-      flex: 1;
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      border: 1px solid var(--card-border);
-    }
-    
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-      color: var(--primary);
-    }
-    
-    .stat-label {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    
-    .stake-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 25px;
-      border: 1px solid var(--card-border);
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    
-    .stake-title {
-      font-size: 1.4rem;
-      margin-bottom: 15px;
-    }
-    
-    .stake-subtitle {
-      color: var(--text-secondary);
-      margin-bottom: 25px;
-    }
-    
-    .stake-button {
-      background: var(--tqh-gradient);
-      border: none;
-      border-radius: 16px;
-      padding: 16px;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      max-width: 300px;
     }
     
     .profile-header {
@@ -1138,6 +1078,162 @@
       color: var(--success);
       margin-bottom: 15px;
     }
+    
+    /* Quiz Page Styles */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .quiz-stats {
+      display: flex;
+      gap: 15px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 15px;
+      border: 1px solid var(--card-border);
+    }
+    
+    .quiz-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+    }
+    
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .quiz-container {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .question-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .question-card.correct {
+      border-left: 5px solid var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .question-card.incorrect {
+      border-left: 5px solid var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .question-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .question-reward {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--tqh-gradient);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    
+    .question-text {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .answer-container {
+      margin-top: 15px;
+    }
+    
+    .answer-input {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    
+    .submit-btn {
+      background: var(--primary);
+      border: none;
+      border-radius: 16px;
+      padding: 14px 20px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .submit-btn:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+    }
+    
+    .feedback {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      display: none;
+    }
+    
+    .feedback.correct {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      display: block;
+    }
+    
+    .feedback.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      display: block;
+    }
+    
+    .feedback-icon {
+      margin-right: 8px;
+    }
+    
+    @media (max-width: 480px) {
+      .quiz-stats {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1283,7 +1379,7 @@
           </div>
         </div>
         
-        <!-- NEW: Join Telegram Channel Task -->
+        <!-- Join Telegram Channel Task -->
         <div class="task-card">
           <div class="task-header">
             <div class="task-icon">
@@ -1308,47 +1404,24 @@
       </div>
     </div>
     
-    <!-- TQH Page -->
-    <div class="page" id="tqh-page">
-      <div class="tqh-stats">
-        <div class="stat-card">
-          <div class="stat-value" id="tqh-balance">0.000</div>
-          <div class="stat-label">TQH Balance</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="daily-reward">1%</div>
-          <div class="stat-label">Daily Reward</div>
+    <!-- Quiz Page (Replaces TQH Page) -->
+    <div class="page" id="quiz-page">
+      <div class="quiz-header">
+        <h2>Crypto Quiz</h2>
+        <div class="quiz-stats">
+          <div class="quiz-stat">
+            <div class="stat-number" id="correct-count">0</div>
+            <div class="stat-label">Correct</div>
+          </div>
+          <div class="quiz-stat">
+            <div class="stat-number" id="earned-tqh">0</div>
+            <div class="stat-label">TQH Earned</div>
+          </div>
         </div>
       </div>
       
-      <div class="stake-card">
-        <div class="stake-title">Stake Your TQH</div>
-        <div class="stake-subtitle">
-          Stake your TQH tokens to earn 1% daily rewards. Your tokens remain liquid and can be unstaked at any time.
-        </div>
-        <button class="stake-button" id="stake-button">
-          <i class="fas fa-lock"></i> Stake TQH Tokens
-        </button>
-      </div>
-      
-      <div class="tokens-section">
-        <div class="section-header">
-          <h2>Staking Details</h2>
-        </div>
-        <div style="padding: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-            <span>Staked Amount:</span>
-            <span id="staked-amount">0.000 TQH</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-            <span>Rewards Earned:</span>
-            <span id="earned-rewards">0.000 TQH</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-            <span>Next Reward:</span>
-            <span id="next-reward">0.000 TQH</span>
-          </div>
-        </div>
+      <div class="quiz-container" id="questions-container">
+        <!-- Questions will be dynamically added here -->
       </div>
     </div>
     
@@ -1443,9 +1516,9 @@
       <i class="fas fa-tasks"></i>
       <span>Tasks</span>
     </a>
-    <a href="#" class="nav-item" data-page="tqh-page">
-      <i class="fas fa-coins"></i>
-      <span>TQH</span>
+    <a href="#" class="nav-item" data-page="quiz-page">
+      <i class="fas fa-question-circle"></i>
+      <span>Quiz</span>
     </a>
     <a href="#" class="nav-item" data-page="profile-page">
       <i class="fas fa-user"></i>
@@ -1637,11 +1710,8 @@
     let walletData = {
       tonBalance: 0,
       tqhBalance: 0,
-      stakedTQH: 0,
-      earnedRewards: 0,
       lastDailyClaim: null,
       lastAdClaim: null,
-      lastRewardClaim: null,
       tonPrice: 3.10,
       referralCount: 0,
       referralEarnings: 0,
@@ -1649,8 +1719,75 @@
       walletBonusGiven: false,
       firstLoginBonusGiven: false,
       tonBonusGiven: false,
-      telegramTaskCompleted: false // NEW: Track Telegram task completion
+      telegramTaskCompleted: false,
+      quizEarnings: 0,
+      correctAnswers: 0,
+      answeredQuestions: []
     };
+    
+    // Quiz questions
+    const quizQuestions = [
+      {
+        id: 1,
+        question: "What does 'BTC' stand for in cryptocurrency?",
+        correctAnswers: ["bitcoin"],
+        reward: 2
+      },
+      {
+        id: 2,
+        question: "Which consensus mechanism does Bitcoin use?",
+        correctAnswers: ["proof of work", "pow"],
+        reward: 2
+      },
+      {
+        id: 3,
+        question: "What is the maximum supply of Bitcoin?",
+        correctAnswers: ["21 million", "21000000"],
+        reward: 2
+      },
+      {
+        id: 4,
+        question: "What is the name of the first blockchain?",
+        correctAnswers: ["bitcoin"],
+        reward: 2
+      },
+      {
+        id: 5,
+        question: "What does 'DeFi' stand for?",
+        correctAnswers: ["decentralized finance"],
+        reward: 2
+      },
+      {
+        id: 6,
+        question: "What is the native cryptocurrency of the Ethereum network?",
+        correctAnswers: ["ether", "eth"],
+        reward: 2
+      },
+      {
+        id: 7,
+        question: "What does 'NFT' stand for?",
+        correctAnswers: ["non-fungible token"],
+        reward: 2
+      },
+      {
+        id: 8,
+        question: "Which blockchain is known for its proof-of-stake consensus?",
+        correctAnswers: ["cardano", "ethereum", "solana", "polkadot"],
+        reward: 2
+      },
+      {
+        id: 9,
+        question: "What is the process of adding transactions to the blockchain called?",
+        correctAnswers: ["mining", "forging", "staking", "validating"],
+        reward: 2
+      },
+      {
+        id: 10,
+        question: "What is the term for a 50% drop in cryptocurrency prices?",
+        correctAnswers: ["halving"],
+        reward: 2
+      }
+    ];
     
     // Load data from localStorage
     function loadWalletData() {
@@ -1663,21 +1800,15 @@
           // Convert date strings to Date objects
           if (walletData.lastDailyClaim) walletData.lastDailyClaim = new Date(walletData.lastDailyClaim);
           if (walletData.lastAdClaim) walletData.lastAdClaim = new Date(walletData.lastAdClaim);
-          if (walletData.lastRewardClaim) walletData.lastRewardClaim = new Date(walletData.lastRewardClaim);
           
           // Migration for existing users
-          if (walletData.walletBonusGiven === undefined) {
-            walletData.walletBonusGiven = true;
-          }
-          if (walletData.firstLoginBonusGiven === undefined) {
-            walletData.firstLoginBonusGiven = true;
-          }
-          if (walletData.tonBonusGiven === undefined) {
-            walletData.tonBonusGiven = true;
-          }
-          if (walletData.telegramTaskCompleted === undefined) {
-            walletData.telegramTaskCompleted = false;
-          }
+          if (walletData.walletBonusGiven === undefined) walletData.walletBonusGiven = true;
+          if (walletData.firstLoginBonusGiven === undefined) walletData.firstLoginBonusGiven = true;
+          if (walletData.tonBonusGiven === undefined) walletData.tonBonusGiven = true;
+          if (walletData.telegramTaskCompleted === undefined) walletData.telegramTaskCompleted = false;
+          if (walletData.quizEarnings === undefined) walletData.quizEarnings = 0;
+          if (walletData.correctAnswers === undefined) walletData.correctAnswers = 0;
+          if (walletData.answeredQuestions === undefined) walletData.answeredQuestions = [];
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -1693,11 +1824,8 @@
         const dataToSave = {
           tonBalance: walletData.tonBalance,
           tqhBalance: walletData.tqhBalance,
-          stakedTQH: walletData.stakedTQH,
-          earnedRewards: walletData.earnedRewards,
           lastDailyClaim: walletData.lastDailyClaim ? walletData.lastDailyClaim.toISOString() : null,
           lastAdClaim: walletData.lastAdClaim ? walletData.lastAdClaim.toISOString() : null,
-          lastRewardClaim: walletData.lastRewardClaim ? walletData.lastRewardClaim.toISOString() : null,
           tonPrice: walletData.tonPrice,
           referralCount: walletData.referralCount,
           referralEarnings: walletData.referralEarnings,
@@ -1705,7 +1833,10 @@
           walletBonusGiven: walletData.walletBonusGiven,
           firstLoginBonusGiven: walletData.firstLoginBonusGiven,
           tonBonusGiven: walletData.tonBonusGiven,
-          telegramTaskCompleted: walletData.telegramTaskCompleted // NEW: Save Telegram task status
+          telegramTaskCompleted: walletData.telegramTaskCompleted,
+          quizEarnings: walletData.quizEarnings,
+          correctAnswers: walletData.correctAnswers,
+          answeredQuestions: walletData.answeredQuestions
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1759,10 +1890,6 @@
     const countdownEl = document.getElementById('countdown');
     const dailyTaskStatus = document.getElementById('daily-task-status');
     const dailyCountdown = document.getElementById('daily-countdown');
-    const stakeButton = document.getElementById('stake-button');
-    const stakedAmountEl = document.getElementById('staked-amount');
-    const earnedRewardsEl = document.getElementById('earned-rewards');
-    const nextRewardEl = document.getElementById('next-reward');
     const profileNameEl = document.getElementById('profile-name');
     const walletAddressEl = document.getElementById('wallet-address');
     const profileTonEl = document.getElementById('profile-ton');
@@ -1779,9 +1906,14 @@
     const adCloseBtn = document.getElementById('ad-close-btn');
     const adProgressBar = document.getElementById('ad-progress-bar');
     
-    // NEW: Telegram task elements
+    // Telegram task elements
     const telegramTaskBtn = document.getElementById('telegram-task-btn');
     const telegramTaskStatus = document.getElementById('telegram-task-status');
+    
+    // Quiz elements
+    const correctCountEl = document.getElementById('correct-count');
+    const earnedTqhEl = document.getElementById('earned-tqh');
+    const questionsContainer = document.getElementById('questions-container');
     
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
@@ -1825,8 +1957,125 @@
         if (targetPage === 'profile-page') {
           updateReferralLink();
         }
+        
+        // Render quiz questions when quiz page is opened
+        if (targetPage === 'quiz-page') {
+          renderQuizQuestions();
+        }
       });
     });
+    
+    // Render quiz questions
+    function renderQuizQuestions() {
+      questionsContainer.innerHTML = '';
+      
+      quizQuestions.forEach(q => {
+        const isAnswered = walletData.answeredQuestions.includes(q.id);
+        
+        const questionCard = document.createElement('div');
+        questionCard.className = `question-card ${isAnswered ? 'correct' : ''}`;
+        questionCard.innerHTML = `
+          <div class="question-header">
+            <div class="question-number">${q.id}</div>
+            <div class="question-reward">
+              <i class="fas fa-coins"></i>
+              <span>${q.reward} TQH</span>
+            </div>
+          </div>
+          <div class="question-text">${q.question}</div>
+          <div class="answer-container">
+            <input 
+              type="text" 
+              class="answer-input" 
+              id="answer-${q.id}" 
+              placeholder="Your answer..."
+              ${isAnswered ? 'disabled' : ''}
+            >
+            <button 
+              class="submit-btn" 
+              id="submit-${q.id}" 
+              ${isAnswered ? 'disabled' : ''}
+            >
+              ${isAnswered ? 'Answered' : 'Submit Answer'}
+            </button>
+            <div class="feedback" id="feedback-${q.id}">
+              ${isAnswered ? 
+                `<i class="fas fa-check-circle feedback-icon"></i> Correct! +${q.reward} TQH earned` : 
+                ''}
+            </div>
+          </div>
+        `;
+        
+        questionsContainer.appendChild(questionCard);
+        
+        // Add event listener if question not answered
+        if (!isAnswered) {
+          const submitBtn = document.getElementById(`submit-${q.id}`);
+          submitBtn.addEventListener('click', () => checkAnswer(q));
+        }
+      });
+      
+      // Update stats
+      updateQuizStats();
+    }
+    
+    // Check answer for a question
+    function checkAnswer(question) {
+      const answerInput = document.getElementById(`answer-${question.id}`);
+      const feedbackEl = document.getElementById(`feedback-${question.id}`);
+      const submitBtn = document.getElementById(`submit-${question.id}`);
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      
+      if (!userAnswer) {
+        feedbackEl.className = 'feedback incorrect';
+        feedbackEl.innerHTML = '<i class="fas fa-exclamation-circle feedback-icon"></i> Please enter an answer';
+        return;
+      }
+      
+      // Check if answer is correct
+      const isCorrect = question.correctAnswers.some(correct => 
+        userAnswer.includes(correct) || correct.includes(userAnswer)
+      );
+      
+      if (isCorrect) {
+        // Mark question as answered
+        walletData.answeredQuestions.push(question.id);
+        walletData.correctAnswers++;
+        walletData.quizEarnings += question.reward;
+        walletData.tqhBalance += question.reward;
+        
+        // Update UI
+        feedbackEl.className = 'feedback correct';
+        feedbackEl.innerHTML = `<i class="fas fa-check-circle feedback-icon"></i> Correct! +${question.reward} TQH earned`;
+        answerInput.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Answered';
+        
+        // Add visual confirmation
+        const questionCard = answerInput.closest('.question-card');
+        questionCard.classList.add('correct');
+        
+        // Update stats
+        updateQuizStats();
+        updateWalletDisplay();
+        
+        // Show notification
+        showNotification(`Correct! You earned ${question.reward} TQH`, 'success');
+        
+        // Save data
+        saveWalletData();
+      } else {
+        // Show incorrect feedback
+        feedbackEl.className = 'feedback incorrect';
+        feedbackEl.innerHTML = '<i class="fas fa-times-circle feedback-icon"></i> Incorrect. Try again!';
+      }
+    }
+    
+    // Update quiz stats display
+    function updateQuizStats() {
+      correctCountEl.textContent = walletData.correctAnswers;
+      earnedTqhEl.textContent = walletData.quizEarnings;
+    }
     
     // Initialize TonConnect
     function initTonConnect() {
@@ -1924,12 +2173,6 @@
       // Update profile page
       profileTonEl.textContent = walletData.tonBalance.toFixed(3);
       profileTqhEl.textContent = walletData.tqhBalance.toFixed(3);
-      
-      // Update TQH page
-      document.getElementById('tqh-balance').textContent = walletData.tqhBalance.toFixed(3);
-      stakedAmountEl.textContent = `${walletData.stakedTQH.toFixed(3)} TQH`;
-      earnedRewardsEl.textContent = `${walletData.earnedRewards.toFixed(3)} TQH`;
-      nextRewardEl.textContent = `${(walletData.stakedTQH * 0.01).toFixed(3)} TQH`;
       
       // Update withdrawal button state
       withdrawButton.disabled = walletData.tonBalance < 70;
@@ -2184,33 +2427,6 @@
       }, 1000);
     }
     
-    // Stake TQH functionality
-    stakeButton.addEventListener('click', function() {
-      // Check if wallet is connected
-      if (!wallet) {
-        connectModal.classList.add('active');
-        showNotification('Please connect your wallet to stake tokens', 'warning');
-        return;
-      }
-      
-      if (walletData.tqhBalance <= 0) {
-        showNotification('You need TQH tokens to stake', 'error');
-        return;
-      }
-      
-      // Stake all available TQH
-      walletData.stakedTQH += walletData.tqhBalance;
-      walletData.tqhBalance = 0;
-      
-      // Save data
-      saveWalletData();
-      
-      // Update display
-      updateWalletDisplay();
-      
-      showNotification(`Staked ${walletData.stakedTQH.toFixed(2)} TQH! You'll earn 1% daily rewards`, 'success');
-    });
-    
     // Withdrawal functionality
     withdrawButton.addEventListener('click', function() {
       if (walletData.tonBalance < 70) {
@@ -2315,25 +2531,6 @@
       }, 3000);
     }
     
-    // Claim daily rewards automatically
-    function claimDailyRewards() {
-      if (!walletData.stakedTQH) return;
-      
-      // Calculate rewards (1% per day)
-      const now = new Date();
-      const lastClaim = walletData.lastRewardClaim || new Date();
-      const hoursPassed = (now - lastClaim) / (1000 * 60 * 60);
-      
-      if (hoursPassed >= 24) {
-        const rewards = walletData.stakedTQH * 0.01;
-        walletData.earnedRewards += rewards;
-        walletData.tqhBalance += rewards;
-        walletData.lastRewardClaim = now;
-        saveWalletData();
-        updateWalletDisplay();
-      }
-    }
-    
     // Give 50 TQH on first login
     function giveFirstLoginBonus() {
       if (!walletData.firstLoginBonusGiven) {
@@ -2375,10 +2572,7 @@
       // Setup referral copy button
       copyReferralBtn.addEventListener('click', copyReferralLink);
       
-      // Claim rewards every 5 seconds (for demo)
-      setInterval(claimDailyRewards, 5000);
-      
-      // NEW: Setup Telegram task button
+      // Setup Telegram task button
       if (walletData.telegramTaskCompleted) {
         telegramTaskBtn.disabled = true;
         telegramTaskBtn.textContent = 'Task Completed';
@@ -2405,6 +2599,9 @@
         // Show notification
         showNotification('100 TQH added for joining our Telegram channel!', 'success');
       });
+      
+      // Render quiz questions
+      renderQuizQuestions();
     }
     
     // Welcome modal button handlers
