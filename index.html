@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TonQash - Crypto Quiz</title>
+  <title>TonQash - NFT Gift Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -28,6 +27,9 @@
       --glass: rgba(255, 255, 255, 0.05);
       --referral-color: #9c27b0;
       --ad-color: #ff5722;
+      --gift-1: #FF6B6B;
+      --gift-2: #4ECDC4;
+      --gift-3: #FFD166;
     }
     
     * {
@@ -746,82 +748,203 @@
       font-size: 1.2rem;
     }
     
-    /* Ad Modal */
-    #ad-modal {
-      z-index: 2000;
+    /* Gift Section Styles */
+    .gift-container {
+      display: grid;
+      gap: 20px;
     }
     
-    #ad-modal-content {
-      background: black;
-      border-radius: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      max-width: none;
+    .gift-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .gift-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
       position: relative;
     }
     
-    #ad-container {
+    .gift-image {
       width: 100%;
+      height: 200px;
+      border-radius: 16px;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .gift-progress {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+    
+    .gift-progress-bar {
       height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .gift-stats {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+      color: var(--text-secondary);
     }
     
-    #ad-close-btn {
+    .gift-price {
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 15px 0;
+    }
+    
+    .gift-badge {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      top: 20px;
+      right: 20px;
+      background: var(--primary);
       color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 100;
-      display: none;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     
-    .ad-progress {
-      width: 100%;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.2);
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    
-    .ad-progress-bar {
-      height: 100%;
-      background: var(--ad-color);
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    .ad-message {
-      position: absolute;
-      bottom: 20px;
+    .gift-subscribe-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
       color: white;
       font-size: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
     }
     
-    .ad-loading {
+    .gift-subscribe-btn:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+    }
+    
+    .gift-subscribe-btn.subscribed {
+      background: var(--success);
+    }
+    
+    /* Subscription Page */
+    .subscription-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 20px;
-      color: white;
+      gap: 8px;
+      margin-bottom: 20px;
+      cursor: pointer;
     }
     
-    .ad-loading .spinner {
-      border-left-color: var(--ad-color);
+    .gift-details {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .gift-title {
+      font-size: 1.8rem;
+      margin: 15px 0;
+      font-weight: 700;
+    }
+    
+    .gift-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    
+    .subscription-form {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    
+    .form-note {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    
+    .terms {
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 16px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    
+    .terms-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .terms-list {
+      padding-left: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .terms-list li {
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .terms-check {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
     }
     
     @media (max-width: 480px) {
@@ -1078,162 +1201,6 @@
       color: var(--success);
       margin-bottom: 15px;
     }
-    
-    /* Quiz Page Styles */
-    .quiz-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .quiz-stats {
-      display: flex;
-      gap: 15px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      padding: 15px;
-      border: 1px solid var(--card-border);
-    }
-    
-    .quiz-stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px;
-    }
-    
-    .stat-number {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-    
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    
-    .quiz-container {
-      display: grid;
-      gap: 20px;
-    }
-    
-    .question-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 24px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-    
-    .question-card.correct {
-      border-left: 5px solid var(--success);
-      background: rgba(16, 185, 129, 0.1);
-    }
-    
-    .question-card.incorrect {
-      border-left: 5px solid var(--danger);
-      background: rgba(239, 68, 68, 0.1);
-    }
-    
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    
-    .question-number {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-    }
-    
-    .question-reward {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--tqh-gradient);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-    
-    .question-text {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    
-    .answer-container {
-      margin-top: 15px;
-    }
-    
-    .answer-input {
-      width: 100%;
-      padding: 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      color: var(--text-primary);
-      font-size: 1rem;
-      margin-bottom: 15px;
-    }
-    
-    .submit-btn {
-      background: var(--primary);
-      border: none;
-      border-radius: 16px;
-      padding: 14px 20px;
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-    }
-    
-    .submit-btn:disabled {
-      background: var(--text-secondary);
-      cursor: not-allowed;
-    }
-    
-    .feedback {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 12px;
-      display: none;
-    }
-    
-    .feedback.correct {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--success);
-      display: block;
-    }
-    
-    .feedback.incorrect {
-      background: rgba(239, 68, 68, 0.15);
-      color: var(--danger);
-      display: block;
-    }
-    
-    .feedback-icon {
-      margin-right: 8px;
-    }
-    
-    @media (max-width: 480px) {
-      .quiz-stats {
-        flex-direction: column;
-      }
-    }
   </style>
 </head>
 <body>
@@ -1404,24 +1371,124 @@
       </div>
     </div>
     
-    <!-- Quiz Page (Replaces TQH Page) -->
-    <div class="page" id="quiz-page">
-      <div class="quiz-header">
-        <h2>Crypto Quiz</h2>
-        <div class="quiz-stats">
-          <div class="quiz-stat">
-            <div class="stat-number" id="correct-count">0</div>
-            <div class="stat-label">Correct</div>
-          </div>
-          <div class="quiz-stat">
-            <div class="stat-number" id="earned-tqh">0</div>
-            <div class="stat-label">TQH Earned</div>
-          </div>
-        </div>
+    <!-- Gift Page -->
+    <div class="page" id="gift-page">
+      <div class="section-header">
+        <h2>NFT Gift Giveaways</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Subscribe to win exclusive NFTs</p>
       </div>
       
-      <div class="quiz-container" id="questions-container">
-        <!-- Questions will be dynamically added here -->
+      <div class="gift-container">
+        <!-- Gift 1 -->
+        <div class="gift-card">
+          <div class="gift-badge">Premium</div>
+          <div class="gift-image" style="background-image: url('https://i.suar.me/5L142/l')"></div>
+          <div class="gift-stats">
+            <div>Participants:</div>
+            <div><span id="gift1-current">2355</span>/<span id="gift1-max">3000</span></div>
+          </div>
+          <div class="gift-progress">
+            <div class="gift-progress-bar" id="gift1-progress" style="width: 78.5%; background: var(--gift-1);"></div>
+          </div>
+          <div class="gift-price">1 TON</div>
+          <div class="task-description">
+            Exclusive NFT collection #1 with unique digital artwork. Only one winner will be selected when all subscriptions are filled.
+          </div>
+          <button class="gift-subscribe-btn" id="gift1-btn" data-gift="1">
+            Subscribe to Win
+          </button>
+        </div>
+        
+        <!-- Gift 2 -->
+        <div class="gift-card">
+          <div class="gift-badge">Popular</div>
+          <div class="gift-image" style="background-image: url('https://i.suar.me/ppxy2/l')"></div>
+          <div class="gift-stats">
+            <div>Participants:</div>
+            <div><span id="gift2-current">5789</span>/<span id="gift2-max">10000</span></div>
+          </div>
+          <div class="gift-progress">
+            <div class="gift-progress-bar" id="gift2-progress" style="width: 57.89%; background: var(--gift-2);"></div>
+          </div>
+          <div class="gift-price">0.5 TON</div>
+          <div class="task-description">
+            Rare NFT collection #2 with limited edition digital art. One winner selected at random when the subscription goal is reached.
+          </div>
+          <button class="gift-subscribe-btn" id="gift2-btn" data-gift="2">
+            Subscribe to Win
+          </button>
+        </div>
+        
+        <!-- Gift 3 -->
+        <div class="gift-card">
+          <div class="gift-badge">New</div>
+          <div class="gift-image" style="background-image: url('https://i.suar.me/avqmd/l')"></div>
+          <div class="gift-stats">
+            <div>Participants:</div>
+            <div><span id="gift3-current">6487</span>/<span id="gift3-max">10000</span></div>
+          </div>
+          <div class="gift-progress">
+            <div class="gift-progress-bar" id="gift3-progress" style="width: 64.87%; background: var(--gift-3);"></div>
+          </div>
+          <div class="gift-price">0.5 TON</div>
+          <div class="task-description">
+            Exclusive NFT collection #3 featuring unique digital masterpieces. Only one winner will be selected when all subscriptions are filled.
+          </div>
+          <button class="gift-subscribe-btn" id="gift3-btn" data-gift="3">
+            Subscribe to Win
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Subscription Page -->
+    <div class="page" id="subscription-page">
+      <div class="subscription-container">
+        <button class="back-btn" id="back-to-gifts">
+          <i class="fas fa-arrow-left"></i> Back to Gifts
+        </button>
+        
+        <div class="gift-details">
+          <div class="gift-image" id="gift-detail-image" style="height: 250px;"></div>
+          <h2 class="gift-title" id="gift-detail-title">NFT Gift</h2>
+          <div class="gift-subtitle" id="gift-detail-subtitle">Exclusive NFT Collection</div>
+          <div class="gift-stats">
+            <div>Participants:</div>
+            <div><span id="gift-detail-current">0</span>/<span id="gift-detail-max">0</span></div>
+          </div>
+          <div class="gift-progress">
+            <div class="gift-progress-bar" id="gift-detail-progress" style="width: 0%;"></div>
+          </div>
+          <div class="gift-price" id="gift-detail-price">0 TON</div>
+        </div>
+        
+        <div class="subscription-form">
+          <div class="form-group">
+            <label class="form-label">Telegram Username</label>
+            <input type="text" class="form-input" id="telegram-username" placeholder="@yourusername">
+            <div class="form-note">Optional - for winner notification</div>
+          </div>
+          
+          <div class="terms">
+            <div class="terms-title">Terms & Conditions:</div>
+            <ul class="terms-list">
+              <li>Only one subscription per user per gift</li>
+              <li>Payment is non-refundable</li>
+              <li>Winner selected randomly when subscription goal is reached</li>
+              <li>Winner will be notified via Telegram or wallet address</li>
+              <li>NFT will be transferred to winner's wallet within 24 hours</li>
+            </ul>
+            
+            <div class="terms-check">
+              <input type="checkbox" id="terms-agree">
+              <label for="terms-agree">I agree to the terms and conditions</label>
+            </div>
+          </div>
+          
+          <button class="gift-subscribe-btn" id="confirm-subscription">
+            <i class="fas fa-lock"></i> Confirm Payment
+          </button>
+        </div>
       </div>
     </div>
     
@@ -1516,9 +1583,9 @@
       <i class="fas fa-tasks"></i>
       <span>Tasks</span>
     </a>
-    <a href="#" class="nav-item" data-page="quiz-page">
-      <i class="fas fa-question-circle"></i>
-      <span>Quiz</span>
+    <a href="#" class="nav-item" data-page="gift-page">
+      <i class="fas fa-gift"></i>
+      <span>Gifts</span>
     </a>
     <a href="#" class="nav-item" data-page="profile-page">
       <i class="fas fa-user"></i>
@@ -1553,18 +1620,18 @@
         <i class="fas fa-times"></i>
       </button>
       <div class="modal-header">
-        <h2>Confirm Transaction</h2>
-        <p id="tx-description">Sending 0.07 TON for daily reward</p>
+        <h2>Confirm Subscription</h2>
+        <p id="tx-description">Payment for NFT Gift Subscription</p>
       </div>
       <div style="text-align: center; margin: 25px 0;">
-        <div style="font-size: 3rem; margin-bottom: 20px;">
-          <i class="fas fa-paper-plane" style="color: var(--primary);"></i>
+        <div style="font-size: 3rem; margin-bottom: 20px; color: var(--primary);">
+          <i class="fas fa-gift"></i>
         </div>
-        <div style="font-size: 1.5rem; margin-bottom: 10px;" id="tx-amount">0.07 TON</div>
-        <div style="color: var(--text-secondary);" id="tx-recipient">To: TonQash Rewards</div>
+        <div style="font-size: 1.5rem; margin-bottom: 10px;" id="tx-amount">0 TON</div>
+        <div style="color: var(--text-secondary);" id="tx-recipient">To: TonQash Gifts</div>
       </div>
       <button class="swap-button" id="confirm-tx-btn">
-        Confirm Transaction
+        Confirm Payment
       </button>
     </div>
   </div>
@@ -1603,20 +1670,30 @@
     </div>
   </div>
   
-  <!-- Ad Modal -->
-  <div class="modal" id="ad-modal">
-    <div class="modal-content" id="ad-modal-content">
-      <button id="ad-close-btn">✕</button>
-      <div class="ad-progress">
-        <div class="ad-progress-bar" id="ad-progress-bar"></div>
+  <!-- Subscription Success Modal -->
+  <div class="modal" id="success-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="success-modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Subscription Successful!</h2>
+        <p>You're now entered to win the NFT</p>
       </div>
-      <div id="ad-container">
-        <div class="ad-loading">
-          <div class="spinner"></div>
-          <p>Loading advertisement...</p>
+      <div style="text-align: center; margin: 25px 0;">
+        <div style="font-size: 3rem; margin-bottom: 20px; color: var(--success);">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div style="font-size: 1.1rem; margin-bottom: 10px;">
+          Your subscription for <span id="success-gift-name">NFT Gift</span> has been confirmed
+        </div>
+        <div style="font-size: 1.1rem; margin-bottom: 10px;">
+          Good luck! The winner will be selected when the subscription goal is reached
         </div>
       </div>
-      <div class="ad-message">Watch the ad to earn 10 TQH tokens</div>
+      <button class="swap-button" id="success-ok-btn">
+        Continue
+      </button>
     </div>
   </div>
   
@@ -1720,74 +1797,49 @@
       firstLoginBonusGiven: false,
       tonBonusGiven: false,
       telegramTaskCompleted: false,
-      quizEarnings: 0,
-      correctAnswers: 0,
-      answeredQuestions: []
+      subscriptions: {
+        gift1: false,
+        gift2: false,
+        gift3: false
+      }
     };
     
-    // Quiz questions
-    const quizQuestions = [
-      {
+    // Gift data
+    const giftData = {
+      gift1: {
         id: 1,
-        question: "What does 'BTC' stand for in cryptocurrency?",
-        correctAnswers: ["bitcoin"],
-        reward: 2
+        name: "Exclusive NFT Collection #1",
+        image: "https://i.suar.me/5L142/l",
+        current: 2355,
+        max: 3000,
+        price: 1,
+        color: "var(--gift-1)"
       },
-      {
+      gift2: {
         id: 2,
-        question: "Which consensus mechanism does Bitcoin use?",
-        correctAnswers: ["proof of work", "pow"],
-        reward: 2
+        name: "Rare NFT Collection #2",
+        image: "https://i.suar.me/ppxy2/l",
+        current: 5789,
+        max: 10000,
+        price: 0.5,
+        color: "var(--gift-2)"
       },
-      {
+      gift3: {
         id: 3,
-        question: "What is the maximum supply of Bitcoin?",
-        correctAnswers: ["21 million", "21000000"],
-        reward: 2
-      },
-      {
-        id: 4,
-        question: "What is the name of the first blockchain?",
-        correctAnswers: ["bitcoin"],
-        reward: 2
-      },
-      {
-        id: 5,
-        question: "What does 'DeFi' stand for?",
-        correctAnswers: ["decentralized finance"],
-        reward: 2
-      },
-      {
-        id: 6,
-        question: "What is the native cryptocurrency of the Ethereum network?",
-        correctAnswers: ["ether", "eth"],
-        reward: 2
-      },
-      {
-        id: 7,
-        question: "What does 'NFT' stand for?",
-        correctAnswers: ["non-fungible token"],
-        reward: 2
-      },
-      {
-        id: 8,
-        question: "Which blockchain is known for its proof-of-stake consensus?",
-        correctAnswers: ["cardano", "ethereum", "solana", "polkadot"],
-        reward: 2
-      },
-      {
-        id: 9,
-        question: "What is the process of adding transactions to the blockchain called?",
-        correctAnswers: ["mining", "forging", "staking", "validating"],
-        reward: 2
-      },
-      {
-        id: 10,
-        question: "What is the term for a 50% drop in cryptocurrency prices?",
-        correctAnswers: ["halving"],
-        reward: 2
+        name: "Premium NFT Collection #3",
+        image: "https://i.suar.me/avqmd/l",
+        current: 6487,
+        max: 10000,
+        price: 0.5,
+        color: "var(--gift-3)"
       }
-    ];
+    };
+    
+    // Recipient wallet for gift subscriptions
+    const GIFT_WALLET = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3";
+    
+    // Current gift being processed
+    let currentGift = null;
     
     // Load data from localStorage
     function loadWalletData() {
@@ -1806,9 +1858,13 @@
           if (walletData.firstLoginBonusGiven === undefined) walletData.firstLoginBonusGiven = true;
           if (walletData.tonBonusGiven === undefined) walletData.tonBonusGiven = true;
           if (walletData.telegramTaskCompleted === undefined) walletData.telegramTaskCompleted = false;
-          if (walletData.quizEarnings === undefined) walletData.quizEarnings = 0;
-          if (walletData.correctAnswers === undefined) walletData.correctAnswers = 0;
-          if (walletData.answeredQuestions === undefined) walletData.answeredQuestions = [];
+          if (walletData.subscriptions === undefined) {
+            walletData.subscriptions = {
+              gift1: false,
+              gift2: false,
+              gift3: false
+            };
+          }
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -1834,9 +1890,7 @@
           firstLoginBonusGiven: walletData.firstLoginBonusGiven,
           tonBonusGiven: walletData.tonBonusGiven,
           telegramTaskCompleted: walletData.telegramTaskCompleted,
-          quizEarnings: walletData.quizEarnings,
-          correctAnswers: walletData.correctAnswers,
-          answeredQuestions: walletData.answeredQuestions
+          subscriptions: walletData.subscriptions
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -1900,20 +1954,25 @@
     const copyReferralBtn = document.getElementById('copy-referral-btn');
     const copySuccessEl = document.getElementById('copy-success');
     
-    // Ad elements
-    const adModal = document.getElementById('ad-modal');
-    const adContainer = document.getElementById('ad-container');
-    const adCloseBtn = document.getElementById('ad-close-btn');
-    const adProgressBar = document.getElementById('ad-progress-bar');
-    
     // Telegram task elements
     const telegramTaskBtn = document.getElementById('telegram-task-btn');
     const telegramTaskStatus = document.getElementById('telegram-task-status');
     
-    // Quiz elements
-    const correctCountEl = document.getElementById('correct-count');
-    const earnedTqhEl = document.getElementById('earned-tqh');
-    const questionsContainer = document.getElementById('questions-container');
+    // Gift elements
+    const gift1Btn = document.getElementById('gift1-btn');
+    const gift2Btn = document.getElementById('gift2-btn');
+    const gift3Btn = document.getElementById('gift3-btn');
+    const backToGiftsBtn = document.getElementById('back-to-gifts');
+    const giftDetailImage = document.getElementById('gift-detail-image');
+    const giftDetailTitle = document.getElementById('gift-detail-title');
+    const giftDetailSubtitle = document.getElementById('gift-detail-subtitle');
+    const giftDetailCurrent = document.getElementById('gift-detail-current');
+    const giftDetailMax = document.getElementById('gift-detail-max');
+    const giftDetailProgress = document.getElementById('gift-detail-progress');
+    const giftDetailPrice = document.getElementById('gift-detail-price');
+    const confirmSubscriptionBtn = document.getElementById('confirm-subscription');
+    const telegramUsername = document.getElementById('telegram-username');
+    const termsAgree = document.getElementById('terms-agree');
     
     // Navigation
     const navItems = document.querySelectorAll('.nav-item');
@@ -1958,206 +2017,12 @@
           updateReferralLink();
         }
         
-        // Render quiz questions when quiz page is opened
-        if (targetPage === 'quiz-page') {
-          renderQuizQuestions();
+        // Update gift buttons when gift page is opened
+        if (targetPage === 'gift-page') {
+          updateGiftButtons();
         }
       });
     });
-    
-    // Render quiz questions
-    function renderQuizQuestions() {
-      questionsContainer.innerHTML = '';
-      
-      quizQuestions.forEach(q => {
-        const isAnswered = walletData.answeredQuestions.includes(q.id);
-        
-        const questionCard = document.createElement('div');
-        questionCard.className = `question-card ${isAnswered ? 'correct' : ''}`;
-        questionCard.innerHTML = `
-          <div class="question-header">
-            <div class="question-number">${q.id}</div>
-            <div class="question-reward">
-              <i class="fas fa-coins"></i>
-              <span>${q.reward} TQH</span>
-            </div>
-          </div>
-          <div class="question-text">${q.question}</div>
-          <div class="answer-container">
-            <input 
-              type="text" 
-              class="answer-input" 
-              id="answer-${q.id}" 
-              placeholder="Your answer..."
-              ${isAnswered ? 'disabled' : ''}
-            >
-            <button 
-              class="submit-btn" 
-              id="submit-${q.id}" 
-              ${isAnswered ? 'disabled' : ''}
-            >
-              ${isAnswered ? 'Answered' : 'Submit Answer'}
-            </button>
-            <div class="feedback" id="feedback-${q.id}">
-              ${isAnswered ? 
-                `<i class="fas fa-check-circle feedback-icon"></i> Correct! +${q.reward} TQH earned` : 
-                ''}
-            </div>
-          </div>
-        `;
-        
-        questionsContainer.appendChild(questionCard);
-        
-        // Add event listener if question not answered
-        if (!isAnswered) {
-          const submitBtn = document.getElementById(`submit-${q.id}`);
-          submitBtn.addEventListener('click', () => checkAnswer(q));
-        }
-      });
-      
-      // Update stats
-      updateQuizStats();
-    }
-    
-    // Check answer for a question
-    function checkAnswer(question) {
-      const answerInput = document.getElementById(`answer-${question.id}`);
-      const feedbackEl = document.getElementById(`feedback-${question.id}`);
-      const submitBtn = document.getElementById(`submit-${question.id}`);
-      const userAnswer = answerInput.value.trim().toLowerCase();
-      
-      if (!userAnswer) {
-        feedbackEl.className = 'feedback incorrect';
-        feedbackEl.innerHTML = '<i class="fas fa-exclamation-circle feedback-icon"></i> Please enter an answer';
-        return;
-      }
-      
-      // Check if answer is correct
-      const isCorrect = question.correctAnswers.some(correct => 
-        userAnswer.includes(correct) || correct.includes(userAnswer)
-      );
-      
-      if (isCorrect) {
-        // Mark question as answered
-        walletData.answeredQuestions.push(question.id);
-        walletData.correctAnswers++;
-        walletData.quizEarnings += question.reward;
-        walletData.tqhBalance += question.reward;
-        
-        // Update UI
-        feedbackEl.className = 'feedback correct';
-        feedbackEl.innerHTML = `<i class="fas fa-check-circle feedback-icon"></i> Correct! +${question.reward} TQH earned`;
-        answerInput.disabled = true;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Answered';
-        
-        // Add visual confirmation
-        const questionCard = answerInput.closest('.question-card');
-        questionCard.classList.add('correct');
-        
-        // Update stats
-        updateQuizStats();
-        updateWalletDisplay();
-        
-        // Show notification
-        showNotification(`Correct! You earned ${question.reward} TQH`, 'success');
-        
-        // Save data
-        saveWalletData();
-      } else {
-        // Show incorrect feedback
-        feedbackEl.className = 'feedback incorrect';
-        feedbackEl.innerHTML = '<i class="fas fa-times-circle feedback-icon"></i> Incorrect. Try again!';
-      }
-    }
-    
-    // Update quiz stats display
-    function updateQuizStats() {
-      correctCountEl.textContent = walletData.correctAnswers;
-      earnedTqhEl.textContent = walletData.quizEarnings;
-    }
-    
-    // Initialize TonConnect
-    function initTonConnect() {
-      tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect',
-        language: 'en'
-      });
-      
-      tonConnectUI.onStatusChange(userWallet => {
-        wallet = userWallet;
-        
-        if (wallet) {
-          // Update UI for connected state
-          connectText.textContent = 'Connected';
-          connectButton.classList.add('connected');
-          
-          // Get Telegram username
-          const tgUsername = getTelegramUser();
-          
-          // Update profile
-          walletAddressEl.textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
-          
-          // Update referral link
-          updateReferralLink();
-          
-          // Give 0.5 TON bonus only once
-          if (!walletData.tonBonusGiven) {
-            walletData.tonBalance = 0.5;
-            walletData.tonBonusGiven = true;
-            saveWalletData();
-            updateWalletDisplay();
-            showNotification('0.5 TON added for connecting your wallet!', 'success');
-          }
-          
-          // Give 10 TQH bonus for wallet connection (only once)
-          if (!walletData.walletBonusGiven) {
-            walletData.tqhBalance += 10;
-            walletData.walletBonusGiven = true;
-            saveWalletData();
-            showNotification('10 TQH added for connecting your wallet!', 'success');
-          }
-          
-          updateWalletDisplay();
-          saveWalletData();
-          
-          // Update modal to show connected state
-          document.getElementById('ton-connect').style.display = 'none';
-          document.getElementById('connected-state').style.display = 'block';
-          document.getElementById('connected-wallet-address').textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
-          
-          // Close modal
-          connectModal.classList.remove('active');
-        } else {
-          // Reset to disconnected state
-          connectText.textContent = 'Connect Wallet';
-          connectButton.classList.remove('connected');
-          profileNameEl.textContent = 'Telegram User';
-          walletAddressEl.textContent = 'Not connected';
-          
-          // Reset referral link
-          updateReferralLink();
-          
-          // Update modal to show connect button
-          document.getElementById('ton-connect').style.display = 'block';
-          document.getElementById('connected-state').style.display = 'none';
-        }
-      });
-    }
-    
-    // Show zero TON modal if needed
-    function showZeroTonModal() {
-      // Don't show if user has disabled it
-      if (localStorage.getItem('dontShowZeroTonModal')) return;
-      
-      // Show modal if user has zero TON
-      if (walletData.tonBalance === 0) {
-        setTimeout(() => {
-          zeroTonModal.classList.add('active');
-        }, 1000);
-      }
-    }
     
     // Update wallet display
     function updateWalletDisplay() {
@@ -2359,7 +2224,7 @@
       }, 1000);
     }
     
-    // Ad task functionality with Adsgram
+    // Ad task functionality
     adTaskBtn.addEventListener('click', async function() {
       // Check if ad is on cooldown
       if (walletData.lastAdClaim) {
@@ -2372,37 +2237,21 @@
         }
       }
       
-      // Disable button and show loading
-      adTaskBtn.disabled = true;
-      adTaskBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Loading Ad...';
+      // Simulate ad completion
+      walletData.tqhBalance += 10;
+      walletData.lastAdClaim = new Date();
       
-      try {
-        // Initialize and show Adsgram ad
-        await window.Adsgram.init({ blockId: "int-12373" }).show();
-        
-        // On successful ad completion
-        walletData.tqhBalance += 10;
-        walletData.lastAdClaim = new Date();
-        
-        // Save data
-        saveWalletData();
-        
-        // Update display
-        updateWalletDisplay();
-        
-        // Show success notification
-        showNotification('Ad completed! 10 TQH added to your wallet', 'ad');
-        
-        // Start cooldown timer
-        startAdCooldown();
-      } catch (error) {
-        console.error('Ad error:', error);
-        showNotification('Ad failed to load. Please try again.', 'error');
-        
-        // Reset button
-        adTaskBtn.disabled = false;
-        adTaskBtn.innerHTML = '<i class="fas fa-play-circle"></i> Watch Ad';
-      }
+      // Save data
+      saveWalletData();
+      
+      // Update display
+      updateWalletDisplay();
+      
+      // Start cooldown timer
+      startAdCooldown();
+      
+      // Show success notification
+      showNotification('Ad completed! 10 TQH added to your wallet', 'success');
     });
     
     // Start ad cooldown timer
@@ -2542,6 +2391,287 @@
       return false;
     }
     
+    // Initialize TonConnect
+    function initTonConnect() {
+      tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://jamladz.github.io/Home/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect',
+        language: 'en'
+      });
+      
+      tonConnectUI.onStatusChange(userWallet => {
+        wallet = userWallet;
+        
+        if (wallet) {
+          // Update UI for connected state
+          connectText.textContent = 'Connected';
+          connectButton.classList.add('connected');
+          
+          // Get Telegram username
+          const tgUsername = getTelegramUser();
+          
+          // Update profile
+          walletAddressEl.textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
+          
+          // Update referral link
+          updateReferralLink();
+          
+          // Give 0.5 TON bonus only once
+          if (!walletData.tonBonusGiven) {
+            walletData.tonBalance = 0.5;
+            walletData.tonBonusGiven = true;
+            saveWalletData();
+            updateWalletDisplay();
+            showNotification('0.5 TON added for connecting your wallet!', 'success');
+          }
+          
+          // Give 10 TQH bonus for wallet connection (only once)
+          if (!walletData.walletBonusGiven) {
+            walletData.tqhBalance += 10;
+            walletData.walletBonusGiven = true;
+            saveWalletData();
+            showNotification('10 TQH added for connecting your wallet!', 'success');
+          }
+          
+          updateWalletDisplay();
+          saveWalletData();
+          
+          // Update modal to show connected state
+          document.getElementById('ton-connect').style.display = 'none';
+          document.getElementById('connected-state').style.display = 'block';
+          document.getElementById('connected-wallet-address').textContent = `${wallet.account.address.slice(0, 8)}...${wallet.account.address.slice(-6)}`;
+          
+          // Close modal
+          connectModal.classList.remove('active');
+        } else {
+          // Reset to disconnected state
+          connectText.textContent = 'Connect Wallet';
+          connectButton.classList.remove('connected');
+          profileNameEl.textContent = 'Telegram User';
+          walletAddressEl.textContent = 'Not connected';
+          
+          // Reset referral link
+          updateReferralLink();
+          
+          // Update modal to show connect button
+          document.getElementById('ton-connect').style.display = 'block';
+          document.getElementById('connected-state').style.display = 'none';
+        }
+      });
+    }
+    
+    // Show zero TON modal if needed
+    function showZeroTonModal() {
+      // Don't show if user has disabled it
+      if (localStorage.getItem('dontShowZeroTonModal')) return;
+      
+      // Show modal if user has zero TON
+      if (walletData.tonBalance === 0) {
+        setTimeout(() => {
+          zeroTonModal.classList.add('active');
+        }, 1000);
+      }
+    }
+    
+    // Update gift buttons based on subscription status
+    function updateGiftButtons() {
+      // Gift 1
+      if (walletData.subscriptions.gift1) {
+        gift1Btn.textContent = 'Already Subscribed';
+        gift1Btn.disabled = true;
+        gift1Btn.classList.add('subscribed');
+      } else {
+        gift1Btn.textContent = 'Subscribe to Win';
+        gift1Btn.disabled = false;
+        gift1Btn.classList.remove('subscribed');
+      }
+      
+      // Gift 2
+      if (walletData.subscriptions.gift2) {
+        gift2Btn.textContent = 'Already Subscribed';
+        gift2Btn.disabled = true;
+        gift2Btn.classList.add('subscribed');
+      } else {
+        gift2Btn.textContent = 'Subscribe to Win';
+        gift2Btn.disabled = false;
+        gift2Btn.classList.remove('subscribed');
+      }
+      
+      // Gift 3
+      if (walletData.subscriptions.gift3) {
+        gift3Btn.textContent = 'Already Subscribed';
+        gift3Btn.disabled = true;
+        gift3Btn.classList.add('subscribed');
+      } else {
+        gift3Btn.textContent = 'Subscribe to Win';
+        gift3Btn.disabled = false;
+        gift3Btn.classList.remove('subscribed');
+      }
+    }
+    
+    // Handle gift subscription button clicks
+    gift1Btn.addEventListener('click', () => openSubscriptionPage('gift1'));
+    gift2Btn.addEventListener('click', () => openSubscriptionPage('gift2'));
+    gift3Btn.addEventListener('click', () => openSubscriptionPage('gift3'));
+    
+    // Open subscription page for a specific gift
+    function openSubscriptionPage(giftId) {
+      // Check if wallet is connected
+      if (!wallet) {
+        connectModal.classList.add('active');
+        showNotification('Please connect your wallet to subscribe', 'warning');
+        return;
+      }
+      
+      // Check if already subscribed
+      if (walletData.subscriptions[giftId]) {
+        showNotification('You have already subscribed to this gift', 'warning');
+        return;
+      }
+      
+      // Set current gift
+      currentGift = giftId;
+      const gift = giftData[giftId];
+      
+      // Update subscription page
+      giftDetailImage.style.backgroundImage = `url('${gift.image}')`;
+      giftDetailTitle.textContent = gift.name;
+      giftDetailSubtitle.textContent = "Exclusive NFT Collection";
+      giftDetailCurrent.textContent = gift.current;
+      giftDetailMax.textContent = gift.max;
+      giftDetailProgress.style.width = `${(gift.current / gift.max) * 100}%`;
+      giftDetailPrice.textContent = `${gift.price} TON`;
+      
+      // Reset form
+      telegramUsername.value = '';
+      termsAgree.checked = false;
+      
+      // Navigate to subscription page
+      navItems.forEach(i => i.classList.remove('active'));
+      document.querySelector('.nav-item[data-page="gift-page"]').classList.add('active');
+      
+      pages.forEach(page => page.classList.remove('active'));
+      document.getElementById('subscription-page').classList.add('active');
+    }
+    
+    // Back to gifts button
+    backToGiftsBtn.addEventListener('click', function() {
+      navItems.forEach(i => i.classList.remove('active'));
+      document.querySelector('.nav-item[data-page="gift-page"]').classList.add('active');
+      
+      pages.forEach(page => page.classList.remove('active'));
+      document.getElementById('gift-page').classList.add('active');
+    });
+    
+    // Confirm subscription button
+    confirmSubscriptionBtn.addEventListener('click', function() {
+      // Check if wallet is connected
+      if (!wallet) {
+        connectModal.classList.add('active');
+        showNotification('Please connect your wallet to subscribe', 'warning');
+        return;
+      }
+      
+      // Check if terms are agreed
+      if (!termsAgree.checked) {
+        showNotification('You must agree to the terms and conditions', 'warning');
+        return;
+      }
+      
+      const gift = giftData[currentGift];
+      
+      // Show transaction modal
+      document.getElementById('tx-description').textContent = `Payment for ${gift.name}`;
+      document.getElementById('tx-amount').textContent = `${gift.price} TON`;
+      document.getElementById('tx-recipient').textContent = `To: ${GIFT_WALLET.slice(0, 6)}...${GIFT_WALLET.slice(-4)}`;
+      transactionModal.classList.add('active');
+      
+      // Set transaction action
+      confirmTxBtn.onclick = async function() {
+        // Show processing modal
+        processingModal.classList.add('active');
+        transactionModal.classList.remove('active');
+        
+        try {
+          // Prepare transaction (gift.price TON in nanoTON)
+          const nanoTonAmount = gift.price * 1000000000;
+          const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
+            messages: [
+              {
+                address: GIFT_WALLET,
+                amount: nanoTonAmount.toString()
+              }
+            ]
+          };
+          
+          // Send transaction using TonConnect
+          await tonConnectUI.sendTransaction(transaction);
+          
+          // If transaction is successful:
+          // Mark as subscribed
+          walletData.subscriptions[currentGift] = true;
+          
+          // Update gift stats
+          giftData[currentGift].current++;
+          
+          // Save data
+          saveWalletData();
+          
+          // Update UI
+          updateGiftButtons();
+          
+          // Close processing modal
+          processingModal.classList.remove('active');
+          
+          // Show success modal
+          document.getElementById('success-gift-name').textContent = gift.name;
+          document.getElementById('success-modal').classList.add('active');
+          
+          // Update gift page stats
+          document.getElementById(`gift${gift.id}-current`).textContent = giftData[currentGift].current;
+          document.getElementById(`gift${gift.id}-progress`).style.width = `${(giftData[currentGift].current / giftData[currentGift].max) * 100}%`;
+        } catch (error) {
+          console.error('Transaction error:', error);
+          processingModal.classList.remove('active');
+          showNotification('Transaction failed. Please try again.', 'error');
+        }
+      };
+    });
+    
+    // Success modal close
+    document.getElementById('success-modal-close').addEventListener('click', function() {
+      document.getElementById('success-modal').classList.remove('active');
+      backToGiftsBtn.click();
+    });
+    
+    document.getElementById('success-ok-btn').addEventListener('click', function() {
+      document.getElementById('success-modal').classList.remove('active');
+      backToGiftsBtn.click();
+    });
+    
+    // Telegram task
+    telegramTaskBtn.addEventListener('click', function() {
+      // Open Telegram channel
+      window.open('https://t.me/TonQash', '_blank');
+      
+      // Add reward
+      walletData.tqhBalance += 100;
+      walletData.telegramTaskCompleted = true;
+      
+      // Update UI
+      telegramTaskBtn.disabled = true;
+      telegramTaskBtn.textContent = 'Task Completed';
+      telegramTaskStatus.style.display = 'block';
+      
+      // Save and update
+      saveWalletData();
+      updateWalletDisplay();
+      
+      // Show notification
+      showNotification('100 TQH added for joining our Telegram channel!', 'success');
+    });
+    
     // Initialize app
     function initApp() {
       // Load wallet data from localStorage
@@ -2579,29 +2709,8 @@
         telegramTaskStatus.style.display = 'block';
       }
       
-      telegramTaskBtn.addEventListener('click', function() {
-        // Open Telegram channel
-        window.open('https://t.me/TonQash', '_blank');
-        
-        // Add reward
-        walletData.tqhBalance += 100;
-        walletData.telegramTaskCompleted = true;
-        
-        // Update UI
-        telegramTaskBtn.disabled = true;
-        telegramTaskBtn.textContent = 'Task Completed';
-        telegramTaskStatus.style.display = 'block';
-        
-        // Save and update
-        saveWalletData();
-        updateWalletDisplay();
-        
-        // Show notification
-        showNotification('100 TQH added for joining our Telegram channel!', 'success');
-      });
-      
-      // Render quiz questions
-      renderQuizQuestions();
+      // Initialize gift page
+      updateGiftButtons();
     }
     
     // Welcome modal button handlers
