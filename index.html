@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TonQash - NFT Gift Platform</title>
+  <title>TonQash - Game Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
@@ -28,9 +28,9 @@
       --glass: rgba(255, 255, 255, 0.05);
       --referral-color: #9c27b0;
       --ad-color: #ff5722;
-      --gift-1: #FF6B6B;
-      --gift-2: #4ECDC4;
-      --gift-3: #FFD166;
+      --game-1: #6366f1;
+      --game-2: #8b5cf6;
+      --game-3: #a855f7;
     }
     
     * {
@@ -749,13 +749,13 @@
       font-size: 1.2rem;
     }
     
-    /* Gift Section Styles */
-    .gift-container {
+    /* Game Section Styles */
+    .game-container {
       display: grid;
       gap: 20px;
     }
     
-    .gift-card {
+    .game-card {
       background: var(--card-bg);
       border-radius: 24px;
       padding: 24px;
@@ -767,7 +767,7 @@
       overflow: hidden;
     }
     
-    .gift-header {
+    .game-header {
       display: flex;
       align-items: center;
       gap: 15px;
@@ -775,7 +775,7 @@
       position: relative;
     }
     
-    .gift-image {
+    .game-image {
       width: 100%;
       height: 200px;
       border-radius: 16px;
@@ -785,7 +785,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    .gift-progress {
+    .game-progress {
       height: 8px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
@@ -793,27 +793,33 @@
       margin: 15px 0;
     }
     
-    .gift-progress-bar {
+    .game-progress-bar {
       height: 100%;
       border-radius: 4px;
       transition: width 0.5s ease;
     }
     
-    .gift-stats {
+    .game-stats {
       display: flex;
       justify-content: space-between;
       margin: 10px 0;
       color: var(--text-secondary);
     }
     
-    .gift-price {
+    .game-reward {
       font-size: 1.4rem;
       font-weight: 700;
       text-align: center;
       margin: 15px 0;
     }
     
-    .gift-badge {
+    .game-description {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .game-badge {
       position: absolute;
       top: 20px;
       right: 20px;
@@ -826,8 +832,8 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     
-    .gift-subscribe-btn {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    .game-play-btn {
+      background: linear-gradient(135deg, var(--game-1), var(--game-2));
       border: none;
       border-radius: 16px;
       padding: 14px;
@@ -840,190 +846,209 @@
       margin-top: 10px;
     }
     
-    .gift-subscribe-btn:disabled {
+    .game-play-btn:disabled {
       background: var(--text-secondary);
       cursor: not-allowed;
     }
     
-    .gift-subscribe-btn.subscribed {
+    .game-play-btn.completed {
       background: var(--success);
     }
     
-    /* Subscription Page */
-    .subscription-container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .back-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-primary);
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-    
-    .gift-details {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .gift-title {
-      font-size: 1.8rem;
-      margin: 15px 0;
-      font-weight: 700;
-    }
-    
-    .gift-subtitle {
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-    }
-    
-    .subscription-form {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 24px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    
-    .form-input {
+    /* Game Canvas */
+    #game-canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      color: var(--text-primary);
-      font-size: 1rem;
-    }
-    
-    .form-note {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-    
-    .terms {
-      background: rgba(30, 41, 59, 0.5);
-      border-radius: 16px;
-      padding: 15px;
-      margin: 20px 0;
-    }
-    
-    .terms-title {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    
-    .terms-list {
-      padding-left: 20px;
-      margin-bottom: 15px;
-    }
-    
-    .terms-list li {
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    
-    .terms-check {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    
-    /* Ad Modal */
-    #ad-modal {
+      height: 100%;
+      background: #0f172a;
       z-index: 2000;
-    }
-    
-    #ad-modal-content {
-      background: black;
-      border-radius: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      max-width: none;
-      position: relative;
-    }
-    
-    #ad-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    #ad-close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 100;
       display: none;
     }
     
-    .ad-progress {
+    #game-canvas-container.active {
+      display: block;
+    }
+    
+    #game-canvas {
       width: 100%;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.2);
-      position: absolute;
+      height: 100%;
+    }
+    
+    .game-ui {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      margin: 8px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 2001;
+    }
+    
+    .ui-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+    }
+    
+    .ui-icon {
+      width: 20px;
+      height: 20px;
+      filter: brightness(1.5);
+    }
+    
+    .game-screen {
+      position: fixed;
       top: 0;
       left: 0;
-    }
-    
-    .ad-progress-bar {
-      height: 100%;
-      background: var(--ad-color);
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    .ad-message {
-      position: absolute;
-      bottom: 20px;
-      color: white;
-      font-size: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px 20px;
-      border-radius: 20px;
-    }
-    
-    .ad-loading {
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      color: white;
+      justify-content: center;
+      padding: 24px;
+      z-index: 2002;
     }
     
-    .ad-loading .spinner {
-      border-left-color: var(--ad-color);
+    .screen-heading {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--game-1), var(--game-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1.5rem;
+    }
+    
+    .game-button {
+      background: linear-gradient(45deg, var(--game-1), var(--game-2));
+      border: none;
+      color: white;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: min(80vw, 280px);
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .game-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(99, 102, 241, 0.2);
+    }
+    
+    .button-danger {
+      background: linear-gradient(45deg, var(--danger), #dc2626);
+    }
+    
+    .button-success {
+      background: linear-gradient(45deg, var(--success), #16a34a);
+    }
+    
+    .user-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      width: min(90%, 300px);
+    }
+    
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--game-1);
+      object-fit: cover;
+    }
+    
+    .user-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 12px;
+      max-width: 250px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .game-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 2003;
+    }
+    
+    .freeze-effect {
+      background: linear-gradient(
+          rgba(178, 235, 242, 0.1),
+          rgba(178, 235, 242, 0.2)
+      );
+      animation: iceShimmer 2s infinite;
+      overflow: hidden;
+    }
+    
+    .bomb-effect {
+      background: rgba(239, 68, 68, 0.2);
+      animation: bombShake 0.4s;
+    }
+    
+    @keyframes iceShimmer {
+      0% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+      100% { opacity: 0.3; }
+    }
+    
+    @keyframes bombShake { 
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-5px, 5px); }
+      50% { transform: translate(5px, -5px); }
+      75% { transform: translate(-5px, -5px); }
+    }
+    
+    @keyframes fall {
+      to {
+          transform: translateY(100vh);
+      }
     }
     
     @media (max-width: 480px) {
@@ -1450,122 +1475,62 @@
       </div>
     </div>
     
-    <!-- Gift Page -->
-    <div class="page" id="gift-page">
+    <!-- Game Page -->
+    <div class="page" id="game-page">
       <div class="section-header">
-        <h2>NFT Gift Giveaways</h2>
-        <p style="color: var(--text-secondary); font-size: 0.95rem;">Subscribe to win exclusive NFTs</p>
+        <h2>Earn TQH by Playing Games</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Play games and earn TQH tokens for your achievements</p>
       </div>
       
-      <div class="gift-container">
-        <!-- Gift 1 -->
-        <div class="gift-card">
-          <div class="gift-badge">Premium</div>
-          <div class="gift-image" style="background-image: url('https://i.suar.me/j5MZW/m')"></div>
-          <div class="gift-stats">
-            <div>Participants:</div>
-            <div><span id="gift1-current">2355</span>/<span id="gift1-max">3000</span></div>
+      <div class="game-container">
+        <!-- Game 1 -->
+        <div class="game-card">
+          <div class="game-badge">Popular</div>
+          <div class="game-image" style="background-image: url('https://i.suar.me/Jzlm4/l')"></div>
+          <div class="game-stats">
+            <div>Players:</div>
+            <div><span id="game1-current">2355</span></div>
           </div>
-          <div class="gift-progress">
-            <div class="gift-progress-bar" id="gift1-progress" style="width: 78.5%; background: var(--gift-1);"></div>
+          <div class="game-reward">+10 TQH per 1000 points</div>
+          <div class="game-description">
+            BB Drop Blast - Catch falling objects and avoid bombs. Earn TQH tokens for every 1000 points you score!
           </div>
-          <div class="gift-price">1 TON</div>
-          <div class="task-description">
-            Exclusive NFT collection #1 with unique digital artwork. Only one winner will be selected when all subscriptions are filled.
-          </div>
-          <button class="gift-subscribe-btn" id="gift1-btn" data-gift="1">
-            Subscribe to Win
+          <button class="game-play-btn" id="game1-btn" data-game="1">
+            <i class="fas fa-play-circle"></i> Play Game
           </button>
         </div>
         
-        <!-- Gift 2 -->
-        <div class="gift-card">
-          <div class="gift-badge">Popular</div>
-          <div class="gift-image" style="background-image: url('https://i.suar.me/Xv83X/m')"></div>
-          <div class="gift-stats">
-            <div>Participants:</div>
-            <div><span id="gift2-current">5789</span>/<span id="gift2-max">10000</span></div>
+        <!-- Game 2 -->
+        <div class="game-card">
+          <div class="game-badge">New</div>
+          <div class="game-image" style="background-image: url('https://i.suar.me/Jzlm4/l')"></div>
+          <div class="game-stats">
+            <div>Players:</div>
+            <div><span id="game2-current">1789</span></div>
           </div>
-          <div class="gift-progress">
-            <div class="gift-progress-bar" id="gift2-progress" style="width: 57.89%; background: var(--gift-2);"></div>
+          <div class="game-reward">+5 TQH per 500 points</div>
+          <div class="game-description">
+            Crypto Runner - Run and collect coins while avoiding obstacles. Get TQH rewards based on your score!
           </div>
-          <div class="gift-price">0.5 TON</div>
-          <div class="task-description">
-            Rare NFT collection #2 with limited edition digital art. One winner selected at random when the subscription goal is reached.
-          </div>
-          <button class="gift-subscribe-btn" id="gift2-btn" data-gift="2">
-            Subscribe to Win
+          <button class="game-play-btn" id="game2-btn" data-game="2">
+            <i class="fas fa-play-circle"></i> Play Game
           </button>
         </div>
         
-        <!-- Gift 3 -->
-        <div class="gift-card">
-          <div class="gift-badge">New</div>
-          <div class="gift-image" style="background-image: url('https://i.suar.me/5LGQM/m')"></div>
-          <div class="gift-stats">
-            <div>Participants:</div>
-            <div><span id="gift3-current">6487</span>/<span id="gift3-max">10000</span></div>
+        <!-- Game 3 -->
+        <div class="game-card">
+          <div class="game-badge">Coming Soon</div>
+          <div class="game-image" style="background-image: url('https://i.suar.me/Jzlm4/l')"></div>
+          <div class="game-stats">
+            <div>Players:</div>
+            <div><span id="game3-current">0</span></div>
           </div>
-          <div class="gift-progress">
-            <div class="gift-progress-bar" id="gift3-progress" style="width: 64.87%; background: var(--gift-3);"></div>
+          <div class="game-reward">TBA</div>
+          <div class="game-description">
+            Token Puzzle - Match tokens to earn rewards. New game coming soon with exciting TQH rewards!
           </div>
-          <div class="gift-price">0.2 TON</div>
-          <div class="task-description">
-            Exclusive NFT collection #3 featuring unique digital masterpieces. Only one winner will be selected when all subscriptions are filled.
-          </div>
-          <button class="gift-subscribe-btn" id="gift3-btn" data-gift="3">
-            Subscribe to Win
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Subscription Page -->
-    <div class="page" id="subscription-page">
-      <div class="subscription-container">
-        <button class="back-btn" id="back-to-gifts">
-          <i class="fas fa-arrow-left"></i> Back to Gifts
-        </button>
-        
-        <div class="gift-details">
-          <div class="gift-image" id="gift-detail-image" style="height: 250px;"></div>
-          <h2 class="gift-title" id="gift-detail-title">NFT Gift</h2>
-          <div class="gift-subtitle" id="gift-detail-subtitle">Exclusive NFT Collection</div>
-          <div class="gift-stats">
-            <div>Participants:</div>
-            <div><span id="gift-detail-current">0</span>/<span id="gift-detail-max">0</span></div>
-          </div>
-          <div class="gift-progress">
-            <div class="gift-progress-bar" id="gift-detail-progress" style="width: 0%;"></div>
-          </div>
-          <div class="gift-price" id="gift-detail-price">0 TON</div>
-        </div>
-        
-        <div class="subscription-form">
-          <div class="form-group">
-            <label class="form-label">Telegram Username</label>
-            <input type="text" class="form-input" id="telegram-username" placeholder="@yourusername">
-            <div class="form-note">Optional - for winner notification</div>
-          </div>
-          
-          <div class="terms">
-            <div class="terms-title">Terms & Conditions:</div>
-            <ul class="terms-list">
-              <li>Only one subscription per user per gift</li>
-              <li>Payment is non-refundable</li>
-              <li>Winner selected randomly when subscription goal is reached</li>
-              <li>Winner will be notified via Telegram or wallet address</li>
-              <li>NFT will be transferred to winner's wallet within 24 hours</li>
-            </ul>
-            
-            <div class="terms-check">
-              <input type="checkbox" id="terms-agree">
-              <label for="terms-agree">I agree to the terms and conditions</label>
-            </div>
-          </div>
-          
-          <button class="gift-subscribe-btn" id="confirm-subscription">
-            <i class="fas fa-lock"></i> Confirm Payment
+          <button class="game-play-btn" id="game3-btn" data-game="3" disabled>
+            <i class="fas fa-clock"></i> Coming Soon
           </button>
         </div>
       </div>
@@ -1652,6 +1617,67 @@
     </div>
   </div>
   
+  <!-- Game Canvas Container -->
+  <div id="game-canvas-container">
+    <div class="game-ui">
+      <div class="ui-card">
+        <img src="https://play-lh.googleusercontent.com/0dI3JtAn_MZNjVy1njKtdfRWGhriJyILLownK3HY6jlXatw774YRVRrXBftkZfBWSQ" class="ui-icon">
+        <span id="game-score">0</span>
+      </div>
+      <div class="ui-card">
+        <img src="https://img.icons8.com/ios-filled/50/clock--v1.png" class="ui-icon">
+        <span id="game-time">60</span>s
+      </div>
+    </div>
+
+    <div id="game-start-screen" class="game-screen">
+      <div class="user-profile">
+        <div class="profile-top">
+          <img id="game-user-avatar" class="user-avatar" src="" alt="Avatar">
+        </div>
+        <div id="game-user-name" class="user-name"></div>
+      </div>
+      <h1 class="screen-heading floating">DROP BLAST</h1>
+      <div class="ui-card" style="margin-bottom: 2rem;">
+        <span>High Score: </span>
+        <span id="game-high-score">0</span>
+      </div>
+      <button class="game-button" id="game-start-button">
+        <img src="https://img.icons8.com/ios/50/play--v1.png" class="ui-icon">
+        Start Game
+      </button>
+      <button class="game-button button-danger" id="game-exit-button">
+        <img src="https://img.icons8.com/ios/50/exit.png" class="ui-icon">
+        Exit Game
+      </button>
+    </div>
+
+    <div id="game-over-screen" class="game-screen" style="display:none">
+      <h1 class="screen-heading">GAME OVER</h1>
+      <div class="ui-card" style="margin: 1.5rem 0;">
+        <span>Score: </span>
+        <span id="game-final-score">0</span>
+      </div>
+      <div id="game-reward-message" style="margin: 1rem 0; color: var(--success); font-weight: 600;"></div>
+      <button class="game-button" id="game-restart-button">
+        <img src="https://img.icons8.com/ios/50/restart--v1.png" class="ui-icon">
+        Play Again
+      </button>
+      <button class="game-button button-success" id="game-share-button">
+        <img src="https://i.imgur.com/LKjClrQ.png" class="ui-icon">
+        Share to Story
+      </button>
+      <button class="game-button button-danger" id="game-menu-button">
+        <img src="https://img.icons8.com/ios/50/home-page.png" class="ui-icon">
+        Main Menu
+      </button>
+    </div>
+
+    <div id="game-freeze-effect" class="game-effect freeze-effect" style="display:none"></div>
+    <div id="game-bomb-effect" class="game-effect bomb-effect" style="display:none"></div>
+    <canvas id="game-canvas"></canvas>
+  </div>
+  
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <a href="#" class="nav-item active" data-page="home-page">
@@ -1662,9 +1688,9 @@
       <i class="fas fa-tasks"></i>
       <span>Tasks</span>
     </a>
-    <a href="#" class="nav-item" data-page="gift-page">
-      <i class="fas fa-gift"></i>
-      <span>Gifts</span>
+    <a href="#" class="nav-item" data-page="game-page">
+      <i class="fas fa-gamepad"></i>
+      <span>Game</span>
     </a>
     <a href="#" class="nav-item" data-page="profile-page">
       <i class="fas fa-user"></i>
@@ -1699,15 +1725,15 @@
         <i class="fas fa-times"></i>
       </button>
       <div class="modal-header">
-        <h2>Confirm Subscription</h2>
-        <p id="tx-description">Payment for NFT Gift Subscription</p>
+        <h2>Confirm Transaction</h2>
+        <p id="tx-description">Payment for daily reward</p>
       </div>
       <div style="text-align: center; margin: 25px 0;">
         <div style="font-size: 3rem; margin-bottom: 20px; color: var(--primary);">
           <i class="fas fa-gift"></i>
         </div>
         <div style="font-size: 1.5rem; margin-bottom: 10px;" id="tx-amount">0 TON</div>
-        <div style="color: var(--text-secondary);" id="tx-recipient">To: TonQash Gifts</div>
+        <div style="color: var(--text-secondary);" id="tx-recipient">To: TonQash Tasks</div>
       </div>
       <button class="swap-button" id="confirm-tx-btn">
         Confirm Payment
@@ -1749,30 +1775,20 @@
     </div>
   </div>
   
-  <!-- Subscription Success Modal -->
-  <div class="modal" id="success-modal">
-    <div class="modal-content">
-      <button class="modal-close" id="success-modal-close">
-        <i class="fas fa-times"></i>
-      </button>
-      <div class="modal-header">
-        <h2>Subscription Successful!</h2>
-        <p>You're now entered to win the NFT</p>
+  <!-- Ad Modal -->
+  <div class="modal" id="ad-modal">
+    <div class="modal-content" id="ad-modal-content">
+      <button id="ad-close-btn">✕</button>
+      <div class="ad-progress">
+        <div class="ad-progress-bar" id="ad-progress-bar"></div>
       </div>
-      <div style="text-align: center; margin: 25px 0;">
-        <div style="font-size: 3rem; margin-bottom: 20px; color: var(--success);">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <div style="font-size: 1.1rem; margin-bottom: 10px;">
-          Your subscription for <span id="success-gift-name">NFT Gift</span> has been confirmed
-        </div>
-        <div style="font-size: 1.1rem; margin-bottom: 10px;">
-          Good luck! The winner will be selected when the subscription goal is reached
+      <div id="ad-container">
+        <div class="ad-loading">
+          <div class="spinner"></div>
+          <p>Loading advertisement...</p>
         </div>
       </div>
-      <button class="swap-button" id="success-ok-btn">
-        Continue
-      </button>
+      <div class="ad-message">Watch the ad to earn 10 TQH tokens</div>
     </div>
   </div>
   
@@ -1800,21 +1816,21 @@
         
         <div class="zero-ton-step">
           <div class="step-icon">
-            <i class="fas fa-exchange-alt"></i>
+            <i class="fas fa-gamepad"></i>
           </div>
           <div class="step-content">
-            <h3>Convert TQH to TON</h3>
-            <p>Swap your earned TQH tokens for TON in the home page</p>
+            <h3>Play Games</h3>
+            <p>Earn TQH by playing games and achieving high scores</p>
           </div>
         </div>
         
         <div class="zero-ton-step">
           <div class="step-icon">
-            <i class="fas fa-wallet"></i>
+            <i class="fas fa-exchange-alt"></i>
           </div>
           <div class="step-content">
-            <h3>Start Transacting</h3>
-            <p>Use your TON to complete more tasks and earn rewards</p>
+            <h3>Convert TQH to TON</h3>
+            <p>Swap your earned TQH tokens for TON in the home page</p>
           </div>
         </div>
       </div>
@@ -1861,23 +1877,6 @@
     </div>
   </div>
   
-  <!-- Ad Modal -->
-  <div class="modal" id="ad-modal">
-    <div class="modal-content" id="ad-modal-content">
-      <button id="ad-close-btn">✕</button>
-      <div class="ad-progress">
-        <div class="ad-progress-bar" id="ad-progress-bar"></div>
-      </div>
-      <div id="ad-container">
-        <div class="ad-loading">
-          <div class="spinner"></div>
-          <p>Loading advertisement...</p>
-        </div>
-      </div>
-      <div class="ad-message">Watch the ad to earn 10 TQH tokens</div>
-    </div>
-  </div>
-  
   <script>
     // Initialize wallet data with localStorage support
     let walletData = {
@@ -1893,49 +1892,48 @@
       firstLoginBonusGiven: false,
       tonBonusGiven: false,
       telegramTaskCompleted: false,
-      subscriptions: {
-        gift1: false,
-        gift2: false,
-        gift3: false
+      gameScores: {
+        game1: 0,
+        game2: 0,
+        game3: 0
+      },
+      gameRewardsClaimed: {
+        game1: 0,
+        game2: 0,
+        game3: 0
       }
     };
     
-    // Gift data
-    const giftData = {
-      gift1: {
+    // Game data
+    const gameData = {
+      game1: {
         id: 1,
-        name: "Exclusive NFT Collection #1",
-        image: "https://i.suar.me/5L142/l",
-        current: 2355,
-        max: 3000,
-        price: 1,
-        color: "var(--gift-1)"
+        name: "BB Drop Blast",
+        image: "https://i.suar.me/j5MZW/m",
+        players: 2355,
+        rewardPerPoints: 10,
+        pointsThreshold: 1000
       },
-      gift2: {
+      game2: {
         id: 2,
-        name: "Rare NFT Collection #2",
-        image: "https://i.suar.me/ppxy2/l",
-        current: 5789,
-        max: 10000,
-        price: 0.5,
-        color: "var(--gift-2)"
+        name: "Crypto Runner",
+        image: "https://i.suar.me/Xv83X/m",
+        players: 1789,
+        rewardPerPoints: 5,
+        pointsThreshold: 500
       },
-      gift3: {
+      game3: {
         id: 3,
-        name: "Premium NFT Collection #3",
-        image: "https://i.suar.me/avqmd/l",
-        current: 6487,
-        max: 10000,
-        price: 0.5,
-        color: "var(--gift-3)"
+        name: "Token Puzzle",
+        image: "https://i.suar.me/5LGQM/m",
+        players: 0,
+        rewardPerPoints: 0,
+        pointsThreshold: 0
       }
     };
     
-    // Recipient wallet for gift subscriptions
-    const GIFT_WALLET = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3";
-    
-    // Current gift being processed
-    let currentGift = null;
+    // Recipient wallet for daily task payment
+    const DAILY_TASK_RECIPIENT = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3";
     
     // Load data from localStorage
     function loadWalletData() {
@@ -1954,11 +1952,18 @@
           if (walletData.firstLoginBonusGiven === undefined) walletData.firstLoginBonusGiven = true;
           if (walletData.tonBonusGiven === undefined) walletData.tonBonusGiven = true;
           if (walletData.telegramTaskCompleted === undefined) walletData.telegramTaskCompleted = false;
-          if (walletData.subscriptions === undefined) {
-            walletData.subscriptions = {
-              gift1: false,
-              gift2: false,
-              gift3: false
+          if (walletData.gameScores === undefined) {
+            walletData.gameScores = {
+              game1: 0,
+              game2: 0,
+              game3: 0
+            };
+          }
+          if (walletData.gameRewardsClaimed === undefined) {
+            walletData.gameRewardsClaimed = {
+              game1: 0,
+              game2: 0,
+              game3: 0
             };
           }
           
@@ -1986,7 +1991,8 @@
           firstLoginBonusGiven: walletData.firstLoginBonusGiven,
           tonBonusGiven: walletData.tonBonusGiven,
           telegramTaskCompleted: walletData.telegramTaskCompleted,
-          subscriptions: walletData.subscriptions
+          gameScores: walletData.gameScores,
+          gameRewardsClaimed: walletData.gameRewardsClaimed
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -2000,8 +2006,31 @@
     let tonConnectUI = null;
     let wallet = null;
     
-    // Define recipient address for daily task payment
-    const DAILY_TASK_RECIPIENT = "UQCTZAMbXoN5T43K9gJXH8GYWBmIstXrUrdoV9kv3btN1Ad3";
+    // Game variables
+    let gameRunning = false;
+    let gameElements = [], gameParticles = [];
+    let gameAnimationFrameId, gameTimerId, gameSpawnTimeout, gameBombEffectTimeout;
+    let gameScore = 0, gameTimeLeft = 60, gameIceAvailable = 3;
+    let gameIsFrozen = false, gameIceActive = false, gameFreezeTime = false;
+    let gameLastFrame = performance.now();
+    let currentGameId = null;
+    
+    // Game assets
+    const gameAssets = {
+      element: Object.assign(new Image(), { src: 'https://play-lh.googleusercontent.com/0dI3JtAn_MZNjVy1njKtdfRWGhriJyILLownK3HY6jlXatw774YRVRrXBftkZfBWSQ' }),
+      bomb: Object.assign(new Image(), { src: 'https://pngimg.com/d/bomb_PNG32.png' }),
+      ice: Object.assign(new Image(), { src: 'https://i.imgur.com/gdcxKlv.png' })
+    };
+    
+    // Game configuration
+    const gameConfig = {
+      spawnRate: 300,
+      elementSpeed: { min: 120, max: 160 },
+      iceDuration: 4000,
+      maxElements: 100,
+      bombChance: 0.15,
+      elementSizes: [35, 40, 50, 55, 60]
+    };
     
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
@@ -2054,21 +2083,27 @@
     const telegramTaskBtn = document.getElementById('telegram-task-btn');
     const telegramTaskStatus = document.getElementById('telegram-task-status');
     
-    // Gift elements
-    const gift1Btn = document.getElementById('gift1-btn');
-    const gift2Btn = document.getElementById('gift2-btn');
-    const gift3Btn = document.getElementById('gift3-btn');
-    const backToGiftsBtn = document.getElementById('back-to-gifts');
-    const giftDetailImage = document.getElementById('gift-detail-image');
-    const giftDetailTitle = document.getElementById('gift-detail-title');
-    const giftDetailSubtitle = document.getElementById('gift-detail-subtitle');
-    const giftDetailCurrent = document.getElementById('gift-detail-current');
-    const giftDetailMax = document.getElementById('gift-detail-max');
-    const giftDetailProgress = document.getElementById('gift-detail-progress');
-    const giftDetailPrice = document.getElementById('gift-detail-price');
-    const confirmSubscriptionBtn = document.getElementById('confirm-subscription');
-    const telegramUsername = document.getElementById('telegram-username');
-    const termsAgree = document.getElementById('terms-agree');
+    // Game elements
+    const game1Btn = document.getElementById('game1-btn');
+    const game2Btn = document.getElementById('game2-btn');
+    const game3Btn = document.getElementById('game3-btn');
+    const gameCanvasContainer = document.getElementById('game-canvas-container');
+    const gameCanvas = document.getElementById('game-canvas');
+    const gameCtx = gameCanvas.getContext('2d');
+    const gameStartScreen = document.getElementById('game-start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const gameStartButton = document.getElementById('game-start-button');
+    const gameRestartButton = document.getElementById('game-restart-button');
+    const gameExitButton = document.getElementById('game-exit-button');
+    const gameMenuButton = document.getElementById('game-menu-button');
+    const gameShareButton = document.getElementById('game-share-button');
+    const gameScoreEl = document.getElementById('game-score');
+    const gameTimeEl = document.getElementById('game-time');
+    const gameHighScoreEl = document.getElementById('game-high-score');
+    const gameFinalScoreEl = document.getElementById('game-final-score');
+    const gameRewardMessageEl = document.getElementById('game-reward-message');
+    const gameUserAvatar = document.getElementById('game-user-avatar');
+    const gameUserName = document.getElementById('game-user-name');
     
     // Ad elements
     const adModal = document.getElementById('ad-modal');
@@ -2087,6 +2122,14 @@
         if (user) {
           const username = user.username ? `@${user.username}` : `${user.first_name} ${user.last_name || ''}`.trim();
           profileNameEl.textContent = username;
+          gameUserName.textContent = username;
+          
+          if (user.photo_url) {
+            gameUserAvatar.src = user.photo_url;
+          } else {
+            gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+          }
+          
           return username;
         }
       }
@@ -2096,9 +2139,13 @@
       const tgUsername = urlParams.get('username');
       if (tgUsername) {
         profileNameEl.textContent = tgUsername;
+        gameUserName.textContent = tgUsername;
         return tgUsername;
       }
       
+      profileNameEl.textContent = "Telegram User";
+      gameUserName.textContent = "Guest";
+      gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
       return "Telegram User";
     }
     
@@ -2119,9 +2166,9 @@
           updateReferralLink();
         }
         
-        // Update gift buttons when gift page is opened
-        if (targetPage === 'gift-page') {
-          updateGiftButtons();
+        // Update game buttons when game page is opened
+        if (targetPage === 'game-page') {
+          updateGameButtons();
         }
       });
     });
@@ -2394,6 +2441,47 @@
       }, 1000);
     }
     
+    // Show ad function that can be called from anywhere
+    function showAdAndThen(callback) {
+      // Disable button and show loading
+      const originalHTML = adTaskBtn.innerHTML;
+      adTaskBtn.disabled = true;
+      adTaskBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Loading Ad...';
+      
+      window.Adsgram.init({ blockId: "int-12373" }).show()
+        .then(() => {
+          // On successful ad completion
+          walletData.tqhBalance += 10;
+          walletData.lastAdClaim = new Date();
+          
+          // Save data
+          saveWalletData();
+          
+          // Update display
+          updateWalletDisplay();
+          
+          // Show success notification
+          showNotification('Ad completed! 10 TQH added to your wallet', 'ad');
+          
+          // Start cooldown timer
+          startAdCooldown();
+          
+          // Execute callback after ad
+          if (callback) callback();
+        })
+        .catch(error => {
+          console.error('Ad error:', error);
+          showNotification('Ad failed to load. Please try again.', 'error');
+          
+          // Reset button
+          adTaskBtn.disabled = false;
+          adTaskBtn.innerHTML = originalHTML;
+          
+          // Execute callback even if ad fails
+          if (callback) callback();
+        });
+    }
+    
     // Withdrawal functionality
     withdrawButton.addEventListener('click', function() {
       if (walletData.tonBalance < 70) {
@@ -2591,182 +2679,364 @@
       }
     }
     
-    // Update gift buttons based on subscription status
-    function updateGiftButtons() {
-      // Gift 1
-      if (walletData.subscriptions.gift1) {
-        gift1Btn.textContent = 'Already Subscribed';
-        gift1Btn.disabled = true;
-        gift1Btn.classList.add('subscribed');
-      } else {
-        gift1Btn.textContent = 'Subscribe to Win';
-        gift1Btn.disabled = false;
-        gift1Btn.classList.remove('subscribed');
-      }
+    // Update game buttons based on game state
+    function updateGameButtons() {
+      // Game 1
+      const game1Score = walletData.gameScores.game1 || 0;
+      const game1HighScore = Math.max(game1Score, parseInt(gameHighScoreEl.textContent) || 0);
+      gameHighScoreEl.textContent = game1HighScore;
       
-      // Gift 2
-      if (walletData.subscriptions.gift2) {
-        gift2Btn.textContent = 'Already Subscribed';
-        gift2Btn.disabled = true;
-        gift2Btn.classList.add('subscribed');
-      } else {
-        gift2Btn.textContent = 'Subscribe to Win';
-        gift2Btn.disabled = false;
-        gift2Btn.classList.remove('subscribed');
-      }
-      
-      // Gift 3
-      if (walletData.subscriptions.gift3) {
-        gift3Btn.textContent = 'Already Subscribed';
-        gift3Btn.disabled = true;
-        gift3Btn.classList.add('subscribed');
-      } else {
-        gift3Btn.textContent = 'Subscribe to Win';
-        gift3Btn.disabled = false;
-        gift3Btn.classList.remove('subscribed');
-      }
+      // Game 2
+      // Add similar logic for game 2 if needed
     }
     
-    // Handle gift subscription button clicks
-    gift1Btn.addEventListener('click', () => openSubscriptionPage('gift1'));
-    gift2Btn.addEventListener('click', () => openSubscriptionPage('gift2'));
-    gift3Btn.addEventListener('click', () => openSubscriptionPage('gift3'));
-    
-    // Open subscription page for a specific gift
-    function openSubscriptionPage(giftId) {
-      // Check if wallet is connected
-      if (!wallet) {
-        connectModal.classList.add('active');
-        showNotification('Please connect your wallet to subscribe', 'warning');
-        return;
-      }
-      
-      // Check if already subscribed
-      if (walletData.subscriptions[giftId]) {
-        showNotification('You have already subscribed to this gift', 'warning');
-        return;
-      }
-      
-      // Set current gift
-      currentGift = giftId;
-      const gift = giftData[giftId];
-      
-      // Update subscription page
-      giftDetailImage.style.backgroundImage = `url('${gift.image}')`;
-      giftDetailTitle.textContent = gift.name;
-      giftDetailSubtitle.textContent = "Exclusive NFT Collection";
-      giftDetailCurrent.textContent = gift.current;
-      giftDetailMax.textContent = gift.max;
-      giftDetailProgress.style.width = `${(gift.current / gift.max) * 100}%`;
-      giftDetailPrice.textContent = `${gift.price} TON`;
-      
-      // Reset form
-      telegramUsername.value = '';
-      termsAgree.checked = false;
-      
-      // Navigate to subscription page
-      navItems.forEach(i => i.classList.remove('active'));
-      document.querySelector('.nav-item[data-page="gift-page"]').classList.add('active');
-      
-      pages.forEach(page => page.classList.remove('active'));
-      document.getElementById('subscription-page').classList.add('active');
-    }
-    
-    // Back to gifts button
-    backToGiftsBtn.addEventListener('click', function() {
-      navItems.forEach(i => i.classList.remove('active'));
-      document.querySelector('.nav-item[data-page="gift-page"]').classList.add('active');
-      
-      pages.forEach(page => page.classList.remove('active'));
-      document.getElementById('gift-page').classList.add('active');
+    // Handle game button clicks
+    game1Btn.addEventListener('click', () => startGame('game1'));
+    game2Btn.addEventListener('click', () => startGame('game2'));
+    game3Btn.addEventListener('click', () => {
+      showNotification('This game is coming soon!', 'info');
     });
     
-    // Confirm subscription button
-    confirmSubscriptionBtn.addEventListener('click', function() {
-      // Check if wallet is connected
-      if (!wallet) {
-        connectModal.classList.add('active');
-        showNotification('Please connect your wallet to subscribe', 'warning');
-        return;
+    // Start a specific game
+    function startGame(gameId) {
+      currentGameId = gameId;
+      const game = gameData[gameId];
+      
+      // Show game canvas
+      gameCanvasContainer.classList.add('active');
+      
+      // Initialize game
+      initGame();
+      
+      // Load high score
+      const highScore = walletData.gameScores[gameId] || 0;
+      gameHighScoreEl.textContent = highScore;
+    }
+    
+    // Initialize game
+    function initGame() {
+      // Setup event listeners for game buttons
+      gameStartButton.addEventListener('click', function() {
+        showAdAndThen(startGameSession);
+      });
+      
+      gameRestartButton.addEventListener('click', function() {
+        showAdAndThen(startGameSession);
+      });
+      
+      gameExitButton.addEventListener('click', exitGame);
+      gameMenuButton.addEventListener('click', exitGame);
+      gameShareButton.addEventListener('click', shareGameScore);
+      
+      // Setup canvas
+      handleGameResize();
+      window.addEventListener('resize', handleGameResize);
+      
+      // Setup game canvas click handler
+      gameCanvas.addEventListener('click', handleGameClick);
+    }
+    
+    // Handle game canvas resize
+    function handleGameResize() {
+      gameCanvas.width = window.innerWidth;
+      gameCanvas.height = window.innerHeight;
+    }
+    
+    // Start game session
+    function startGameSession() {
+      gameStartScreen.style.display = 'none';
+      gameOverScreen.style.display = 'none';
+      
+      // Reset game state
+      resetGameState();
+      
+      // Start game loop
+      gameRunning = true;
+      gameAnimationFrameId = requestAnimationFrame(gameLoop);
+      spawnGameElements();
+      updateGameTimer();
+    }
+    
+    // Reset game state
+    function resetGameState() {
+      gameScore = 0;
+      gameTimeLeft = 60;
+      gameIceAvailable = 3;
+      gameElements = [];
+      gameParticles = [];
+      gameIsFrozen = false;
+      gameIceActive = false;
+      gameFreezeTime = false;
+      gameLastFrame = performance.now();
+      gameScoreEl.textContent = '0';
+      gameTimeEl.textContent = '60';
+      document.getElementById('game-freeze-effect').style.display = 'none';
+      document.getElementById('game-bomb-effect').style.display = 'none';
+      gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+    }
+    
+    // Spawn game elements
+    function spawnGameElements() {
+      if (!gameRunning || gameIsFrozen || gameElements.length >= gameConfig.maxElements) return;
+      
+      let type = 'element';
+      const rand = Math.random();
+      if (rand < gameConfig.bombChance) type = 'bomb';
+      else if (gameIceAvailable > 0 && rand > 0.9 && !gameIceActive) {
+        type = 'ice';
+        gameIceAvailable--;
+        gameIceActive = true;
+      }
+  
+      const size = gameConfig.elementSizes[Math.floor(Math.random() * gameConfig.elementSizes.length)];
+      gameElements.push({
+        type,
+        x: Math.random() * (gameCanvas.width - size),
+        y: -size,
+        speed: gameConfig.elementSpeed.min + Math.random()*(gameConfig.elementSpeed.max - gameConfig.elementSpeed.min),
+        alpha: 1,
+        size: size
+      });
+  
+      gameSpawnTimeout = setTimeout(spawnGameElements, gameConfig.spawnRate);
+    }
+    
+    // Update game timer
+    function updateGameTimer() {
+      if (!gameRunning) return;
+      
+      if (!gameFreezeTime) {
+        gameTimeLeft = Math.max(0, gameTimeLeft - 1);
+        gameTimeEl.textContent = gameTimeLeft;
       }
       
-      // Check if terms are agreed
-      if (!termsAgree.checked) {
-        showNotification('You must agree to the terms and conditions', 'warning');
-        return;
+      if (gameTimeLeft <= 0) {
+        endGameSession();
+      } else {
+        gameTimerId = setTimeout(updateGameTimer, 1000);
+      }
+    }
+    
+    // End game session
+    function endGameSession() {
+      gameRunning = false;
+      gameOverScreen.style.display = 'flex';
+      gameFinalScoreEl.textContent = gameScore;
+      
+      // Update high score
+      const currentHighScore = parseInt(gameHighScoreEl.textContent) || 0;
+      if (gameScore > currentHighScore) {
+        gameHighScoreEl.textContent = gameScore;
+        walletData.gameScores[currentGameId] = gameScore;
+        saveWalletData();
       }
       
-      const gift = giftData[currentGift];
+      // Calculate and display TQH reward
+      const game = gameData[currentGameId];
+      const rewardMultiplier = Math.floor(gameScore / game.pointsThreshold);
+      const tqhReward = rewardMultiplier * game.rewardPerPoints;
       
-      // Show transaction modal
-      document.getElementById('tx-description').textContent = `Payment for ${gift.name}`;
-      document.getElementById('tx-amount').textContent = `${gift.price} TON`;
-      document.getElementById('tx-recipient').textContent = `To: ${GIFT_WALLET.slice(0, 6)}...${GIFT_WALLET.slice(-4)}`;
-      transactionModal.classList.add('active');
-      
-      // Set transaction action
-      confirmTxBtn.onclick = async function() {
-        // Show processing modal
-        processingModal.classList.add('active');
-        transactionModal.classList.remove('active');
-        
-        try {
-          // Prepare transaction (gift.price TON in nanoTON)
-          const nanoTonAmount = gift.price * 1000000000;
-          const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
-            messages: [
-              {
-                address: GIFT_WALLET,
-                amount: nanoTonAmount.toString()
-              }
-            ]
-          };
-          
-          // Send transaction using TonConnect
-          await tonConnectUI.sendTransaction(transaction);
-          
-          // If transaction is successful:
-          // Mark as subscribed
-          walletData.subscriptions[currentGift] = true;
-          
-          // Update gift stats
-          giftData[currentGift].current++;
-          
-          // Save data
+      if (tqhReward > 0) {
+        // Check if reward was already claimed for this score
+        const claimedReward = walletData.gameRewardsClaimed[currentGameId] || 0;
+        if (tqhReward > claimedReward) {
+          const newReward = tqhReward - claimedReward;
+          walletData.tqhBalance += newReward;
+          walletData.gameRewardsClaimed[currentGameId] = tqhReward;
           saveWalletData();
+          updateWalletDisplay();
           
-          // Update UI
-          updateGiftButtons();
+          gameRewardMessageEl.textContent = `You earned ${newReward} TQH!`;
+          gameRewardMessageEl.style.display = 'block';
           
-          // Close processing modal
-          processingModal.classList.remove('active');
-          
-          // Show success modal
-          document.getElementById('success-gift-name').textContent = gift.name;
-          document.getElementById('success-modal').classList.add('active');
-          
-          // Update gift page stats
-          document.getElementById(`gift${gift.id}-current`).textContent = giftData[currentGift].current;
-          document.getElementById(`gift${gift.id}-progress`).style.width = `${(giftData[currentGift].current / giftData[currentGift].max) * 100}%`;
-        } catch (error) {
-          console.error('Transaction error:', error);
-          processingModal.classList.remove('active');
-          showNotification('Transaction failed. Please try again.', 'error');
+          showNotification(`Congratulations! You earned ${newReward} TQH from playing ${game.name}`, 'success');
+        } else {
+          gameRewardMessageEl.textContent = `You already claimed ${tqhReward} TQH for this game`;
+          gameRewardMessageEl.style.display = 'block';
         }
+      } else {
+        gameRewardMessageEl.textContent = 'Keep playing to earn TQH!';
+        gameRewardMessageEl.style.display = 'block';
+      }
+    }
+    
+    // Handle game canvas click
+    function handleGameClick(e) {
+      if (!gameRunning) return;
+      const rect = gameCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+  
+      gameElements = gameElements.filter(el => {
+        if (x > el.x && x < el.x + el.size && y > el.y && y < el.y + el.size) {
+          processGameClick(el);
+          createGameParticles(el.x + el.size/2, el.y + el.size/2, el.type);
+          return false;
+        }
+        return true;
+      });
+    }
+    
+    // Process game click
+    function processGameClick(el) {
+      switch(el.type) {
+        case 'element': 
+          gameScore += 10; 
+          break;
+        case 'bomb': 
+          gameScore = Math.max(0, gameScore - 30);
+          if (navigator.vibrate) navigator.vibrate(300);
+          showGameBombEffect();
+          break;
+        case 'ice': 
+          activateGameFreeze(); 
+          break;
+      }
+      gameScoreEl.textContent = gameScore;
+    }
+    
+    // Activate game freeze
+    function activateGameFreeze() {
+      if (gameIsFrozen) return;
+      gameIsFrozen = true;
+      gameFreezeTime = true;
+      
+      const freezeEffect = document.getElementById('game-freeze-effect');
+      freezeEffect.style.display = 'block';
+  
+      setTimeout(() => {
+        gameIsFrozen = false;
+        gameFreezeTime = false;
+        gameIceActive = false;
+        freezeEffect.style.display = 'none';
+        gameElements.forEach(el => el.speed = el.originalSpeed);
+        spawnGameElements();
+      }, gameConfig.iceDuration);
+  
+      gameElements.forEach(el => {
+        el.originalSpeed = el.speed;
+        el.speed = el.speed * 0.2;
+      });
+    }
+    
+    // Show game bomb effect
+    function showGameBombEffect() {
+      const bombEffect = document.getElementById('game-bomb-effect');
+      bombEffect.style.display = 'block';
+      gameBombEffectTimeout = setTimeout(() => bombEffect.style.display = 'none', 500);
+    }
+    
+    // Create game particles
+    function createGameParticles(x, y, type) {
+      const colors = {
+        element: '#6366f1',
+        bomb: '#ef4444',
+        ice: '#60a5fa'
       };
-    });
+      
+      for (let i = 0; i < 20; i++) {
+        gameParticles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 1) * 20,
+          life: 1,
+          size: Math.random() * 4 + 2,
+          color: colors[type]
+        });
+      }
+    }
     
-    // Success modal close
-    document.getElementById('success-modal-close').addEventListener('click', function() {
-      document.getElementById('success-modal').classList.remove('active');
-      backToGiftsBtn.click();
-    });
+    // Update game state
+    function updateGame(delta) {
+      gameElements = gameElements.filter(el => el.y < gameCanvas.height + 100);
+      
+      if (!gameIsFrozen) {
+        gameElements.forEach(el => {
+          el.y += el.speed * (delta / 1000);
+          el.alpha = Math.min(1, el.alpha + delta * 0.002);
+        });
+      }
+  
+      gameParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.7;
+        p.life -= 0.015;
+      });
+      gameParticles = gameParticles.filter(p => p.life > 0);
+    }
     
-    document.getElementById('success-ok-btn').addEventListener('click', function() {
-      document.getElementById('success-modal').classList.remove('active');
-      backToGiftsBtn.click();
-    });
+    // Draw game
+    function drawGame() {
+      gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+      
+      gameElements.forEach(el => {
+        gameCtx.globalAlpha = el.alpha;
+        gameCtx.drawImage(gameAssets[el.type], el.x, el.y, el.size, el.size);
+      });
+      
+      gameParticles.forEach(p => {
+        gameCtx.fillStyle = p.color;
+        gameCtx.globalAlpha = p.life;
+        gameCtx.beginPath();
+        gameCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        gameCtx.fill();
+      });
+      
+      gameCtx.globalAlpha = 1;
+    }
+    
+    // Game loop
+    function gameLoop(timestamp) {
+      if (!gameRunning) return;
+      const delta = timestamp - gameLastFrame;
+      gameLastFrame = timestamp;
+      
+      updateGame(delta);
+      drawGame();
+      gameAnimationFrameId = requestAnimationFrame(gameLoop);
+    }
+    
+    // Exit game
+    function exitGame() {
+      gameRunning = false;
+      cancelAnimationFrame(gameAnimationFrameId);
+      clearTimeout(gameTimerId);
+      clearTimeout(gameSpawnTimeout);
+      clearTimeout(gameBombEffectTimeout);
+      
+      gameCanvasContainer.classList.remove('active');
+      gameStartScreen.style.display = 'flex';
+      gameOverScreen.style.display = 'none';
+      
+      // Update wallet display in case rewards were earned
+      updateWalletDisplay();
+    }
+    
+    // Share game score
+    function shareGameScore() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const media_url = 'https://botfather.cloud/Assets/Photo/DropBlast.jpg';
+        const storyParams = {
+          text: `I scored ${gameScore} points in BB Drop Blast! Can you beat me?`,
+        };
+  
+        if (window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.is_premium) {
+          storyParams.widget_link = {
+            url: 'https://app.bots.business/',
+            name: 'Create Own Bot',
+          };
+        }
+  
+        if (window.Telegram.WebApp.platform !== 'unknown') {
+          window.Telegram.WebApp.shareToStory(media_url, storyParams);
+        } else {
+          showNotification('Story sharing is not available in this version of Telegram', 'info');
+        }
+      } else {
+        showNotification('Sharing is not available', 'info');
+      }
+    }
     
     // Telegram task
     telegramTaskBtn.addEventListener('click', function() {
@@ -2827,8 +3097,8 @@
         telegramTaskStatus.style.display = 'block';
       }
       
-      // Initialize gift page
-      updateGiftButtons();
+      // Initialize game page
+      updateGameButtons();
     }
     
     // Welcome modal button handlers
