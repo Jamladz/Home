@@ -331,68 +331,71 @@
       cursor: not-allowed;
     }
     
+    /* Compact Tasks Section */
     .tasks-container {
       display: grid;
-      gap: 20px;
+      gap: 16px;
     }
     
     .task-card {
       background: var(--card-bg);
-      border-radius: 24px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 20px;
       border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
     }
     
     .task-header {
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
     
     .task-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       background: rgba(0, 120, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 20px;
       color: var(--primary);
     }
     
     .task-title {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
     
     .task-description {
       color: var(--text-secondary);
-      margin-bottom: 20px;
-      line-height: 1.6;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      font-size: 0.9rem;
     }
     
     .task-reward {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      font-size: 1.1rem;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 1rem;
       font-weight: 600;
     }
     
     .reward-icon {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       background: var(--tqh-gradient);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 12px;
       color: white;
     }
     
@@ -687,6 +690,30 @@
       color: var(--danger);
     }
     
+    /* Airdrop Button */
+    .airdrop-section {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+    
+    .airdrop-header {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    
+    .airdrop-info {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
     /* Referral Earnings */
     .referral-earnings {
       display: flex;
@@ -856,7 +883,7 @@
     }
     
     /* Game Canvas */
-    #game-canvas-container {
+    #game-canvas-container, #game2-canvas-container {
       position: fixed;
       top: 0;
       left: 0;
@@ -867,11 +894,11 @@
       display: none;
     }
     
-    #game-canvas-container.active {
+    #game-canvas-container.active, #game2-canvas-container.active {
       display: block;
     }
     
-    #game-canvas {
+    #game-canvas, #game2-canvas {
       width: 100%;
       height: 100%;
     }
@@ -1456,7 +1483,7 @@
             <div class="task-icon">
               <i class="fab fa-telegram"></i>
             </div>
-            <div class="task-title">Join Telegram Channel</div>
+            <div class="task-title">Join Channel</div>
           </div>
           <div class="task-description">
             Join our official Telegram channel to get 100 TQH tokens. This reward can be claimed only once.
@@ -1472,6 +1499,29 @@
             <i class="fas fa-check-circle"></i> Task Completed!
           </div>
         </div>
+        
+        <!-- Share Referral Link Task -->
+        <div class="task-card">
+          <div class="task-header">
+            <div class="task-icon">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <div class="task-title">Share Referral</div>
+          </div>
+          <div class="task-description">
+            Share your referral link with friends to earn 50 TQH. Get 10% of their rewards for life!
+          </div>
+          <div class="task-reward">
+            <div class="reward-icon">TQH</div>
+            <span>+50 TQH</span>
+          </div>
+          <button class="swap-button" id="share-referral-btn">
+            <i class="fas fa-share-alt"></i> Share Link
+          </button>
+          <div id="share-referral-status" style="margin-top: 15px; color: var(--success); text-align: center; display: none;">
+            <i class="fas fa-check-circle"></i> Task Completed!
+          </div>
+        </div>
       </div>
     </div>
     
@@ -1483,34 +1533,34 @@
       </div>
       
       <div class="game-container">
-        <!-- Game 1 -->
+        <!-- Game 1 - Time Blast -->
         <div class="game-card">
           <div class="game-badge">Popular</div>
           <div class="game-image" style="background-image: url('https://i.suar.me/7a9vr/l')"></div>
           <div class="game-stats">
             <div>Players:</div>
-            <div><span id="game1-current">23355</span></div>
+            <div><span id="game1-current">2355</span></div>
           </div>
           <div class="game-reward">+10 TQH per 1000 points</div>
           <div class="game-description">
-            BB Drop Blast - Catch falling objects and avoid bombs. Earn TQH tokens for every 1000 points you score!
+            Time Blast - Catch falling objects and avoid bombs. Earn TQH tokens for every 1000 points you score!
           </div>
           <button class="game-play-btn" id="game1-btn" data-game="1">
             <i class="fas fa-play-circle"></i> Play Game
           </button>
         </div>
         
-        <!-- Game 2 -->
+        <!-- Game 2 - Heart Blaster -->
         <div class="game-card">
           <div class="game-badge">New</div>
           <div class="game-image" style="background-image: url('https://i.suar.me/xpP12/l')"></div>
           <div class="game-stats">
             <div>Players:</div>
-            <div><span id="game2-current">18789</span></div>
+            <div><span id="game2-current">1789</span></div>
           </div>
           <div class="game-reward">+5 TQH per 500 points</div>
           <div class="game-description">
-            Crypto Runner - Run and collect coins while avoiding obstacles. Get TQH rewards based on your score!
+            Heart Blaster - Shoot enemy planes and avoid collisions. Earn TQH rewards based on your score!
           </div>
           <button class="game-play-btn" id="game2-btn" data-game="2">
             <i class="fas fa-play-circle"></i> Play Game
@@ -1520,7 +1570,7 @@
         <!-- Game 3 -->
         <div class="game-card">
           <div class="game-badge">Coming Soon</div>
-          <div class="game-image" style="background-image: url('https://i.suar.me/gPB5w/l')"></div>
+          <div class="game-image" style="background-image: url('https://i.suar.me/Jzlm4/l')"></div>
           <div class="game-stats">
             <div>Players:</div>
             <div><span id="game3-current">0</span></div>
@@ -1555,6 +1605,19 @@
           <div class="stat-value" id="profile-tqh">0.000</div>
           <div class="stat-label">TQH</div>
         </div>
+      </div>
+      
+      <!-- Airdrop Section -->
+      <div class="airdrop-section">
+        <div class="airdrop-header">
+          <i class="fas fa-parachute-box"></i> Airdrop
+        </div>
+        <div class="airdrop-info">
+          Participate in our exclusive airdrop events to earn free tokens. Stay tuned for upcoming airdrop opportunities!
+        </div>
+        <button class="swap-button" id="airdrop-button">
+          <i class="fas fa-gift"></i> Check Airdrop
+        </button>
       </div>
       
       <div class="withdrawal-section">
@@ -1617,7 +1680,7 @@
     </div>
   </div>
   
-  <!-- Game Canvas Container -->
+  <!-- Game Canvas Container for Time Blast -->
   <div id="game-canvas-container">
     <div class="game-ui">
       <div class="ui-card">
@@ -1637,7 +1700,7 @@
         </div>
         <div id="game-user-name" class="user-name"></div>
       </div>
-      <h1 class="screen-heading floating">DROP BLAST</h1>
+      <h1 class="screen-heading floating">TIME BLAST</h1>
       <div class="ui-card" style="margin-bottom: 2rem;">
         <span>High Score: </span>
         <span id="game-high-score">0</span>
@@ -1676,6 +1739,64 @@
     <div id="game-freeze-effect" class="game-effect freeze-effect" style="display:none"></div>
     <div id="game-bomb-effect" class="game-effect bomb-effect" style="display:none"></div>
     <canvas id="game-canvas"></canvas>
+  </div>
+  
+  <!-- Game Canvas Container for Heart Blaster -->
+  <div id="game2-canvas-container">
+    <div class="game-ui">
+      <div class="ui-card">
+        <img src="https://img.icons8.com/ios-filled/50/treasure-chest.png" class="ui-icon">
+        <span id="game2-score">0</span>
+      </div>
+      <div class="ui-card">
+        <img src="https://img.icons8.com/ios-filled/50/clock--v1.png" class="ui-icon">
+        <span id="game2-time">60</span>s
+      </div>
+    </div>
+
+    <div id="game2-start-screen" class="game-screen">
+      <div class="user-profile">
+        <img id="game2-user-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar">
+        <div id="game2-user-name" class="user-name">Sky Commander</div>
+      </div>
+      <h1 class="screen-heading floating">HEART BLASTER</h1>
+      <div class="ui-card" style="margin-bottom: 2rem;">
+        <span>High Score: </span>
+        <span id="game2-high-score">0</span>
+      </div>
+      <button class="game-button" id="game2-start-button">
+        <img src="https://img.icons8.com/ios/50/play--v1.png" class="ui-icon">
+        Start Mission
+      </button>
+      <button class="game-button button-danger" id="game2-exit-button">
+        <img src="https://img.icons8.com/ios/50/exit.png" class="ui-icon">
+        Exit Game
+      </button>
+    </div>
+
+    <div id="game2-over-screen" class="game-screen" style="display:none">
+      <h1 class="screen-heading">MISSION COMPLETE</h1>
+      <div class="ui-card" style="margin: 1.5rem 0;">
+        <span>Final Score: </span>
+        <span id="game2-final-score">0</span>
+      </div>
+      <div id="game2-reward-message" style="margin: 1rem 0; color: var(--success); font-weight: 600;"></div>
+      <button class="game-button" id="game2-restart-button">
+        <img src="https://img.icons8.com/ios/50/restart--v1.png" class="ui-icon">
+        Fly Again
+      </button>
+      <button class="game-button button-success" id="game2-share-button">
+        <img src="https://img.icons8.com/ios/50/share--v1.png" class="ui-icon">
+        Share Victory
+      </button>
+      <button class="game-button button-danger" id="game2-menu-button">
+        <img src="https://img.icons8.com/ios/50/home-page.png" class="ui-icon">
+        Return to Base
+      </button>
+    </div>
+
+    <div id="game2-explosion-effect" class="game-effect" style="display:none; background: radial-gradient(circle, rgba(239,68,68,0.3) 0%, transparent 70%);"></div>
+    <canvas id="game2-canvas"></canvas>
   </div>
   
   <!-- Bottom Navigation -->
@@ -1877,6 +1998,29 @@
     </div>
   </div>
   
+  <!-- Airdrop Modal -->
+  <div class="modal" id="airdrop-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="airdrop-modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Airdrop</h2>
+        <p>Exclusive token distribution events</p>
+      </div>
+      <div style="text-align: center; margin: 25px 0;">
+        <div style="font-size: 3rem; margin-bottom: 20px; color: var(--warning);">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div style="font-size: 1.5rem; margin-bottom: 10px;">Coming Soon</div>
+        <div style="color: var(--text-secondary);">We're preparing exciting airdrop events. Stay tuned for updates!</div>
+      </div>
+      <button class="swap-button" id="airdrop-ok-btn">
+        OK
+      </button>
+    </div>
+  </div>
+  
   <script>
     // Initialize wallet data with localStorage support
     let walletData = {
@@ -1892,6 +2036,7 @@
       firstLoginBonusGiven: false,
       tonBonusGiven: false,
       telegramTaskCompleted: false,
+      shareReferralTaskCompleted: false,
       gameScores: {
         game1: 0,
         game2: 0,
@@ -1908,7 +2053,7 @@
     const gameData = {
       game1: {
         id: 1,
-        name: "BB Drop Blast",
+        name: "Time Blast",
         image: "https://i.suar.me/j5MZW/m",
         players: 2355,
         rewardPerPoints: 10,
@@ -1916,7 +2061,7 @@
       },
       game2: {
         id: 2,
-        name: "Crypto Runner",
+        name: "Heart Blaster",
         image: "https://i.suar.me/Xv83X/m",
         players: 1789,
         rewardPerPoints: 5,
@@ -1952,6 +2097,7 @@
           if (walletData.firstLoginBonusGiven === undefined) walletData.firstLoginBonusGiven = true;
           if (walletData.tonBonusGiven === undefined) walletData.tonBonusGiven = true;
           if (walletData.telegramTaskCompleted === undefined) walletData.telegramTaskCompleted = false;
+          if (walletData.shareReferralTaskCompleted === undefined) walletData.shareReferralTaskCompleted = false;
           if (walletData.gameScores === undefined) {
             walletData.gameScores = {
               game1: 0,
@@ -1991,6 +2137,7 @@
           firstLoginBonusGiven: walletData.firstLoginBonusGiven,
           tonBonusGiven: walletData.tonBonusGiven,
           telegramTaskCompleted: walletData.telegramTaskCompleted,
+          shareReferralTaskCompleted: walletData.shareReferralTaskCompleted,
           gameScores: walletData.gameScores,
           gameRewardsClaimed: walletData.gameRewardsClaimed
         };
@@ -2006,7 +2153,7 @@
     let tonConnectUI = null;
     let wallet = null;
     
-    // Game variables
+    // Game variables for Time Blast
     let gameRunning = false;
     let gameElements = [], gameParticles = [];
     let gameAnimationFrameId, gameTimerId, gameSpawnTimeout, gameBombEffectTimeout;
@@ -2015,14 +2162,14 @@
     let gameLastFrame = performance.now();
     let currentGameId = null;
     
-    // Game assets
+    // Game assets for Time Blast
     const gameAssets = {
       element: Object.assign(new Image(), { src: 'https://i.suar.me/qnPGV/l' }),
       bomb: Object.assign(new Image(), { src: 'https://pngimg.com/d/bomb_PNG32.png' }),
       ice: Object.assign(new Image(), { src: 'https://i.suar.me/Ozd2B/l' })
     };
     
-    // Game configuration
+    // Game configuration for Time Blast
     const gameConfig = {
       spawnRate: 300,
       elementSpeed: { min: 120, max: 160 },
@@ -2031,6 +2178,23 @@
       bombChance: 0.15,
       elementSizes: [35, 40, 50, 55, 60]
     };
+    
+    // Game variables for Heart Blaster
+    let game2Running = false;
+    let game2AnimationFrameId, game2TimerId, game2SpawnTimeout;
+    let game2Score = 0, game2TimeLeft = 60;
+    let game2Player = {
+      x: 0, y: 0,
+      width: 60, height: 40,
+      speed: 5,
+      isMoving: false,
+      targetX: 0
+    };
+    let game2Bullets = [];
+    let game2Enemies = [];
+    let game2Particles = [];
+    let game2LastBulletTime = 0;
+    const game2BulletCooldown = 150;
     
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
@@ -2053,6 +2217,12 @@
     const welcomeModal = document.getElementById('welcome-modal');
     const welcomeConnectBtn = document.getElementById('welcome-connect-btn');
     const welcomeContinueBtn = document.getElementById('welcome-continue-btn');
+    const airdropButton = document.getElementById('airdrop-button');
+    const airdropModal = document.getElementById('airdrop-modal');
+    const airdropModalClose = document.getElementById('airdrop-modal-close');
+    const airdropOkBtn = document.getElementById('airdrop-ok-btn');
+    const shareReferralBtn = document.getElementById('share-referral-btn');
+    const shareReferralStatus = document.getElementById('share-referral-status');
     
     const totalBalanceEl = document.getElementById('total-balance');
     const tonBalanceEl = document.getElementById('ton-balance');
@@ -2105,6 +2275,25 @@
     const gameUserAvatar = document.getElementById('game-user-avatar');
     const gameUserName = document.getElementById('game-user-name');
     
+    // Heart Blaster game elements
+    const game2CanvasContainer = document.getElementById('game2-canvas-container');
+    const game2Canvas = document.getElementById('game2-canvas');
+    const game2Ctx = game2Canvas.getContext('2d');
+    const game2StartScreen = document.getElementById('game2-start-screen');
+    const game2OverScreen = document.getElementById('game2-over-screen');
+    const game2StartButton = document.getElementById('game2-start-button');
+    const game2RestartButton = document.getElementById('game2-restart-button');
+    const game2ExitButton = document.getElementById('game2-exit-button');
+    const game2MenuButton = document.getElementById('game2-menu-button');
+    const game2ShareButton = document.getElementById('game2-share-button');
+    const game2ScoreEl = document.getElementById('game2-score');
+    const game2TimeEl = document.getElementById('game2-time');
+    const game2HighScoreEl = document.getElementById('game2-high-score');
+    const game2FinalScoreEl = document.getElementById('game2-final-score');
+    const game2RewardMessageEl = document.getElementById('game2-reward-message');
+    const game2UserAvatar = document.getElementById('game2-user-avatar');
+    const game2UserName = document.getElementById('game2-user-name');
+    
     // Ad elements
     const adModal = document.getElementById('ad-modal');
     const adContainer = document.getElementById('ad-container');
@@ -2123,11 +2312,14 @@
           const username = user.username ? `@${user.username}` : `${user.first_name} ${user.last_name || ''}`.trim();
           profileNameEl.textContent = username;
           gameUserName.textContent = username;
+          game2UserName.textContent = username;
           
           if (user.photo_url) {
             gameUserAvatar.src = user.photo_url;
+            game2UserAvatar.src = user.photo_url;
           } else {
             gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+            game2UserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
           }
           
           return username;
@@ -2140,12 +2332,15 @@
       if (tgUsername) {
         profileNameEl.textContent = tgUsername;
         gameUserName.textContent = tgUsername;
+        game2UserName.textContent = tgUsername;
         return tgUsername;
       }
       
       profileNameEl.textContent = "Telegram User";
       gameUserName.textContent = "Guest";
+      game2UserName.textContent = "Guest";
       gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+      game2UserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
       return "Telegram User";
     }
     
@@ -2518,6 +2713,67 @@
       }, 2000);
     });
     
+    // Airdrop functionality
+    airdropButton.addEventListener('click', function() {
+      airdropModal.classList.add('active');
+    });
+    
+    airdropModalClose.addEventListener('click', function() {
+      airdropModal.classList.remove('active');
+    });
+    
+    airdropOkBtn.addEventListener('click', function() {
+      airdropModal.classList.remove('active');
+    });
+    
+    // Share referral task functionality
+    shareReferralBtn.addEventListener('click', function() {
+      if (walletData.shareReferralTaskCompleted) {
+        showNotification('You have already completed this task!', 'warning');
+        return;
+      }
+      
+      const referralLink = referralLinkEl.textContent;
+      const message = `Join TonQash using my referral link and earn TQH tokens! ${referralLink}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Join TonQash',
+          text: message
+        }).then(() => {
+          completeShareReferralTask();
+        }).catch(() => {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(message).then(() => {
+            completeShareReferralTask();
+            showNotification('Referral link copied to clipboard!', 'success');
+          });
+        });
+      } else {
+        navigator.clipboard.writeText(message).then(() => {
+          completeShareReferralTask();
+          showNotification('Referral link copied to clipboard!', 'success');
+        });
+      }
+    });
+    
+    function completeShareReferralTask() {
+      walletData.tqhBalance += 50;
+      walletData.shareReferralTaskCompleted = true;
+      
+      // Update UI
+      shareReferralBtn.disabled = true;
+      shareReferralBtn.textContent = 'Task Completed';
+      shareReferralStatus.style.display = 'block';
+      
+      // Save and update
+      saveWalletData();
+      updateWalletDisplay();
+      
+      // Show notification
+      showNotification('50 TQH added for sharing your referral link!', 'success');
+    }
+    
     // Modal functionality
     connectButton.addEventListener('click', () => {
       connectModal.classList.add('active');
@@ -2687,7 +2943,9 @@
       gameHighScoreEl.textContent = game1HighScore;
       
       // Game 2
-      // Add similar logic for game 2 if needed
+      const game2Score = walletData.gameScores.game2 || 0;
+      const game2HighScore = Math.max(game2Score, parseInt(game2HighScoreEl.textContent) || 0);
+      game2HighScoreEl.textContent = game2HighScore;
     }
     
     // Handle game button clicks
@@ -2702,19 +2960,30 @@
       currentGameId = gameId;
       const game = gameData[gameId];
       
-      // Show game canvas
-      gameCanvasContainer.classList.add('active');
+      // Hide bottom navigation when game starts
+      document.querySelector('.bottom-nav').style.display = 'none';
       
-      // Initialize game
-      initGame();
+      if (gameId === 'game1') {
+        // Show Time Blast game
+        gameCanvasContainer.classList.add('active');
+        initTimeBlast();
+      } else if (gameId === 'game2') {
+        // Show Heart Blaster game
+        game2CanvasContainer.classList.add('active');
+        initHeartBlaster();
+      }
       
       // Load high score
       const highScore = walletData.gameScores[gameId] || 0;
-      gameHighScoreEl.textContent = highScore;
+      if (gameId === 'game1') {
+        gameHighScoreEl.textContent = highScore;
+      } else if (gameId === 'game2') {
+        game2HighScoreEl.textContent = highScore;
+      }
     }
     
-    // Initialize game
-    function initGame() {
+    // Initialize Time Blast game
+    function initTimeBlast() {
       // Setup event listeners for game buttons
       gameStartButton.addEventListener('click', function() {
         showAdAndThen(startGameSession);
@@ -2724,8 +2993,8 @@
         showAdAndThen(startGameSession);
       });
       
-      gameExitButton.addEventListener('click', exitGame);
-      gameMenuButton.addEventListener('click', exitGame);
+      gameExitButton.addEventListener('click', exitTimeBlast);
+      gameMenuButton.addEventListener('click', exitTimeBlast);
       gameShareButton.addEventListener('click', shareGameScore);
       
       // Setup canvas
@@ -2736,13 +3005,13 @@
       gameCanvas.addEventListener('click', handleGameClick);
     }
     
-    // Handle game canvas resize
+    // Handle game canvas resize for Time Blast
     function handleGameResize() {
       gameCanvas.width = window.innerWidth;
       gameCanvas.height = window.innerHeight;
     }
     
-    // Start game session
+    // Start Time Blast game session
     function startGameSession() {
       gameStartScreen.style.display = 'none';
       gameOverScreen.style.display = 'none';
@@ -2757,7 +3026,7 @@
       updateGameTimer();
     }
     
-    // Reset game state
+    // Reset Time Blast game state
     function resetGameState() {
       gameScore = 0;
       gameTimeLeft = 60;
@@ -2775,7 +3044,7 @@
       gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     }
     
-    // Spawn game elements
+    // Spawn Time Blast game elements
     function spawnGameElements() {
       if (!gameRunning || gameIsFrozen || gameElements.length >= gameConfig.maxElements) return;
       
@@ -2801,7 +3070,7 @@
       gameSpawnTimeout = setTimeout(spawnGameElements, gameConfig.spawnRate);
     }
     
-    // Update game timer
+    // Update Time Blast game timer
     function updateGameTimer() {
       if (!gameRunning) return;
       
@@ -2817,7 +3086,7 @@
       }
     }
     
-    // End game session
+    // End Time Blast game session
     function endGameSession() {
       gameRunning = false;
       gameOverScreen.style.display = 'flex';
@@ -2860,7 +3129,7 @@
       }
     }
     
-    // Handle game canvas click
+    // Handle Time Blast game canvas click
     function handleGameClick(e) {
       if (!gameRunning) return;
       const rect = gameCanvas.getBoundingClientRect();
@@ -2877,7 +3146,7 @@
       });
     }
     
-    // Process game click
+    // Process Time Blast game click
     function processGameClick(el) {
       switch(el.type) {
         case 'element': 
@@ -2895,7 +3164,7 @@
       gameScoreEl.textContent = gameScore;
     }
     
-    // Activate game freeze
+    // Activate Time Blast game freeze
     function activateGameFreeze() {
       if (gameIsFrozen) return;
       gameIsFrozen = true;
@@ -2919,14 +3188,14 @@
       });
     }
     
-    // Show game bomb effect
+    // Show Time Blast game bomb effect
     function showGameBombEffect() {
       const bombEffect = document.getElementById('game-bomb-effect');
       bombEffect.style.display = 'block';
       gameBombEffectTimeout = setTimeout(() => bombEffect.style.display = 'none', 500);
     }
     
-    // Create game particles
+    // Create Time Blast game particles
     function createGameParticles(x, y, type) {
       const colors = {
         element: '#6366f1',
@@ -2946,7 +3215,7 @@
       }
     }
     
-    // Update game state
+    // Update Time Blast game state
     function updateGame(delta) {
       gameElements = gameElements.filter(el => el.y < gameCanvas.height + 100);
       
@@ -2966,7 +3235,7 @@
       gameParticles = gameParticles.filter(p => p.life > 0);
     }
     
-    // Draw game
+    // Draw Time Blast game
     function drawGame() {
       gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
       
@@ -2986,7 +3255,7 @@
       gameCtx.globalAlpha = 1;
     }
     
-    // Game loop
+    // Time Blast game loop
     function gameLoop(timestamp) {
       if (!gameRunning) return;
       const delta = timestamp - gameLastFrame;
@@ -2997,8 +3266,8 @@
       gameAnimationFrameId = requestAnimationFrame(gameLoop);
     }
     
-    // Exit game
-    function exitGame() {
+    // Exit Time Blast game
+    function exitTimeBlast() {
       gameRunning = false;
       cancelAnimationFrame(gameAnimationFrameId);
       clearTimeout(gameTimerId);
@@ -3009,16 +3278,19 @@
       gameStartScreen.style.display = 'flex';
       gameOverScreen.style.display = 'none';
       
+      // Show bottom navigation again
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      
       // Update wallet display in case rewards were earned
       updateWalletDisplay();
     }
     
-    // Share game score
+    // Share Time Blast game score
     function shareGameScore() {
       if (window.Telegram && window.Telegram.WebApp) {
         const media_url = 'https://botfather.cloud/Assets/Photo/DropBlast.jpg';
         const storyParams = {
-          text: `I scored ${gameScore} points in BB Drop Blast! Can you beat me?`,
+          text: `I scored ${gameScore} points in Time Blast! Can you beat me?`,
         };
   
         if (window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.is_premium) {
@@ -3038,10 +3310,447 @@
       }
     }
     
+    // Initialize Heart Blaster game
+    function initHeartBlaster() {
+      // Setup event listeners for game buttons
+      game2StartButton.addEventListener('click', function() {
+        showAdAndThen(startHeartBlasterSession);
+      });
+      
+      game2RestartButton.addEventListener('click', function() {
+        showAdAndThen(startHeartBlasterSession);
+      });
+      
+      game2ExitButton.addEventListener('click', exitHeartBlaster);
+      game2MenuButton.addEventListener('click', exitHeartBlaster);
+      game2ShareButton.addEventListener('click', shareHeartBlasterScore);
+      
+      // Setup canvas
+      handleHeartBlasterResize();
+      window.addEventListener('resize', handleHeartBlasterResize);
+      
+      // Setup controls
+      setupHeartBlasterControls();
+    }
+    
+    // Handle Heart Blaster game canvas resize
+    function handleHeartBlasterResize() {
+      game2Canvas.width = window.innerWidth;
+      game2Canvas.height = window.innerHeight;
+      game2Player.x = game2Canvas.width / 2 - game2Player.width / 2;
+      game2Player.y = game2Canvas.height - 100;
+      game2Player.targetX = game2Player.x;
+    }
+    
+    // Setup Heart Blaster controls
+    function setupHeartBlasterControls() {
+      let isShooting = false;
+      
+      // Mouse/Touch controls
+      game2Canvas.addEventListener('mousedown', startMove);
+      game2Canvas.addEventListener('mousemove', movePlayer);
+      game2Canvas.addEventListener('mouseup', stopMove);
+      game2Canvas.addEventListener('mouseleave', stopMove);
+      
+      game2Canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        startMove(e.touches[0]);
+      });
+      
+      game2Canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        movePlayer(e.touches[0]);
+      });
+      
+      game2Canvas.addEventListener('touchend', stopMove);
+      
+      // Auto-shoot when holding
+      game2Canvas.addEventListener('mousedown', () => { isShooting = true; });
+      game2Canvas.addEventListener('touchstart', () => { isShooting = true; });
+      game2Canvas.addEventListener('mouseup', () => { isShooting = false; });
+      game2Canvas.addEventListener('touchend', () => { isShooting = false; });
+      
+      function startMove(e) {
+        game2Player.isMoving = true;
+        game2Player.targetX = e.clientX - game2Player.width / 2;
+      }
+      
+      function movePlayer(e) {
+        if (game2Player.isMoving) {
+          game2Player.targetX = e.clientX - game2Player.width / 2;
+        }
+      }
+      
+      function stopMove() {
+        game2Player.isMoving = false;
+      }
+      
+      // Shooting logic
+      function updateShooting() {
+        if (!game2Running) return;
+        
+        const currentTime = Date.now();
+        if (isShooting && currentTime - game2LastBulletTime > game2BulletCooldown) {
+          shootBullet();
+          game2LastBulletTime = currentTime;
+        }
+      }
+      
+      // Add shooting to game loop
+      const originalHeartBlasterLoop = heartBlasterLoop;
+      heartBlasterLoop = function(timestamp) {
+        updateShooting();
+        originalHeartBlasterLoop(timestamp);
+      };
+    }
+    
+    // Start Heart Blaster game session
+    function startHeartBlasterSession() {
+      game2StartScreen.style.display = 'none';
+      game2OverScreen.style.display = 'none';
+      
+      resetHeartBlasterState();
+      game2Running = true;
+      
+      game2AnimationFrameId = requestAnimationFrame(heartBlasterLoop);
+      game2TimerId = setInterval(updateHeartBlasterTimer, 1000);
+      game2SpawnTimeout = setInterval(spawnEnemy, 1000);
+    }
+    
+    // Reset Heart Blaster game state
+    function resetHeartBlasterState() {
+      game2Score = 0;
+      game2TimeLeft = 60;
+      game2Bullets = [];
+      game2Enemies = [];
+      game2Particles = [];
+      
+      game2Player.x = game2Canvas.width / 2 - game2Player.width / 2;
+      game2Player.y = game2Canvas.height - 100;
+      game2Player.targetX = game2Player.x;
+      
+      game2ScoreEl.textContent = '0';
+      game2TimeEl.textContent = '60';
+    }
+    
+    // Update Heart Blaster game timer
+    function updateHeartBlasterTimer() {
+      if (!game2Running) return;
+      
+      game2TimeLeft--;
+      game2TimeEl.textContent = game2TimeLeft;
+      
+      if (game2TimeLeft <= 0) {
+        endHeartBlasterSession();
+      }
+    }
+    
+    // End Heart Blaster game session
+    function endHeartBlasterSession() {
+      game2Running = false;
+      cancelAnimationFrame(game2AnimationFrameId);
+      clearInterval(game2TimerId);
+      clearInterval(game2SpawnTimeout);
+      
+      game2OverScreen.style.display = 'flex';
+      game2FinalScoreEl.textContent = game2Score;
+      
+      // Update high score
+      const currentHighScore = parseInt(game2HighScoreEl.textContent) || 0;
+      if (game2Score > currentHighScore) {
+        game2HighScoreEl.textContent = game2Score;
+        walletData.gameScores['game2'] = game2Score;
+        saveWalletData();
+      }
+      
+      // Calculate and display TQH reward
+      const game = gameData['game2'];
+      const rewardMultiplier = Math.floor(game2Score / game.pointsThreshold);
+      const tqhReward = rewardMultiplier * game.rewardPerPoints;
+      
+      if (tqhReward > 0) {
+        // Check if reward was already claimed for this score
+        const claimedReward = walletData.gameRewardsClaimed['game2'] || 0;
+        if (tqhReward > claimedReward) {
+          const newReward = tqhReward - claimedReward;
+          walletData.tqhBalance += newReward;
+          walletData.gameRewardsClaimed['game2'] = tqhReward;
+          saveWalletData();
+          updateWalletDisplay();
+          
+          game2RewardMessageEl.textContent = `You earned ${newReward} TQH!`;
+          game2RewardMessageEl.style.display = 'block';
+          
+          showNotification(`Congratulations! You earned ${newReward} TQH from playing ${game.name}`, 'success');
+        } else {
+          game2RewardMessageEl.textContent = `You already claimed ${tqhReward} TQH for this game`;
+          game2RewardMessageEl.style.display = 'block';
+        }
+      } else {
+        game2RewardMessageEl.textContent = 'Keep playing to earn TQH!';
+        game2RewardMessageEl.style.display = 'block';
+      }
+    }
+    
+    // Spawn Heart Blaster enemies
+    function spawnEnemy() {
+      if (!game2Running) return;
+      
+      const size = 40 + Math.random() * 20;
+      const enemyType = Math.random() > 0.5 ? 'normal' : 'fast';
+      const enemy = {
+        x: Math.random() * (game2Canvas.width - size),
+        y: -size,
+        width: size,
+        height: size,
+        speed: enemyType === 'fast' ? 3 + Math.random() * 2 : 1 + Math.random() * 1.5,
+        type: Math.random() > 0.9 ? 'bonus' : 'normal',
+        health: 1
+      };
+      
+      game2Enemies.push(enemy);
+    }
+    
+    // Shoot bullet in Heart Blaster
+    function shootBullet() {
+      const bullet = {
+        x: game2Player.x + game2Player.width / 2 - 2,
+        y: game2Player.y,
+        width: 4,
+        height: 12,
+        speed: 10
+      };
+      
+      game2Bullets.push(bullet);
+      
+      // Create muzzle flash particles
+      for (let i = 0; i < 3; i++) {
+        game2Particles.push({
+          x: bullet.x,
+          y: bullet.y + bullet.height,
+          vx: (Math.random() - 0.5) * 4,
+          vy: Math.random() * 2 + 1,
+          life: 20,
+          color: '#ffd93d'
+        });
+      }
+    }
+    
+    // Update Heart Blaster game state
+    function updateHeartBlaster() {
+      // Update player position with smooth movement
+      const dx = game2Player.targetX - game2Player.x;
+      game2Player.x += dx * 0.2;
+      
+      // Keep player in bounds
+      game2Player.x = Math.max(0, Math.min(game2Canvas.width - game2Player.width, game2Player.x));
+      
+      // Update bullets
+      game2Bullets.forEach((bullet, index) => {
+        bullet.y -= bullet.speed;
+        
+        // Remove bullets that are off screen
+        if (bullet.y < -bullet.height) {
+          game2Bullets.splice(index, 1);
+        }
+      });
+      
+      // Update enemies
+      game2Enemies.forEach((enemy, eIndex) => {
+        enemy.y += enemy.speed;
+        
+        // Check if enemy is off screen
+        if (enemy.y > game2Canvas.height) {
+          game2Enemies.splice(eIndex, 1);
+          return;
+        }
+        
+        // Check bullet collisions
+        game2Bullets.forEach((bullet, bIndex) => {
+          if (isColliding(bullet, enemy)) {
+            // Hit enemy
+            enemy.health--;
+            
+            // Create explosion particles
+            createHeartBlasterExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2);
+            
+            // Remove bullet
+            game2Bullets.splice(bIndex, 1);
+            
+            if (enemy.health <= 0) {
+              // Add score
+              const points = enemy.type === 'bonus' ? 50 : 10;
+              game2Score += points;
+              game2ScoreEl.textContent = game2Score;
+              
+              // Remove enemy
+              game2Enemies.splice(eIndex, 1);
+              
+              // Show explosion effect
+              showHeartBlasterExplosionEffect();
+            }
+          }
+        });
+      });
+      
+      // Update particles
+      game2Particles.forEach((particle, index) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life--;
+        
+        if (particle.life <= 0) {
+          game2Particles.splice(index, 1);
+        }
+      });
+    }
+    
+    // Check collision in Heart Blaster
+    function isColliding(obj1, obj2) {
+      return obj1.x < obj2.x + obj2.width &&
+             obj1.x + obj1.width > obj2.x &&
+             obj1.y < obj2.y + obj2.height &&
+             obj1.y + obj1.height > obj2.y;
+    }
+    
+    // Create explosion in Heart Blaster
+    function createHeartBlasterExplosion(x, y) {
+      for (let i = 0; i < 15; i++) {
+        game2Particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8,
+          life: 30 + Math.random() * 20,
+          color: ['#ff6b6b', '#ffd93d', '#ffa726'][Math.floor(Math.random() * 3)]
+        });
+      }
+    }
+    
+    // Show explosion effect in Heart Blaster
+    function showHeartBlasterExplosionEffect() {
+      const effect = document.getElementById('game2-explosion-effect');
+      effect.style.display = 'block';
+      
+      setTimeout(() => {
+        effect.style.display = 'none';
+      }, 200);
+    }
+    
+    // Draw Heart Blaster game
+    function drawHeartBlaster() {
+      // Clear canvas with a slight transparency for trail effect
+      game2Ctx.fillStyle = 'rgba(15, 23, 42, 0.1)';
+      game2Ctx.fillRect(0, 0, game2Canvas.width, game2Canvas.height);
+      
+      // Draw background stars
+      drawHeartBlasterStars();
+      
+      // Draw player (warplane)
+      game2Ctx.fillStyle = '#6366f1';
+      game2Ctx.fillRect(game2Player.x, game2Player.y, game2Player.width, game2Player.height);
+      
+      // Draw bullets
+      game2Bullets.forEach(bullet => {
+        game2Ctx.fillStyle = '#ffd93d';
+        game2Ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+      });
+      
+      // Draw enemies
+      game2Enemies.forEach(enemy => {
+        game2Ctx.fillStyle = enemy.type === 'bonus' ? '#22c55e' : '#ef4444';
+        game2Ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+        
+        // Bonus enemy indicator
+        if (enemy.type === 'bonus') {
+          game2Ctx.strokeStyle = '#22c55e';
+          game2Ctx.lineWidth = 2;
+          game2Ctx.strokeRect(enemy.x - 2, enemy.y - 2, enemy.width + 4, enemy.height + 4);
+        }
+      });
+      
+      // Draw particles
+      game2Particles.forEach(particle => {
+        game2Ctx.fillStyle = particle.color;
+        game2Ctx.globalAlpha = particle.life / 50;
+        game2Ctx.beginPath();
+        game2Ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+        game2Ctx.fill();
+        game2Ctx.globalAlpha = 1;
+      });
+    }
+    
+    // Draw stars in Heart Blaster
+    function drawHeartBlasterStars() {
+      game2Ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 137) % game2Canvas.width;
+        const y = (i * 237) % game2Canvas.height;
+        const size = Math.random() * 2;
+        game2Ctx.beginPath();
+        game2Ctx.arc(x, y, size, 0, Math.PI * 2);
+        game2Ctx.fill();
+      }
+    }
+    
+    // Heart Blaster game loop
+    function heartBlasterLoop(timestamp) {
+      if (!game2Running) return;
+      
+      updateHeartBlaster();
+      drawHeartBlaster();
+      
+      game2AnimationFrameId = requestAnimationFrame(heartBlasterLoop);
+    }
+    
+    // Exit Heart Blaster game
+    function exitHeartBlaster() {
+      game2Running = false;
+      cancelAnimationFrame(game2AnimationFrameId);
+      clearInterval(game2TimerId);
+      clearInterval(game2SpawnTimeout);
+      
+      game2CanvasContainer.classList.remove('active');
+      game2StartScreen.style.display = 'flex';
+      game2OverScreen.style.display = 'none';
+      
+      // Show bottom navigation again
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      
+      // Update wallet display in case rewards were earned
+      updateWalletDisplay();
+    }
+    
+    // Share Heart Blaster score
+    function shareHeartBlasterScore() {
+      const message = `🚀 I scored ${game2Score} points in Heart Blaster! Can you beat my aerial combat skills? ✈️`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Heart Blaster Score',
+          text: message
+        }).catch(() => {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(message).then(() => {
+            showNotification('Score copied to clipboard!', 'success');
+          });
+        });
+      } else {
+        navigator.clipboard.writeText(message).then(() => {
+          showNotification('Score copied to clipboard! Share it with your friends!', 'success');
+        });
+      }
+    }
+    
     // Telegram task
     telegramTaskBtn.addEventListener('click', function() {
+      if (walletData.telegramTaskCompleted) {
+        showNotification('You have already completed this task!', 'warning');
+        return;
+      }
+      
       // Open Telegram channel
-      window.open('https://t.me/TonQash', '_blank');
+      window.open('https://t.me/Piswapnetwork_bot?start', '_blank');
       
       // Add reward
       walletData.tqhBalance += 100;
@@ -3095,6 +3804,13 @@
         telegramTaskBtn.disabled = true;
         telegramTaskBtn.textContent = 'Task Completed';
         telegramTaskStatus.style.display = 'block';
+      }
+      
+      // Setup share referral task button
+      if (walletData.shareReferralTaskCompleted) {
+        shareReferralBtn.disabled = true;
+        shareReferralBtn.textContent = 'Task Completed';
+        shareReferralStatus.style.display = 'block';
       }
       
       // Initialize game page
