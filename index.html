@@ -1332,6 +1332,107 @@
       color: var(--success);
       margin-bottom: 15px;
     }
+
+    /* Subway Surfers Game Container */
+    .subway-game-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 2000;
+      display: none;
+    }
+
+    .subway-game-container.active {
+      display: block;
+    }
+
+    .subway-top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background-color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      z-index: 2001;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .subway-home-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+    }
+
+    .subway-home-button:hover {
+      background-color: #45a049;
+    }
+
+    .subway-home-button i {
+      font-size: 16px;
+    }
+
+    .subway-game-frame {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - 50px);
+      background: #000;
+      border: none;
+    }
+
+    .subway-game-overlay {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 50px);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 2002;
+    }
+
+    .subway-score-display {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      margin-bottom: 20px;
+    }
+
+    .subway-score-value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--success);
+      margin: 10px 0;
+    }
+
+    .subway-reward-message {
+      color: var(--text-secondary);
+      margin: 15px 0;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
@@ -1550,17 +1651,17 @@
           </button>
         </div>
         
-        <!-- Game 2 - Heart Blaster -->
+        <!-- Game 2 - Subway Surfers -->
         <div class="game-card">
           <div class="game-badge">New</div>
-          <div class="game-image" style="background-image: url('https://i.suar.me/xpP12/l')"></div>
+          <div class="game-image" style="background-image: url('https://i.suar.me/1AoG3/l')"></div>
           <div class="game-stats">
             <div>Players:</div>
             <div><span id="game2-current">1789</span></div>
           </div>
-          <div class="game-reward">+5 TQH per 500 points</div>
+          <div class="game-reward">+15 TQH per 5000 points</div>
           <div class="game-description">
-            Heart Blaster - Shoot enemy planes and avoid collisions. Earn TQH rewards based on your score!
+            Subway Surfers - Run as far as you can and avoid obstacles. Earn TQH rewards based on your score!
           </div>
           <button class="game-play-btn" id="game2-btn" data-game="2">
             <i class="fas fa-play-circle"></i> Play Game
@@ -1741,62 +1842,36 @@
     <canvas id="game-canvas"></canvas>
   </div>
   
-  <!-- Game Canvas Container for Heart Blaster -->
-  <div id="game2-canvas-container">
-    <div class="game-ui">
-      <div class="ui-card">
-        <img src="https://img.icons8.com/ios-filled/50/treasure-chest.png" class="ui-icon">
-        <span id="game2-score">0</span>
-      </div>
-      <div class="ui-card">
-        <img src="https://img.icons8.com/ios-filled/50/clock--v1.png" class="ui-icon">
-        <span id="game2-time">60</span>s
-      </div>
-    </div>
-
-    <div id="game2-start-screen" class="game-screen">
-      <div class="user-profile">
-        <img id="game2-user-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar">
-        <div id="game2-user-name" class="user-name">Sky Commander</div>
-      </div>
-      <h1 class="screen-heading floating">HEART BLASTER</h1>
-      <div class="ui-card" style="margin-bottom: 2rem;">
-        <span>High Score: </span>
-        <span id="game2-high-score">0</span>
-      </div>
-      <button class="game-button" id="game2-start-button">
-        <img src="https://img.icons8.com/ios/50/play--v1.png" class="ui-icon">
-        Start Mission
-      </button>
-      <button class="game-button button-danger" id="game2-exit-button">
-        <img src="https://img.icons8.com/ios/50/exit.png" class="ui-icon">
-        Exit Game
+  <!-- Subway Surfers Game Container -->
+  <div class="subway-game-container" id="subway-game-container">
+    <div class="subway-top-bar">
+      <button class="subway-home-button" onclick="exitSubwaySurfers()">
+        <i class="fas fa-home"></i>
+        Home
       </button>
     </div>
-
-    <div id="game2-over-screen" class="game-screen" style="display:none">
-      <h1 class="screen-heading">MISSION COMPLETE</h1>
-      <div class="ui-card" style="margin: 1.5rem 0;">
-        <span>Final Score: </span>
-        <span id="game2-final-score">0</span>
+    <iframe class="subway-game-frame" id="subway-game-frame" src="about:blank" frameborder="0" allowfullscreen></iframe>
+    
+    <!-- Game Over Overlay -->
+    <div class="subway-game-overlay" id="subway-game-overlay" style="display: none;">
+      <div class="subway-score-display">
+        <h2 style="margin-bottom: 15px;">Game Completed!</h2>
+        <div class="subway-score-value" id="subway-final-score">0</div>
+        <div class="subway-reward-message" id="subway-reward-message">Calculating your reward...</div>
       </div>
-      <div id="game2-reward-message" style="margin: 1rem 0; color: var(--success); font-weight: 600;"></div>
-      <button class="game-button" id="game2-restart-button">
-        <img src="https://img.icons8.com/ios/50/restart--v1.png" class="ui-icon">
-        Fly Again
+      <button class="game-button" onclick="restartSubwaySurfers()">
+        <i class="fas fa-redo"></i>
+        Play Again
       </button>
-      <button class="game-button button-success" id="game2-share-button">
-        <img src="https://img.icons8.com/ios/50/share--v1.png" class="ui-icon">
-        Share Victory
+      <button class="game-button button-success" onclick="shareSubwayScore()">
+        <i class="fas fa-share"></i>
+        Share Score
       </button>
-      <button class="game-button button-danger" id="game2-menu-button">
-        <img src="https://img.icons8.com/ios/50/home-page.png" class="ui-icon">
-        Return to Base
+      <button class="game-button button-danger" onclick="exitSubwaySurfers()">
+        <i class="fas fa-home"></i>
+        Main Menu
       </button>
     </div>
-
-    <div id="game2-explosion-effect" class="game-effect" style="display:none; background: radial-gradient(circle, rgba(239,68,68,0.3) 0%, transparent 70%);"></div>
-    <canvas id="game2-canvas"></canvas>
   </div>
   
   <!-- Bottom Navigation -->
@@ -2046,7 +2121,8 @@
         game1: 0,
         game2: 0,
         game3: 0
-      }
+      },
+      subwayScores: []
     };
     
     // Game data
@@ -2061,11 +2137,11 @@
       },
       game2: {
         id: 2,
-        name: "Heart Blaster",
+        name: "Subway Surfers",
         image: "https://i.suar.me/Xv83X/m",
         players: 1789,
-        rewardPerPoints: 5,
-        pointsThreshold: 500
+        rewardPerPoints: 15,
+        pointsThreshold: 5000
       },
       game3: {
         id: 3,
@@ -2112,6 +2188,9 @@
               game3: 0
             };
           }
+          if (walletData.subwayScores === undefined) {
+            walletData.subwayScores = [];
+          }
           
           console.log("Loaded wallet data from localStorage");
         } catch (e) {
@@ -2139,7 +2218,8 @@
           telegramTaskCompleted: walletData.telegramTaskCompleted,
           shareReferralTaskCompleted: walletData.shareReferralTaskCompleted,
           gameScores: walletData.gameScores,
-          gameRewardsClaimed: walletData.gameRewardsClaimed
+          gameRewardsClaimed: walletData.gameRewardsClaimed,
+          subwayScores: walletData.subwayScores
         };
         
         localStorage.setItem('tonqash_wallet_data', JSON.stringify(dataToSave));
@@ -2179,22 +2259,11 @@
       elementSizes: [35, 40, 50, 55, 60]
     };
     
-    // Game variables for Heart Blaster
-    let game2Running = false;
-    let game2AnimationFrameId, game2TimerId, game2SpawnTimeout;
-    let game2Score = 0, game2TimeLeft = 60;
-    let game2Player = {
-      x: 0, y: 0,
-      width: 60, height: 40,
-      speed: 5,
-      isMoving: false,
-      targetX: 0
-    };
-    let game2Bullets = [];
-    let game2Enemies = [];
-    let game2Particles = [];
-    let game2LastBulletTime = 0;
-    const game2BulletCooldown = 150;
+    // Subway Surfers variables
+    let subwayGameActive = false;
+    let subwayScore = 0;
+    let subwayGameStartTime = null;
+    let subwayGameInterval = null;
     
     // DOM Elements
     const connectButton = document.getElementById('connect-button');
@@ -2275,24 +2344,12 @@
     const gameUserAvatar = document.getElementById('game-user-avatar');
     const gameUserName = document.getElementById('game-user-name');
     
-    // Heart Blaster game elements
-    const game2CanvasContainer = document.getElementById('game2-canvas-container');
-    const game2Canvas = document.getElementById('game2-canvas');
-    const game2Ctx = game2Canvas.getContext('2d');
-    const game2StartScreen = document.getElementById('game2-start-screen');
-    const game2OverScreen = document.getElementById('game2-over-screen');
-    const game2StartButton = document.getElementById('game2-start-button');
-    const game2RestartButton = document.getElementById('game2-restart-button');
-    const game2ExitButton = document.getElementById('game2-exit-button');
-    const game2MenuButton = document.getElementById('game2-menu-button');
-    const game2ShareButton = document.getElementById('game2-share-button');
-    const game2ScoreEl = document.getElementById('game2-score');
-    const game2TimeEl = document.getElementById('game2-time');
-    const game2HighScoreEl = document.getElementById('game2-high-score');
-    const game2FinalScoreEl = document.getElementById('game2-final-score');
-    const game2RewardMessageEl = document.getElementById('game2-reward-message');
-    const game2UserAvatar = document.getElementById('game2-user-avatar');
-    const game2UserName = document.getElementById('game2-user-name');
+    // Subway Surfers elements
+    const subwayGameContainer = document.getElementById('subway-game-container');
+    const subwayGameFrame = document.getElementById('subway-game-frame');
+    const subwayGameOverlay = document.getElementById('subway-game-overlay');
+    const subwayFinalScoreEl = document.getElementById('subway-final-score');
+    const subwayRewardMessageEl = document.getElementById('subway-reward-message');
     
     // Ad elements
     const adModal = document.getElementById('ad-modal');
@@ -2312,14 +2369,11 @@
           const username = user.username ? `@${user.username}` : `${user.first_name} ${user.last_name || ''}`.trim();
           profileNameEl.textContent = username;
           gameUserName.textContent = username;
-          game2UserName.textContent = username;
           
           if (user.photo_url) {
             gameUserAvatar.src = user.photo_url;
-            game2UserAvatar.src = user.photo_url;
           } else {
             gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            game2UserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
           }
           
           return username;
@@ -2332,15 +2386,12 @@
       if (tgUsername) {
         profileNameEl.textContent = tgUsername;
         gameUserName.textContent = tgUsername;
-        game2UserName.textContent = tgUsername;
         return tgUsername;
       }
       
       profileNameEl.textContent = "Telegram User";
       gameUserName.textContent = "Guest";
-      game2UserName.textContent = "Guest";
       gameUserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-      game2UserAvatar.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
       return "Telegram User";
     }
     
@@ -2942,10 +2993,9 @@
       const game1HighScore = Math.max(game1Score, parseInt(gameHighScoreEl.textContent) || 0);
       gameHighScoreEl.textContent = game1HighScore;
       
-      // Game 2
+      // Game 2 (Subway Surfers)
       const game2Score = walletData.gameScores.game2 || 0;
-      const game2HighScore = Math.max(game2Score, parseInt(game2HighScoreEl.textContent) || 0);
-      game2HighScoreEl.textContent = game2HighScore;
+      document.getElementById('game2-current').textContent = gameData.game2.players;
     }
     
     // Handle game button clicks
@@ -2968,17 +3018,14 @@
         gameCanvasContainer.classList.add('active');
         initTimeBlast();
       } else if (gameId === 'game2') {
-        // Show Heart Blaster game
-        game2CanvasContainer.classList.add('active');
-        initHeartBlaster();
+        // Show Subway Surfers game
+        startSubwaySurfers();
       }
       
       // Load high score
       const highScore = walletData.gameScores[gameId] || 0;
       if (gameId === 'game1') {
         gameHighScoreEl.textContent = highScore;
-      } else if (gameId === 'game2') {
-        game2HighScoreEl.textContent = highScore;
       }
     }
     
@@ -3310,409 +3357,129 @@
       }
     }
     
-    // Initialize Heart Blaster game
-    function initHeartBlaster() {
-      // Setup event listeners for game buttons
-      game2StartButton.addEventListener('click', function() {
-        showAdAndThen(startHeartBlasterSession);
-      });
-      
-      game2RestartButton.addEventListener('click', function() {
-        showAdAndThen(startHeartBlasterSession);
-      });
-      
-      game2ExitButton.addEventListener('click', exitHeartBlaster);
-      game2MenuButton.addEventListener('click', exitHeartBlaster);
-      game2ShareButton.addEventListener('click', shareHeartBlasterScore);
-      
-      // Setup canvas
-      handleHeartBlasterResize();
-      window.addEventListener('resize', handleHeartBlasterResize);
-      
-      // Setup controls
-      setupHeartBlasterControls();
-    }
-    
-    // Handle Heart Blaster game canvas resize
-    function handleHeartBlasterResize() {
-      game2Canvas.width = window.innerWidth;
-      game2Canvas.height = window.innerHeight;
-      game2Player.x = game2Canvas.width / 2 - game2Player.width / 2;
-      game2Player.y = game2Canvas.height - 100;
-      game2Player.targetX = game2Player.x;
-    }
-    
-    // Setup Heart Blaster controls
-    function setupHeartBlasterControls() {
-      let isShooting = false;
-      
-      // Mouse/Touch controls
-      game2Canvas.addEventListener('mousedown', startMove);
-      game2Canvas.addEventListener('mousemove', movePlayer);
-      game2Canvas.addEventListener('mouseup', stopMove);
-      game2Canvas.addEventListener('mouseleave', stopMove);
-      
-      game2Canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        startMove(e.touches[0]);
-      });
-      
-      game2Canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        movePlayer(e.touches[0]);
-      });
-      
-      game2Canvas.addEventListener('touchend', stopMove);
-      
-      // Auto-shoot when holding
-      game2Canvas.addEventListener('mousedown', () => { isShooting = true; });
-      game2Canvas.addEventListener('touchstart', () => { isShooting = true; });
-      game2Canvas.addEventListener('mouseup', () => { isShooting = false; });
-      game2Canvas.addEventListener('touchend', () => { isShooting = false; });
-      
-      function startMove(e) {
-        game2Player.isMoving = true;
-        game2Player.targetX = e.clientX - game2Player.width / 2;
-      }
-      
-      function movePlayer(e) {
-        if (game2Player.isMoving) {
-          game2Player.targetX = e.clientX - game2Player.width / 2;
-        }
-      }
-      
-      function stopMove() {
-        game2Player.isMoving = false;
-      }
-      
-      // Shooting logic
-      function updateShooting() {
-        if (!game2Running) return;
+    // Subway Surfers Game Functions
+    function startSubwaySurfers() {
+      showAdAndThen(() => {
+        // Show the game container
+        subwayGameContainer.classList.add('active');
         
-        const currentTime = Date.now();
-        if (isShooting && currentTime - game2LastBulletTime > game2BulletCooldown) {
-          shootBullet();
-          game2LastBulletTime = currentTime;
+        // Load the Subway Surfers game
+        subwayGameFrame.src = "https://freeonlinegames.github.io/subway-surfers-tokyo/";
+        
+        // Start tracking game session
+        subwayGameActive = true;
+        subwayScore = 0;
+        subwayGameStartTime = Date.now();
+        
+        // Simulate score tracking (in a real implementation, you would use postMessage or other methods)
+        startSubwayScoreSimulation();
+        
+        // Listen for game end (user closes the game)
+        setupSubwayGameEndListener();
+      });
+    }
+    
+    function startSubwayScoreSimulation() {
+      // This simulates tracking the player's score
+      // In a real implementation, you would use postMessage to communicate with the iframe
+      subwayGameInterval = setInterval(() => {
+        if (subwayGameActive) {
+          // Simulate score increase based on play time
+          const timePlayed = (Date.now() - subwayGameStartTime) / 1000;
+          subwayScore = Math.floor(timePlayed * 100); // 100 points per second
         }
-      }
-      
-      // Add shooting to game loop
-      const originalHeartBlasterLoop = heartBlasterLoop;
-      heartBlasterLoop = function(timestamp) {
-        updateShooting();
-        originalHeartBlasterLoop(timestamp);
-      };
+      }, 1000);
     }
     
-    // Start Heart Blaster game session
-    function startHeartBlasterSession() {
-      game2StartScreen.style.display = 'none';
-      game2OverScreen.style.display = 'none';
+    function setupSubwayGameEndListener() {
+      // Listen for visibility changes to detect when user leaves the game
+      document.addEventListener('visibilitychange', handleSubwayVisibilityChange);
       
-      resetHeartBlasterState();
-      game2Running = true;
-      
-      game2AnimationFrameId = requestAnimationFrame(heartBlasterLoop);
-      game2TimerId = setInterval(updateHeartBlasterTimer, 1000);
-      game2SpawnTimeout = setInterval(spawnEnemy, 1000);
+      // Listen for beforeunload to catch when user tries to close
+      window.addEventListener('beforeunload', handleSubwayBeforeUnload);
     }
     
-    // Reset Heart Blaster game state
-    function resetHeartBlasterState() {
-      game2Score = 0;
-      game2TimeLeft = 60;
-      game2Bullets = [];
-      game2Enemies = [];
-      game2Particles = [];
-      
-      game2Player.x = game2Canvas.width / 2 - game2Player.width / 2;
-      game2Player.y = game2Canvas.height - 100;
-      game2Player.targetX = game2Player.x;
-      
-      game2ScoreEl.textContent = '0';
-      game2TimeEl.textContent = '60';
-    }
-    
-    // Update Heart Blaster game timer
-    function updateHeartBlasterTimer() {
-      if (!game2Running) return;
-      
-      game2TimeLeft--;
-      game2TimeEl.textContent = game2TimeLeft;
-      
-      if (game2TimeLeft <= 0) {
-        endHeartBlasterSession();
+    function handleSubwayVisibilityChange() {
+      if (document.hidden && subwayGameActive) {
+        // User switched to another tab or app, end the game
+        endSubwayGame();
       }
     }
     
-    // End Heart Blaster game session
-    function endHeartBlasterSession() {
-      game2Running = false;
-      cancelAnimationFrame(game2AnimationFrameId);
-      clearInterval(game2TimerId);
-      clearInterval(game2SpawnTimeout);
-      
-      game2OverScreen.style.display = 'flex';
-      game2FinalScoreEl.textContent = game2Score;
-      
-      // Update high score
-      const currentHighScore = parseInt(game2HighScoreEl.textContent) || 0;
-      if (game2Score > currentHighScore) {
-        game2HighScoreEl.textContent = game2Score;
-        walletData.gameScores['game2'] = game2Score;
-        saveWalletData();
+    function handleSubwayBeforeUnload() {
+      if (subwayGameActive) {
+        endSubwayGame();
       }
+    }
+    
+    function endSubwayGame() {
+      if (!subwayGameActive) return;
       
-      // Calculate and display TQH reward
+      subwayGameActive = false;
+      clearInterval(subwayGameInterval);
+      
+      // Calculate final score (in a real game, this would come from the actual game)
+      const finalScore = subwayScore + Math.floor(Math.random() * 5000);
+      
+      // Show game over overlay
+      subwayGameOverlay.style.display = 'flex';
+      subwayFinalScoreEl.textContent = finalScore.toLocaleString();
+      
+      // Calculate and award TQH reward
+      calculateSubwayReward(finalScore);
+      
+      // Clean up event listeners
+      document.removeEventListener('visibilitychange', handleSubwayVisibilityChange);
+      window.removeEventListener('beforeunload', handleSubwayBeforeUnload);
+    }
+    
+    function calculateSubwayReward(score) {
       const game = gameData['game2'];
-      const rewardMultiplier = Math.floor(game2Score / game.pointsThreshold);
+      const rewardMultiplier = Math.floor(score / game.pointsThreshold);
       const tqhReward = rewardMultiplier * game.rewardPerPoints;
       
+      // Update high score
+      const currentHighScore = walletData.gameScores['game2'] || 0;
+      if (score > currentHighScore) {
+        walletData.gameScores['game2'] = score;
+      }
+      
+      // Store this session's score
+      walletData.subwayScores.push({
+        score: score,
+        timestamp: new Date().toISOString(),
+        reward: tqhReward
+      });
+      
       if (tqhReward > 0) {
-        // Check if reward was already claimed for this score
-        const claimedReward = walletData.gameRewardsClaimed['game2'] || 0;
-        if (tqhReward > claimedReward) {
-          const newReward = tqhReward - claimedReward;
-          walletData.tqhBalance += newReward;
-          walletData.gameRewardsClaimed['game2'] = tqhReward;
-          saveWalletData();
-          updateWalletDisplay();
-          
-          game2RewardMessageEl.textContent = `You earned ${newReward} TQH!`;
-          game2RewardMessageEl.style.display = 'block';
-          
-          showNotification(`Congratulations! You earned ${newReward} TQH from playing ${game.name}`, 'success');
-        } else {
-          game2RewardMessageEl.textContent = `You already claimed ${tqhReward} TQH for this game`;
-          game2RewardMessageEl.style.display = 'block';
-        }
+        // Add reward to balance
+        walletData.tqhBalance += tqhReward;
+        saveWalletData();
+        updateWalletDisplay();
+        
+        subwayRewardMessageEl.textContent = `You earned ${tqhReward} TQH!`;
+        subwayRewardMessageEl.style.color = 'var(--success)';
+        
+        showNotification(`Congratulations! You earned ${tqhReward} TQH from playing Subway Surfers`, 'success');
       } else {
-        game2RewardMessageEl.textContent = 'Keep playing to earn TQH!';
-        game2RewardMessageEl.style.display = 'block';
+        subwayRewardMessageEl.textContent = 'Keep playing to earn TQH! Score 5000+ points to start earning.';
+        subwayRewardMessageEl.style.color = 'var(--text-secondary)';
       }
     }
     
-    // Spawn Heart Blaster enemies
-    function spawnEnemy() {
-      if (!game2Running) return;
-      
-      const size = 40 + Math.random() * 20;
-      const enemyType = Math.random() > 0.5 ? 'normal' : 'fast';
-      const enemy = {
-        x: Math.random() * (game2Canvas.width - size),
-        y: -size,
-        width: size,
-        height: size,
-        speed: enemyType === 'fast' ? 3 + Math.random() * 2 : 1 + Math.random() * 1.5,
-        type: Math.random() > 0.9 ? 'bonus' : 'normal',
-        health: 1
-      };
-      
-      game2Enemies.push(enemy);
+    function restartSubwaySurfers() {
+      subwayGameOverlay.style.display = 'none';
+      startSubwaySurfers();
     }
     
-    // Shoot bullet in Heart Blaster
-    function shootBullet() {
-      const bullet = {
-        x: game2Player.x + game2Player.width / 2 - 2,
-        y: game2Player.y,
-        width: 4,
-        height: 12,
-        speed: 10
-      };
-      
-      game2Bullets.push(bullet);
-      
-      // Create muzzle flash particles
-      for (let i = 0; i < 3; i++) {
-        game2Particles.push({
-          x: bullet.x,
-          y: bullet.y + bullet.height,
-          vx: (Math.random() - 0.5) * 4,
-          vy: Math.random() * 2 + 1,
-          life: 20,
-          color: '#ffd93d'
-        });
+    function exitSubwaySurfers() {
+      if (subwayGameActive) {
+        endSubwayGame();
       }
-    }
-    
-    // Update Heart Blaster game state
-    function updateHeartBlaster() {
-      // Update player position with smooth movement
-      const dx = game2Player.targetX - game2Player.x;
-      game2Player.x += dx * 0.2;
       
-      // Keep player in bounds
-      game2Player.x = Math.max(0, Math.min(game2Canvas.width - game2Player.width, game2Player.x));
-      
-      // Update bullets
-      game2Bullets.forEach((bullet, index) => {
-        bullet.y -= bullet.speed;
-        
-        // Remove bullets that are off screen
-        if (bullet.y < -bullet.height) {
-          game2Bullets.splice(index, 1);
-        }
-      });
-      
-      // Update enemies
-      game2Enemies.forEach((enemy, eIndex) => {
-        enemy.y += enemy.speed;
-        
-        // Check if enemy is off screen
-        if (enemy.y > game2Canvas.height) {
-          game2Enemies.splice(eIndex, 1);
-          return;
-        }
-        
-        // Check bullet collisions
-        game2Bullets.forEach((bullet, bIndex) => {
-          if (isColliding(bullet, enemy)) {
-            // Hit enemy
-            enemy.health--;
-            
-            // Create explosion particles
-            createHeartBlasterExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2);
-            
-            // Remove bullet
-            game2Bullets.splice(bIndex, 1);
-            
-            if (enemy.health <= 0) {
-              // Add score
-              const points = enemy.type === 'bonus' ? 50 : 10;
-              game2Score += points;
-              game2ScoreEl.textContent = game2Score;
-              
-              // Remove enemy
-              game2Enemies.splice(eIndex, 1);
-              
-              // Show explosion effect
-              showHeartBlasterExplosionEffect();
-            }
-          }
-        });
-      });
-      
-      // Update particles
-      game2Particles.forEach((particle, index) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.life--;
-        
-        if (particle.life <= 0) {
-          game2Particles.splice(index, 1);
-        }
-      });
-    }
-    
-    // Check collision in Heart Blaster
-    function isColliding(obj1, obj2) {
-      return obj1.x < obj2.x + obj2.width &&
-             obj1.x + obj1.width > obj2.x &&
-             obj1.y < obj2.y + obj2.height &&
-             obj1.y + obj1.height > obj2.y;
-    }
-    
-    // Create explosion in Heart Blaster
-    function createHeartBlasterExplosion(x, y) {
-      for (let i = 0; i < 15; i++) {
-        game2Particles.push({
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 8,
-          vy: (Math.random() - 0.5) * 8,
-          life: 30 + Math.random() * 20,
-          color: ['#ff6b6b', '#ffd93d', '#ffa726'][Math.floor(Math.random() * 3)]
-        });
-      }
-    }
-    
-    // Show explosion effect in Heart Blaster
-    function showHeartBlasterExplosionEffect() {
-      const effect = document.getElementById('game2-explosion-effect');
-      effect.style.display = 'block';
-      
-      setTimeout(() => {
-        effect.style.display = 'none';
-      }, 200);
-    }
-    
-    // Draw Heart Blaster game
-    function drawHeartBlaster() {
-      // Clear canvas with a slight transparency for trail effect
-      game2Ctx.fillStyle = 'rgba(15, 23, 42, 0.1)';
-      game2Ctx.fillRect(0, 0, game2Canvas.width, game2Canvas.height);
-      
-      // Draw background stars
-      drawHeartBlasterStars();
-      
-      // Draw player (warplane)
-      game2Ctx.fillStyle = '#6366f1';
-      game2Ctx.fillRect(game2Player.x, game2Player.y, game2Player.width, game2Player.height);
-      
-      // Draw bullets
-      game2Bullets.forEach(bullet => {
-        game2Ctx.fillStyle = '#ffd93d';
-        game2Ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-      });
-      
-      // Draw enemies
-      game2Enemies.forEach(enemy => {
-        game2Ctx.fillStyle = enemy.type === 'bonus' ? '#22c55e' : '#ef4444';
-        game2Ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-        
-        // Bonus enemy indicator
-        if (enemy.type === 'bonus') {
-          game2Ctx.strokeStyle = '#22c55e';
-          game2Ctx.lineWidth = 2;
-          game2Ctx.strokeRect(enemy.x - 2, enemy.y - 2, enemy.width + 4, enemy.height + 4);
-        }
-      });
-      
-      // Draw particles
-      game2Particles.forEach(particle => {
-        game2Ctx.fillStyle = particle.color;
-        game2Ctx.globalAlpha = particle.life / 50;
-        game2Ctx.beginPath();
-        game2Ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
-        game2Ctx.fill();
-        game2Ctx.globalAlpha = 1;
-      });
-    }
-    
-    // Draw stars in Heart Blaster
-    function drawHeartBlasterStars() {
-      game2Ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      for (let i = 0; i < 50; i++) {
-        const x = (i * 137) % game2Canvas.width;
-        const y = (i * 237) % game2Canvas.height;
-        const size = Math.random() * 2;
-        game2Ctx.beginPath();
-        game2Ctx.arc(x, y, size, 0, Math.PI * 2);
-        game2Ctx.fill();
-      }
-    }
-    
-    // Heart Blaster game loop
-    function heartBlasterLoop(timestamp) {
-      if (!game2Running) return;
-      
-      updateHeartBlaster();
-      drawHeartBlaster();
-      
-      game2AnimationFrameId = requestAnimationFrame(heartBlasterLoop);
-    }
-    
-    // Exit Heart Blaster game
-    function exitHeartBlaster() {
-      game2Running = false;
-      cancelAnimationFrame(game2AnimationFrameId);
-      clearInterval(game2TimerId);
-      clearInterval(game2SpawnTimeout);
-      
-      game2CanvasContainer.classList.remove('active');
-      game2StartScreen.style.display = 'flex';
-      game2OverScreen.style.display = 'none';
+      subwayGameContainer.classList.remove('active');
+      subwayGameOverlay.style.display = 'none';
+      subwayGameFrame.src = "about:blank";
       
       // Show bottom navigation again
       document.querySelector('.bottom-nav').style.display = 'flex';
@@ -3721,13 +3488,13 @@
       updateWalletDisplay();
     }
     
-    // Share Heart Blaster score
-    function shareHeartBlasterScore() {
-      const message = `🚀 I scored ${game2Score} points in Heart Blaster! Can you beat my aerial combat skills? ✈️`;
+    function shareSubwayScore() {
+      const score = parseInt(subwayFinalScoreEl.textContent.replace(/,/g, '')) || 0;
+      const message = `🏃‍♂️ I scored ${score.toLocaleString()} points in Subway Surfers! Can you beat my running skills? 🚇`;
       
       if (navigator.share) {
         navigator.share({
-          title: 'Heart Blaster Score',
+          title: 'Subway Surfers Score',
           text: message
         }).catch(() => {
           // Fallback to clipboard
