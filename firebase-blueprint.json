@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "DoctorProfile": {
+      "title": "Doctor Profile",
+      "description": "Public profile details of a doctor.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "specialty": { "type": "string" },
+        "clinicAddress": { "type": "string" },
+        "phone": { "type": "string" },
+        "rating": { "type": "number" },
+        "patientCount": { "type": "number" }
+      },
+      "required": ["userId", "name", "specialty", "clinicAddress"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Patient booking for a doctor.",
+      "type": "object",
+      "properties": {
+        "doctorId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientPhone": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["doctorId", "patientName", "patientPhone", "date", "time", "status", "createdAt"]
+    },
+    "Permanence": {
+      "title": "Permanence",
+      "description": "On-duty pharmacy or lab.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["pharmacy", "laboratory"] },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "openUntil": { "type": "string" }
+      },
+      "required": ["name", "type", "address"]
+    }
+  },
+  "firestore": {
+    "/doctors/{doctorId}": {
+      "schema": { "$ref": "#/entities/DoctorProfile" },
+      "description": "Profiles of doctors registered on the platform"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": { "$ref": "#/entities/Appointment" },
+      "description": "All booked appointments"
+    },
+    "/permanences/{permanenceId}": {
+      "schema": { "$ref": "#/entities/Permanence" },
+      "description": "List of on-duty pharmacies and labs"
+    }
+  }
+}

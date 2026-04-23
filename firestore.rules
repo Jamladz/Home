@@ -1,0 +1,146 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Catch-all deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared Helpers
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isAdmin() { 
+      return isSignedIn() && (request.auth.token.email == 'sekanedrmessaif@gmail.com' || exists(/databases/$(database)/documents/admins/$(request.auth.uid))); 
+    }
+
+    // Doctor Profile Validation
+    function isValidDoctorProfile(data) {
+      return data.keys().hasAll(['userId', 'name', 'specialty', 'clinicAddress']) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.specialty is string && data.specialty.size() > 0 && data.specialty.size() <= 100 &&
+             data.clinicAddress is string && data.clinicAddress.size() > 0 && data.clinicAddress.size() <= 200 &&
+             data.get('phone', '') is string && data.get('phone', '').size() <= 20 &&
+             data.get('wilaya', '') is string && data.get('wilaya', '').size() <= 100 &&
+             data.get('commune', '') is string && data.get('commune', '').size() <= 100 &&
+             data.get('googleSheetWebhookUrl', '') is string && data.get('googleSheetWebhookUrl', '').size() <= 500 &&
+             data.get('maxPatientsPerDay', 0) is number &&
+             data.get('rating', 0) is number &&
+             data.get('reviewCount', 0) is number &&
+             data.get('patientCount', 0) is number &&
+             data.get('status', 'pending') in ['pending', 'approved'];
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['doctorId', 'patientName', 'rating', 'comment', 'createdAt']) &&
+             data.doctorId is string && data.doctorId.size() <= 128 &&
+             data.patientName is string && data.patientName.size() > 0 && data.patientName.size() <= 100 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 1000 &&
+             data.createdAt is number;
+    }
+
+    // Admins Collection
+    match /admins/{userId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Doctors Collection
+    match /doctors/{doctorId} {
+      // List/Get: Patient view of doctors or admin
+      allow read: if existing().get('status', 'approved') == 'approved' || isAdmin() || (isSignedIn() && doctorId == request.auth.uid); 
+      
+      // Doctors creating or updating their profile
+      allow create: if (isSignedIn() && 
+                    isValidId(doctorId) && 
+                    doctorId == request.auth.uid && 
+                    isValidDoctorProfile(incoming()) && 
+                    incoming().get('status', 'pending') == 'pending' &&
+                    incoming().keys().size() <= 13) || isAdmin();
+                    
+      allow update: if (isSignedIn() && 
+                        doctorId == request.auth.uid && 
+                        isValidDoctorProfile(incoming()) && 
+                        incoming().userId == existing().userId &&
+                        incoming().get('status', 'pending') == existing().get('status', 'pending') && // Block self-approval
+                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status'])) ||
+                       (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount', 'patientCount']) &&
+                        incoming().rating is number && incoming().rating >= 0 && incoming().rating <= 5 &&
+                        incoming().reviewCount is number && incoming().patientCount is number) || isAdmin();
+      
+      allow delete: if (isSignedIn() && doctorId == request.auth.uid) || isAdmin();
+    }
+
+    // Reviews Collection
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isValidId(reviewId) &&
+                    isValidReview(incoming()) &&
+                    exists(/databases/$(database)/documents/doctors/$(incoming().doctorId));
+      allow delete: if isAdmin();
+    }
+
+    // Appointment Validation
+    function isValidAppointment(data) {
+      return data.keys().hasAll(['doctorId', 'patientName', 'patientPhone', 'date', 'time', 'status', 'createdAt']) &&
+             data.doctorId is string && data.doctorId.size() <= 128 &&
+             data.patientName is string && data.patientName.size() > 0 && data.patientName.size() <= 100 &&
+             data.patientPhone is string && data.patientPhone.size() > 0 && data.patientPhone.size() <= 20 &&
+             data.date is string && data.date.size() <= 20 &&
+             data.time is string && data.time.size() <= 10 &&
+             data.status in ['pending', 'confirmed', 'cancelled'] &&
+             data.createdAt is number;
+    }
+
+    // Appointments Collection
+    match /appointments/{appointmentId} {
+      // Unauthenticated patients can CREATE an appointment.
+      // Must reference a valid doctor. (Usually, we'd require exists(), 
+      // but get(/databases/$(database)/documents/doctors/$(incoming().doctorId)) can verify the doctor is real).
+      allow create: if isValidId(appointmentId) && 
+                    isValidAppointment(incoming()) &&
+                    incoming().keys().size() == 7 &&
+                    exists(/databases/$(database)/documents/doctors/$(incoming().doctorId));
+
+      // ONLY the specific doctor who owns this appointment can read or update it.
+      allow read, delete: if (isSignedIn() && existing().doctorId == request.auth.uid) || isAdmin();
+      allow update: if (isSignedIn() && 
+                    existing().doctorId == request.auth.uid &&
+                    isValidAppointment(incoming()) &&
+                    incoming().doctorId == existing().doctorId &&
+                    incoming().patientName == existing().patientName &&
+                    incoming().patientPhone == existing().patientPhone &&
+                    incoming().createdAt == existing().createdAt &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['status', 'date', 'time'])) || isAdmin();
+    }
+
+    // Permanence Validation
+    function isValidPermanence(data) {
+      return data.keys().hasAll(['name', 'type', 'address']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.type in ['pharmacy', 'laboratory'] &&
+             data.address is string && data.address.size() > 0 && data.address.size() <= 200 &&
+             data.get('phone', '') is string && data.get('phone', '').size() <= 20 &&
+             data.get('openUntil', '') is string && data.get('openUntil', '').size() <= 50;
+    }
+
+    // Permanences Collection
+    match /permanences/{permanenceId} {
+      // Anyone can read duty pharmacies/labs
+      allow read: if true;
+      
+      allow create: if isAdmin() && 
+                    isValidId(permanenceId) && 
+                    isValidPermanence(incoming()) &&
+                    incoming().keys().size() <= 5;
+      
+      allow update: if isAdmin() &&
+                    isValidPermanence(incoming()) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'address', 'phone', 'openUntil']);
+                    
+      allow delete: if isAdmin();
+    }
+  }
+}
