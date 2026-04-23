@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { BottomNav } from "./components/BottomNav";
+import { TopHeader } from "./components/TopHeader";
 import Home from "./pages/Home";
 import DoctorsList from "./pages/DoctorsList";
 import DoctorDetail from "./pages/DoctorDetail";
@@ -17,19 +18,21 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
       if (user && user.email === 'sekanedrmessaif@gmail.com') {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
       }
     });
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
   return (
     <BrowserRouter>
       <div className="font-sans min-h-screen bg-slate-50 pb-16 lg:pb-0 text-slate-800">
+        <TopHeader />
+
         {/* Admin floating button */}
         {isAdmin && (
           <Link to="/admin" className="fixed top-24 left-4 z-50 bg-slate-800 text-white p-3 rounded-full shadow-lg hover:bg-slate-900 hover:scale-110 transition border-2 border-indigo-500">
