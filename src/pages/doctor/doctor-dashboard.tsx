@@ -38,6 +38,11 @@ export default function DoctorDashboard() {
         navigate("/doctor/login");
         return;
       }
+      if (user.email?.toLowerCase().trim() === 'sekanedrmessaif@gmail.com') {
+        navigate("/admin");
+        return;
+      }
+      
       setUid(user.uid);
       
       try {
