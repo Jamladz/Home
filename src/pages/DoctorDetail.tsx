@@ -66,60 +66,21 @@ export default function DoctorDetail() {
 
     try {
       let finalDate = date;
-      
-      // Auto-shift date logic if max patients per day is reached
-      if (doctor.maxPatientsPerDay) {
-        let isFull = true;
-        let currentDateToCheck = new Date(date);
-        
-        while (isFull) {
-          const checkDateStr = currentDateToCheck.toISOString().split('T')[0];
-          const q = query(
-            collection(db, "appointments"), 
-            where("doctorId", "==", doctorId),
-            where("date", "==", checkDateStr)
-          );
-          const apptSnap = await getDocs(q);
-          
-          if (apptSnap.docs.length >= doctor.maxPatientsPerDay) {
-            // Day is full, shift to next day
-            currentDateToCheck.setDate(currentDateToCheck.getDate() + 1);
-          } else {
-            // Found a day with available slots
-            finalDate = checkDateStr;
-            if (finalDate !== date) {
-              setShiftedDate(finalDate);
-            }
-            isFull = false;
-          }
-        }
-      }
+      const timeStamp = Date.now();
 
-      // 1. Save to Firebase Database within a transaction to increment patientCount
-      await runTransaction(db, async (transaction) => {
-        const doctorRef = doc(db, "doctors", doctorId);
-        const doctorDoc = await transaction.get(doctorRef);
-        
-        if (doctorDoc.exists()) {
-          const currentPatientCount = doctorDoc.data().patientCount || 0;
-          transaction.update(doctorRef, {
-            patientCount: currentPatientCount + 1
-          });
-        }
-        
-        const newApptRef = doc(collection(db, "appointments"));
-        transaction.set(newApptRef, {
-          doctorId,
-          patientName,
-          patientPhone,
-          date: finalDate,
-          time,
-          status: "pending",
-          createdAt: Date.now()
-        });
+      await addDoc(collection(db, "appointments"), {
+        doctorId,
+        patientName,
+        patientPhone,
+        date: finalDate,
+        time,
+        status: "pending",
+        createdAt: timeStamp
       });
       
-      // Update local state for patient count
+      // We don't increment patientCount in the doctors doc directly since it's hard to 
+      // secure atomically without Cloud Functions, and it leaks concurrency issues.
+      // But we will update UI purely for optimism.
       if (doctor) {
         setDoctor({ ...doctor, patientCount: (doctor.patientCount || 0) + 1 });
       }
@@ -129,9 +90,9 @@ export default function DoctorDetail() {
       setPatientPhone("");
       setDate("");
       setTime("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error booking appointment:", error);
-      alert("حدث خطأ أثناء الحجز. يرجى المحاولة مرة أخرى.");
+      alert(`حدث خطأ أثناء الحجز: ${error.message || "يرجى المحاولة مرة أخرى."}`);
     } finally {
       setBookingLoading(false);
     }
@@ -158,7 +119,8 @@ export default function DoctorDetail() {
         
         transaction.update(doctorRef, { 
           rating: newRating, 
-          reviewCount: newCount 
+          reviewCount: newCount,
+          patientCount: data.patientCount || 0
         });
         
         const newReviewRef = doc(collection(db, "reviews"));
