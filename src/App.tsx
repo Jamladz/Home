@@ -5,17 +5,19 @@ import Home from "./pages/Home";
 import DoctorsList from "./pages/DoctorsList";
 import DoctorDetail from "./pages/DoctorDetail";
 import PermanenceList from "./pages/PermanenceList";
-import DoctorLogin from "./pages/doctor/doctor-login.tsx";
-import DoctorDashboard from "./pages/doctor/doctor-dashboard.tsx";
+import DoctorLogin from "./pages/doctor/doctor-login";
+import DoctorDashboard from "./pages/doctor/doctor-dashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { useEffect, useState } from "react";
 import { auth } from "./lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
+import { useLanguage } from "./contexts/LanguageContext";
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const { language } = useLanguage();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -30,7 +32,10 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="font-sans min-h-screen bg-slate-50 pb-16 lg:pb-0 text-slate-800">
+      <div 
+        className="font-sans min-h-screen bg-slate-50 pb-16 lg:pb-0 text-slate-800 transition-colors duration-300" 
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
+      >
         <TopHeader />
 
         {/* Admin floating button */}
