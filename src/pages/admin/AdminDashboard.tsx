@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.email === 'sekanedrmessaif@gmail.com') {
+      if (user && user.email?.toLowerCase().trim() === 'sekanedrmessaif@gmail.com') {
         setIsAdmin(true);
         fetchData();
       } else {
