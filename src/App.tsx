@@ -21,7 +21,7 @@ export default function App() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (user && user.email === 'sekanedrmessaif@gmail.com') {
+      if (user && user.email?.toLowerCase().trim() === 'sekanedrmessaif@gmail.com') {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
