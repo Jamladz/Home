@@ -101,8 +101,7 @@ service cloud.firestore {
       // but get(/databases/$(database)/documents/doctors/$(incoming().doctorId)) can verify the doctor is real).
       allow create: if isValidId(appointmentId) && 
                     isValidAppointment(incoming()) &&
-                    incoming().keys().size() == 7 &&
-                    exists(/databases/$(database)/documents/doctors/$(incoming().doctorId));
+                    incoming().keys().size() == 7;
 
       // ONLY the specific doctor who owns this appointment can read or update it.
       allow read, delete: if (isSignedIn() && existing().doctorId == request.auth.uid) || isAdmin();
