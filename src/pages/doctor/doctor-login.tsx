@@ -18,12 +18,29 @@ export default function DoctorLogin() {
 
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
     try {
       await signInWithPopup(auth, provider);
       // Auto redirects via onAuthStateChanged
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login Error:", error);
-      alert("حدث خطأ أثناء تسجيل الدخول");
+      let errorMessage = "حدث خطأ أثناء تسجيل الدخول.";
+      
+      if (error.code) {
+        if (error.code === 'auth/popup-blocked') {
+          errorMessage = "تم حظر النافذة المنبثقة! المتصفح يمنع تسجيل الدخول. يرجى فتح التطبيق في نافذة جديدة أو السماح بالنوافذ المنبثقة.";
+        } else if (error.code === 'auth/popup-closed-by-user') {
+          errorMessage = "لقد قمت بإغلاق نافذة تسجيل الدخول قبل اكتمال العملية.";
+        } else if (error.code === 'auth/unauthorized-domain') {
+          errorMessage = "هذا النطاق غير مصرح له بتسجيل الدخول. تأكد من إعدادات Firebase.";
+        } else {
+          errorMessage += `\nالرمز: ${error.code}`;
+        }
+      }
+      
+      alert(errorMessage);
     }
   };
 

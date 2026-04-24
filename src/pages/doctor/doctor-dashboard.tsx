@@ -262,7 +262,7 @@ export default function DoctorDashboard() {
   return (
     <div className="pb-8 bg-slate-100 min-h-screen">
       {profile.status === 'pending' && (
-        <div className="bg-amber-100 text-amber-800 p-4 text-sm font-bold text-center border-b border-amber-200">
+        <div className="sticky top-[68px] z-40 bg-amber-100 text-amber-800 p-4 text-sm font-bold text-center border-b border-amber-200 shadow-sm">
           ⚠️ {language === 'ar' 
             ? 'حسابك قيد المراجعة من الإدارة. لن تظهر للمرضى حتى تتم الموافقة.' 
             : 'Your account is under review. It will not be visible to patients until approved.'}
