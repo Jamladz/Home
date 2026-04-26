@@ -7,7 +7,7 @@ export function TopHeader() {
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200 px-6 py-4 shadow-sm">
       <div className="flex justify-center items-center">
         <h1 className="text-xl font-bold text-indigo-700">
-           {language === 'ar' ? 'Doctouri - دكتوري' : 'Doctouri - دكتوري'}
+           Dawini - داويني
         </h1>
       </div>
     </header>
