@@ -20,6 +20,7 @@ service cloud.firestore {
       return data.keys().hasAll(['userId', 'name', 'specialty', 'clinicAddress']) &&
              data.userId == request.auth.uid &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.get('gender', '') in ['', 'male', 'female'] &&
              data.specialty is string && data.specialty.size() > 0 && data.specialty.size() <= 100 &&
              data.clinicAddress is string && data.clinicAddress.size() > 0 && data.clinicAddress.size() <= 200 &&
              data.get('phone', '') is string && data.get('phone', '').size() <= 20 &&
@@ -58,14 +59,14 @@ service cloud.firestore {
                     doctorId == request.auth.uid && 
                     isValidDoctorProfile(incoming()) && 
                     incoming().get('status', 'pending') == 'pending' &&
-                    incoming().keys().size() <= 13) || isAdmin();
+                    incoming().keys().size() <= 15) || isAdmin();
                     
       allow update: if (isSignedIn() && 
                         doctorId == request.auth.uid && 
                         isValidDoctorProfile(incoming()) && 
                         incoming().userId == existing().userId &&
                         incoming().get('status', 'pending') == existing().get('status', 'pending') && // Block self-approval
-                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status'])) ||
+                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'gender', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status'])) ||
                        (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount', 'patientCount']) &&
                         incoming().rating is number && incoming().rating >= 0 && incoming().rating <= 5 &&
                         incoming().reviewCount is number && incoming().patientCount is number) || isAdmin();
@@ -90,7 +91,7 @@ service cloud.firestore {
              data.patientPhone is string && data.patientPhone.size() > 0 && data.patientPhone.size() <= 20 &&
              data.date is string && data.date.size() <= 20 &&
              data.time is string && data.time.size() <= 10 &&
-             data.status in ['pending', 'confirmed', 'cancelled'] &&
+             data.status in ['pending', 'confirmed', 'cancelled', 'completed', 'no_show'] &&
              data.createdAt is number;
     }
 
@@ -140,6 +141,12 @@ service cloud.firestore {
                     incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'address', 'phone', 'openUntil']);
                     
       allow delete: if isAdmin();
+    }
+    
+    // Config Collection 
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
