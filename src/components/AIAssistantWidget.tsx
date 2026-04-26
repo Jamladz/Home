@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageSquare, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { MessageSquare, X, Send, Bot, User, Loader2, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { GoogleGenAI } from "@google/genai";
 import { useLanguage } from "../contexts/LanguageContext";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 export function AIAssistantWidget() {
   const { language } = useLanguage();
@@ -14,6 +16,23 @@ export function AIAssistantWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [errorError, setError] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [tempApiKey, setTempApiKey] = useState(localStorage.getItem("GEMINI_API_KEY") || "");
+  const [globalApiKey, setGlobalApiKey] = useState("");
+
+  useEffect(() => {
+    const fetchGlobalKey = async () => {
+      try {
+        const snap = await getDoc(doc(db, "config", "settings"));
+        if (snap.exists()) {
+          setGlobalApiKey(snap.data().geminiApiKey || "");
+        }
+      } catch (err) {
+        // Ignore read errors
+      }
+    };
+    fetchGlobalKey();
+  }, []);
 
   // Initialize with a welcome message
   useEffect(() => {
@@ -48,19 +67,31 @@ export function AIAssistantWidget() {
     setIsLoading(true);
     setError(null);
 
-    let apiKey = "";
-    try {
-      if (typeof process !== "undefined" && process.env) {
-        apiKey = process.env.GEMINI_API_KEY || "";
-      }
-    } catch (e) {}
+    let apiKey = globalApiKey;
+    if (!apiKey) {
+      try {
+        if (typeof process !== "undefined" && process.env) {
+          apiKey = process.env.GEMINI_API_KEY || "";
+        }
+      } catch (e) {}
+    }
+    
+    // Check local storage as a fallback
+    if (!apiKey) {
+      apiKey = localStorage.getItem("GEMINI_API_KEY") || "";
+    }
 
     if (!apiKey) {
-      setError(
-        language === "ar"
-          ? "مفتاح الذكاء الاصطناعي مفقود."
-          : "La clé API de l'IA est manquante.",
-      );
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "model",
+          text:
+            language === "ar"
+              ? "عذراً، المساعد الذكي قيد الصيانة حالياً. يرجى المحاولة لاحقاً."
+              : "Désolé, l'assistant intelligent est actuellement en maintenance. Veuillez réessayer plus tard.",
+        },
+      ]);
       setIsLoading(false);
       return;
     }
@@ -167,101 +198,147 @@ Assistant:`;
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-indigo-100 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-              {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === "user" ? (language === "ar" ? "justify-end" : "justify-end") : language === "ar" ? "justify-start" : "justify-start"}`}
-                  dir={
-                    msg.role === "model" && language === "ar"
-                      ? "rtl"
-                      : undefined
-                  }
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl p-3.5 text-sm ${
-                      msg.role === "user"
-                        ? "bg-indigo-600 text-white rounded-bl-sm"
-                        : "bg-white text-slate-700 border border-slate-100 shadow-sm rounded-br-sm"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div
-                  className={`flex ${language === "ar" ? "justify-start" : "justify-start"}`}
-                >
-                  <div className="bg-white text-slate-500 border border-slate-100 shadow-sm rounded-2xl rounded-br-sm p-4 flex gap-1.5 items-center">
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
-                    <span
-                      className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.15s" }}
-                    ></span>
-                    <span
-                      className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.3s" }}
-                    ></span>
-                  </div>
-                </div>
-              )}
-              {errorError && (
-                <div className="text-center text-red-500 text-xs my-2">
-                  {errorError}
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input */}
-            <form
-              onSubmit={handleSend}
-              className="p-3 bg-white border-t border-slate-100 shrink-0"
-            >
-              <div className="flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-2 py-2 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={
-                    language === "ar"
-                      ? "اكتب سؤالك الطبي المباشر هنا..."
-                      : "Posez votre question médicale..."
-                  }
-                  className="w-full max-h-32 min-h-[40px] bg-transparent resize-none outline-none text-sm px-2 py-2.5 text-slate-700"
-                  rows={1}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                />
+              <div className="flex items-center gap-1">
                 <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="bg-indigo-600 text-white p-2.5 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="text-indigo-100 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition"
                 >
-                  <Send
-                    className={`w-4 h-4 ${language === "ar" ? "-scale-x-100" : ""}`}
-                  />
+                  <Settings className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-indigo-100 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="text-[9px] text-center text-slate-400 mt-2">
-                {language === "ar"
-                  ? "هذا الذكاء الاصطناعي مخصص للإرشاد فقط ولا يعد بديلاً لاستشارة الطبيب."
-                  : "Cette IA est à titre indicatif et ne remplace pas l'avis d'un médecin."}
+            </div>
+
+            {/* Body */}
+            {showSettings ? (
+              <div className="flex-1 overflow-y-auto p-4 bg-slate-50 flex flex-col items-center justify-center space-y-4">
+                <div className="text-center space-y-2">
+                  <h4 className="font-bold text-slate-800">
+                    {language === "ar" ? "إعدادات الذكاء الاصطناعي" : "Paramètres IA"}
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-[250px]">
+                    {language === "ar"
+                      ? "أدخل مفتاح Gemini API الخاص بك لتفعيل المساعد الذكي. سيتم حفظه محلياً في متصفحك."
+                      : "Entrez votre clé API Gemini pour activer l'assistant. Elle sera stockée localement dans votre navigateur."}
+                  </p>
+                </div>
+                <div className="w-full space-y-3">
+                  <input
+                    type="password"
+                    value={tempApiKey}
+                    onChange={(e) => setTempApiKey(e.target.value)}
+                    placeholder="AIzaSy..."
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    dir="ltr"
+                  />
+                  <button
+                    onClick={() => {
+                      if (tempApiKey.trim()) {
+                        localStorage.setItem("GEMINI_API_KEY", tempApiKey.trim());
+                        setShowSettings(false);
+                      }
+                    }}
+                    className="w-full bg-indigo-600 text-white rounded-xl py-2.5 text-sm font-medium hover:bg-indigo-700 transition"
+                  >
+                    {language === "ar" ? "حفظ المفتاح" : "Enregistrer la clé"}
+                  </button>
+                </div>
               </div>
-            </form>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === "user" ? (language === "ar" ? "justify-end" : "justify-end") : language === "ar" ? "justify-start" : "justify-start"}`}
+                    dir={
+                      msg.role === "model" && language === "ar"
+                        ? "rtl"
+                        : undefined
+                    }
+                  >
+                    <div
+                      className={`max-w-[85%] rounded-2xl p-3.5 text-sm ${
+                        msg.role === "user"
+                          ? "bg-indigo-600 text-white rounded-bl-sm"
+                          : "bg-white text-slate-700 border border-slate-100 shadow-sm rounded-br-sm"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div
+                    className={`flex ${language === "ar" ? "justify-start" : "justify-start"}`}
+                  >
+                    <div className="bg-white text-slate-500 border border-slate-100 shadow-sm rounded-2xl rounded-br-sm p-4 flex gap-1.5 items-center">
+                      <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
+                      <span
+                        className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.15s" }}
+                      ></span>
+                      <span
+                        className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.3s" }}
+                      ></span>
+                    </div>
+                  </div>
+                )}
+                {errorError && (
+                  <div className="text-center text-red-500 text-xs my-2">
+                    {errorError}
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+
+            {/* Input */}
+            {!showSettings && (
+              <form
+                onSubmit={handleSend}
+                className="p-3 bg-white border-t border-slate-100 shrink-0"
+              >
+                <div className="flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-2 py-2 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={
+                      language === "ar"
+                        ? "اكتب سؤالك الطبي المباشر هنا..."
+                        : "Posez votre question médicale..."
+                    }
+                    className="w-full max-h-32 min-h-[40px] bg-transparent resize-none outline-none text-sm px-2 py-2.5 text-slate-700"
+                    rows={1}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isLoading}
+                    className="bg-indigo-600 text-white p-2.5 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                  >
+                    <Send
+                      className={`w-4 h-4 ${language === "ar" ? "-scale-x-100" : ""}`}
+                    />
+                  </button>
+                </div>
+                <div className="text-[9px] text-center text-slate-400 mt-2">
+                  {language === "ar"
+                    ? "هذا الذكاء الاصطناعي مخصص للإرشاد فقط ولا يعد بديلاً لاستشارة الطبيب."
+                    : "Cette IA est à titre indicatif et ne remplace pas l'avis d'un médecin."}
+                </div>
+              </form>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
