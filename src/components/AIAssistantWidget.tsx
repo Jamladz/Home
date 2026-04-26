@@ -49,27 +49,17 @@ export function AIAssistantWidget() {
     setError(null);
 
     let apiKey = "";
-    // Try Vite env first, which works in Netlify/Vercel
     try {
-      if (typeof import.meta !== "undefined" && import.meta.env) {
-        apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
+      if (typeof process !== "undefined" && process.env) {
+        apiKey = process.env.GEMINI_API_KEY || "";
       }
     } catch (e) {}
-
-    // Fallback to process.env for AI Studio
-    if (!apiKey) {
-      try {
-        if (typeof process !== "undefined" && process.env) {
-          apiKey = process.env.GEMINI_API_KEY || "";
-        }
-      } catch (e) {}
-    }
 
     if (!apiKey) {
       setError(
         language === "ar"
-          ? "مفتاح الذكاء الاصطناعي مفقود. إذا كنت في بيئة إنتاج (مثل Netlify)، تأكد من إضافة VITE_GEMINI_API_KEY."
-          : "La clé API de l'IA est manquante. Si vous êtes en production (ex: Netlify), ajoutez VITE_GEMINI_API_KEY.",
+          ? "مفتاح الذكاء الاصطناعي مفقود."
+          : "La clé API de l'IA est manquante.",
       );
       setIsLoading(false);
       return;
