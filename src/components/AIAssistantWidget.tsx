@@ -49,11 +49,20 @@ export function AIAssistantWidget() {
     setError(null);
 
     let apiKey = "";
+    // Try Vite env first, which works in Netlify/Vercel
     try {
-      apiKey =
-        process.env.GEMINI_API_KEY || (import.meta as any).env.VITE_GEMINI_API_KEY || "";
-    } catch (e) {
-      // Ignore process/import errors if environments differ
+      if (typeof import.meta !== "undefined" && import.meta.env) {
+        apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
+      }
+    } catch (e) {}
+
+    // Fallback to process.env for AI Studio
+    if (!apiKey) {
+      try {
+        if (typeof process !== "undefined" && process.env) {
+          apiKey = process.env.GEMINI_API_KEY || "";
+        }
+      } catch (e) {}
     }
 
     if (!apiKey) {
