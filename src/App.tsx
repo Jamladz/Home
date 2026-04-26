@@ -9,7 +9,7 @@ import DoctorLogin from "./pages/doctor/doctor-login";
 import DoctorDashboard from "./pages/doctor/doctor-dashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MaintenancePage from "./pages/MaintenancePage";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth, db } from "./lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
@@ -96,6 +96,7 @@ function AppContent() {
       )}
 
       <AnimatePresence mode="wait">
+        {/* @ts-ignore */}
         <Routes location={location} key={location.pathname}>
           {/* Patient Routes */}
           <Route
