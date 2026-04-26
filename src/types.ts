@@ -1,6 +1,7 @@
 export interface DoctorProfile {
   userId: string;
   name: string;
+  gender?: 'male' | 'female';
   specialty: string;
   clinicAddress: string;
   wilaya?: string;
