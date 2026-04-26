@@ -51,7 +51,7 @@ export function AIAssistantWidget() {
     let apiKey = "";
     try {
       apiKey =
-        process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || "";
+        process.env.GEMINI_API_KEY || (import.meta as any).env.VITE_GEMINI_API_KEY || "";
     } catch (e) {
       // Ignore process/import errors if environments differ
     }
@@ -59,8 +59,8 @@ export function AIAssistantWidget() {
     if (!apiKey) {
       setError(
         language === "ar"
-          ? "مفتاح الذكاء الاصطناعي مفقود."
-          : "La clé API de l'IA est manquante.",
+          ? "مفتاح الذكاء الاصطناعي مفقود. إذا كنت في بيئة إنتاج (مثل Netlify)، تأكد من إضافة VITE_GEMINI_API_KEY."
+          : "La clé API de l'IA est manquante. Si vous êtes en production (ex: Netlify), ajoutez VITE_GEMINI_API_KEY.",
       );
       setIsLoading(false);
       return;
@@ -95,7 +95,7 @@ Patient: ${userText}
 Assistant:`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
       });
 
