@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Permanence } from "../types";
-import { Cross, MapPin, Microscope, Phone, Clock } from "lucide-react";
+import { MapPin, Microscope, Phone, Clock } from "lucide-react";
 
 export default function PermanenceList() {
   const [permanences, setPermanences] = useState<Permanence[]>([]);
