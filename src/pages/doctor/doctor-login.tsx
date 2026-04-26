@@ -107,7 +107,7 @@ export default function DoctorLogin() {
           {language === 'ar' ? 'بوابة الأطباء' : 'Doctor Portal'}
         </h1>
         <p className="text-slate-500 text-sm mb-8">
-          {language === 'ar' ? 'سجل دخولك لإدارة مواعيدك وعيادتك في دكتوري.' : 'Sign in to manage your clinic and appointments.'}
+          {language === 'ar' ? 'سجل دخولك لإدارة مواعيدك وعيادتك في داويني.' : 'Sign in to manage your clinic and appointments.'}
         </p>
 
         {message && (

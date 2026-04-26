@@ -6,6 +6,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { DoctorProfile, Appointment, Review } from "../../types";
 import { UserRound, LogOut, CalendarCheck, MapPin, Clock, Phone, Settings, Trash2, Star, MessageSquareText } from "lucide-react";
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
+import { medicalSpecialties } from "../../lib/specialties";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function DoctorDashboard() {
@@ -21,6 +22,7 @@ export default function DoctorDashboard() {
   
   // Registration Form State
   const [name, setName] = useState("");
+  const [gender, setGender] = useState<'male' | 'female' | ''>('');
   const [specialty, setSpecialty] = useState("");
   const [clinicAddress, setClinicAddress] = useState("");
   const [wilaya, setWilaya] = useState("");
@@ -29,6 +31,7 @@ export default function DoctorDashboard() {
   const [maxPatientsPerDay, setMaxPatientsPerDay] = useState<number>(20);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [filter, setFilter] = useState<'today' | 'upcoming' | 'past'>('today');
+  const [expandedApptId, setExpandedApptId] = useState<string | null>(null);
 
   useEffect(() => {
     let unsubscribeAppointments: (() => void) | undefined;
@@ -53,6 +56,7 @@ export default function DoctorDashboard() {
           const profileData = docSnap.data() as DoctorProfile;
           setProfile(profileData);
           setName(profileData.name || "");
+          setGender(profileData.gender || "");
           setSpecialty(profileData.specialty || "");
           setClinicAddress(profileData.clinicAddress || "");
           setWilaya(profileData.wilaya || "");
@@ -66,8 +70,8 @@ export default function DoctorDashboard() {
           const q = query(collection(db, "appointments"), where("doctorId", "==", user.uid));
           unsubscribeAppointments = onSnapshot(q, (apptSnap) => {
             const appts = apptSnap.docs.map(d => ({ ...d.data(), id: d.id } as Appointment));
-            // Sort descending
-            appts.sort((a, b) => b.createdAt - a.createdAt);
+            // Sort ascending (First to book is first)
+            appts.sort((a, b) => a.createdAt - b.createdAt);
             setAppointments(appts);
           });
 
@@ -100,6 +104,7 @@ export default function DoctorDashboard() {
       const newProfile: DoctorProfile = {
         userId: uid,
         name,
+        gender: gender as 'male' | 'female',
         specialty,
         clinicAddress,
         wilaya,
@@ -122,7 +127,7 @@ export default function DoctorDashboard() {
     }
   };
 
-  const updateStatus = async (apptId: string, status: 'confirmed' | 'cancelled') => {
+  const updateStatus = async (apptId: string, status: string) => {
     try {
       await updateDoc(doc(db, "appointments", apptId), { status });
       setAppointments(prev => prev.map(a => a.id === apptId ? { ...a, status } : a));
@@ -149,7 +154,7 @@ export default function DoctorDashboard() {
     const csvRows = [headers.join(',')];
     
     appointments.forEach(appt => {
-      const statusMap = { 'confirmed': 'مؤكد', 'pending': 'قيد الانتظار', 'cancelled': 'ملغي' };
+      const statusMap: Record<string, string> = { 'completed': 'تم الفحص', 'pending': 'في الانتظار', 'no_show': 'لم يأتي المريض' };
       const dateStr = new Date(appt.createdAt).toLocaleString('ar-EG');
       const row = [
         appt.date,
@@ -216,9 +221,23 @@ export default function DoctorDashboard() {
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none" />
           </div>
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">الجنس</label>
+            <select required value={gender} onChange={e => setGender(e.target.value as 'male' | 'female' | '')}
+              className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none">
+              <option value="">اختر الجنس</option>
+              <option value="male">ذكر (طبيب)</option>
+              <option value="female">أنثى (طبيبة)</option>
+            </select>
+          </div>
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">التخصص</label>
-            <input type="text" required value={specialty} onChange={e => setSpecialty(e.target.value)} placeholder="مثال: طب عام، طب أسنان..."
-              className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none" />
+            <select required value={specialty} onChange={e => setSpecialty(e.target.value)}
+              className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none">
+              <option value="">اختر التخصص</option>
+              {medicalSpecialties.map(s => (
+                <option key={s.id} value={language === 'ar' ? s.ar : s.fr}>{language === 'ar' ? s.ar : s.fr}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">الولاية</label>
@@ -368,41 +387,95 @@ export default function DoctorDashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredAppointments.map(appt => (
-                <div key={appt.id} className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="font-bold text-slate-800 text-md">{appt.patientName}</h4>
-                      <div className="flex items-center text-xs text-slate-500 mt-1" dir="ltr">
-                        <Phone className="w-3 h-3 ml-1 text-slate-400" />
-                        {appt.patientPhone}
+              {filteredAppointments.map((appt, index) => {
+                const isExpanded = expandedApptId === appt.id;
+                return (
+                  <div key={appt.id} className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300">
+                    <div 
+                      className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${isExpanded ? 'bg-indigo-50/50' : 'hover:bg-slate-50'}`}
+                      onClick={() => setExpandedApptId(isExpanded ? null : (appt.id || null))}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-colors ${isExpanded ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-indigo-100 text-indigo-700'}`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h4 className={`font-bold text-md transition-colors ${isExpanded ? 'text-indigo-900' : 'text-slate-800'}`}>
+                            {appt.patientName}
+                          </h4>
+                          <span className="text-xs text-slate-500 font-medium">
+                           {appt.status === 'pending' && <span className="text-amber-500">في الانتظار ⏳</span>}
+                           {appt.status === 'completed' && <span className="text-emerald-500">تم الفحص ✅</span>}
+                           {appt.status === 'no_show' && <span className="text-rose-500">لم يأتي ❌</span>}
+                           {(!appt.status || (appt.status !== 'pending' && appt.status !== 'completed' && appt.status !== 'no_show')) && <span className="text-slate-500">{appt.status}</span>}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="text-left hidden sm:block">
+                          <div className="text-xs font-bold text-slate-700">{appt.time ? appt.time : '--:--'}</div>
+                          <div className="text-[10px] text-slate-400">{appt.date}</div>
+                        </div>
+                        <div className={`transform transition-transform text-slate-400 ${isExpanded ? 'rotate-180' : 'rotate-0'}`}>
+                          ▼
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {appt.status === 'pending' && <span className="bg-amber-50 text-amber-600 text-[10px] font-bold px-2 py-1 rounded-lg">قيد الانتظار</span>}
-                      {appt.status === 'confirmed' && <span className="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">مؤكد</span>}
-                      {appt.status === 'cancelled' && <span className="bg-rose-50 text-rose-600 text-[10px] font-bold px-2 py-1 rounded-lg">ملغي</span>}
-                      <button onClick={() => deleteAppointment(appt.id!)} className="text-slate-400 hover:text-rose-600 p-1.5 bg-white border border-slate-200 hover:border-rose-200 hover:bg-rose-50 rounded-lg transition" title="حذف الحجز نهائياً">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-slate-50 rounded-2xl p-3 flex justify-between items-center text-xs mb-3 border border-slate-100">
-                    <div className="flex items-center text-slate-600 font-bold">
-                      <Clock className="w-4 h-4 ml-2 text-indigo-400" />
-                      {appt.date} {appt.time && `| ${appt.time}`}
-                    </div>
-                  </div>
+                    
+                    {isExpanded && (
+                      <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-white animate-in slide-in-from-top-2 fade-in duration-200">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                           <a 
+                             href={`tel:${appt.patientPhone}`} 
+                             className="flex items-center justify-center gap-2 flex-1 bg-white border border-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-sm hover:text-indigo-600 hover:border-indigo-200 transition shadow-sm" 
+                             dir="ltr"
+                            >
+                             <Phone className="w-4 h-4" />
+                             {appt.patientPhone}
+                           </a>
+                           <div className="flex items-center justify-center gap-2 flex-1 text-xs text-slate-600 font-bold sm:hidden">
+                             <Clock className="w-4 h-4 text-indigo-400" />
+                             {appt.date} {appt.time && `| ${appt.time}`}
+                           </div>
+                        </div>
 
-                  {appt.status === 'pending' && (
-                    <div className="flex gap-2">
-                      <button onClick={() => updateStatus(appt.id!, 'confirmed')} className="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-indigo-700">تأكيد الموعد</button>
-                      <button onClick={() => updateStatus(appt.id!, 'cancelled')} className="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs hover:bg-slate-200 hover:text-rose-600 transition">إلغاء</button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                        <div className="flex gap-2 mb-3">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); updateStatus(appt.id!, 'pending'); }} 
+                            className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === 'pending' ? 'bg-amber-100 text-amber-800 border-amber-300 shadow-sm ring-2 ring-amber-500/20' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                          >
+                            في الانتظار ⏳
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); updateStatus(appt.id!, 'completed'); }} 
+                            className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm ring-2 ring-emerald-500/20' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                          >
+                            تم الفحص ✅
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); updateStatus(appt.id!, 'no_show'); }} 
+                            className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === 'no_show' ? 'bg-rose-100 text-rose-800 border-rose-300 shadow-sm ring-2 ring-rose-500/20' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                          >
+                            لم يأتي ❌
+                          </button>
+                        </div>
+
+                        <div className="flex justify-end">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); deleteAppointment(appt.id!); }} 
+                            className="flex items-center gap-2 text-rose-500 hover:text-white px-4 py-2 bg-white border border-rose-200 hover:bg-rose-500 hover:border-rose-500 rounded-xl transition text-xs font-bold shadow-sm" 
+                            title="حذف الحجز نهائياً"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            حذف الحجز
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
