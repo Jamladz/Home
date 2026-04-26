@@ -1,16 +1,53 @@
 import { Link } from "react-router-dom";
-import { Search, Stethoscope, HeartPulse, Microscope, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Stethoscope, HeartPulse, Eye, Baby, Syringe, Activity, ChevronLeft, ChevronRight, Star, MapPin } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { DoctorProfile } from "../types";
+import { DoctorAvatar } from "../components/DoctorAvatar";
+import { medicalSpecialties } from "../lib/specialties";
 
 export default function Home() {
   const { t, language } = useLanguage();
+  const [topDoctors, setTopDoctors] = useState<DoctorProfile[]>([]);
+  const [loadingTop, setLoadingTop] = useState(true);
+
+  useEffect(() => {
+    async function fetchTopDoctors() {
+      try {
+        const q = query(
+          collection(db, "doctors"),
+          where("status", "==", "approved")
+        );
+        const snap = await getDocs(q);
+        const docs = snap.docs.map(d => ({ ...d.data(), userId: d.id } as DoctorProfile));
+        // Sort and limit in memory
+        docs.sort((a,b) => (b.rating || 0) - (a.rating || 0));
+        setTopDoctors(docs.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to fetch top doctors:", err);
+      } finally {
+        setLoadingTop(false);
+      }
+    }
+    fetchTopDoctors();
+  }, []);
+
+  const getSpecialtyLabel = (id: string) => {
+    const spec = medicalSpecialties.find(s => s.id === id);
+    if (!spec) return '';
+    return language === 'ar' ? spec.ar : spec.fr;
+  };
 
   const categories = [
-    { title: language === 'ar' ? "طب عام" : "General", icon: Stethoscope, color: "bg-indigo-100 text-indigo-700" },
-    { title: language === 'ar' ? "طب أسنان" : "Dentist", icon: HeartPulse, color: "bg-amber-100 text-amber-600" },
-    { title: language === 'ar' ? "أطفال" : "Pediatrician", icon: HeartPulse, color: "bg-rose-100 text-rose-600" },
-    { title: language === 'ar' ? "مخابر" : "Laboratory", icon: Microscope, color: "bg-emerald-100 text-emerald-600" },
+    { title: getSpecialtyLabel('general_practice'), icon: Stethoscope, color: "bg-indigo-100 text-indigo-700", id: "general_practice" },
+    { title: getSpecialtyLabel('dentistry'), icon: Syringe, color: "bg-emerald-100 text-emerald-700", id: "dentistry" },
+    { title: getSpecialtyLabel('pediatrics'), icon: Baby, color: "bg-rose-100 text-rose-700", id: "pediatrics" },
+    { title: getSpecialtyLabel('ophthalmology'), icon: Eye, color: "bg-blue-100 text-blue-700", id: "ophthalmology" },
+    { title: getSpecialtyLabel('cardiology'), icon: HeartPulse, color: "bg-red-100 text-red-700", id: "cardiology" },
+    { title: getSpecialtyLabel('gastroenterology'), icon: Activity, color: "bg-amber-100 text-amber-700", id: "gastroenterology" },
   ];
 
   const containerVariants = {
@@ -61,30 +98,72 @@ export default function Home() {
       </div>
 
       {/* Quick Access sections */}
-      <motion.div variants={itemVariants} className="px-4 mt-6">
+      <motion.div variants={itemVariants} className="px-4 mt-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-slate-700">{t('home.new_doctors')}</h2>
-          <Link to="/doctors" className="text-indigo-600 text-sm font-bold flex items-center">
+          <h2 className="text-xl font-bold text-slate-700">{language === 'ar' ? 'أفضل الأطباء المتاحين' : 'Meilleurs Médecins Disponibles'}</h2>
+          <Link to="/doctors" className="text-indigo-600 text-sm font-bold flex items-center bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">
             {t('home.view_all')}
             {language === 'ar' ? <ChevronLeft className="w-4 h-4 ml-1" /> : <ChevronRight className="w-4 h-4 ml-1" />}
           </Link>
         </div>
         
-        <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/60 shadow-sm flex flex-col items-center">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
-            <Stethoscope className="w-8 h-8 text-indigo-500" />
+        {loadingTop ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-indigo-200 border-t-indigo-500"></div>
           </div>
-          <h3 className="text-lg font-bold text-slate-700 mb-2">{t('home.browse_doctors')}</h3>
-          <p className="text-slate-500 text-sm mb-5 max-w-xs">{t('home.browse_doctors_desc')}</p>
-          <Link to="/doctors" className="inline-block bg-indigo-600 text-white px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all w-full md:w-auto">
-            {t('home.browse_doctors')}
-          </Link>
-        </div>
+        ) : topDoctors.length > 0 ? (
+          <div className="space-y-4">
+            {topDoctors.map(doctor => (
+              <Link 
+                key={doctor.userId} 
+                to={`/doctors/${doctor.userId}`}
+                className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex items-center gap-4 transition hover:border-indigo-300 hover:shadow-md"
+              >
+                <div className="w-16 h-16 shrink-0 relative">
+                  <DoctorAvatar gender={doctor.gender} className="w-16 h-16" />
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm">
+                    <div className="bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-slate-800 text-sm mb-0.5">د. {doctor.name}</h3>
+                  <p className="text-slate-500 text-[11px] mb-1.5 font-medium">{doctor.specialty}</p>
+                  <div className="flex items-center text-slate-400 text-[10px]">
+                    <MapPin className="w-3 h-3 mr-1 text-slate-300" />
+                    <span className="truncate max-w-[120px]">
+                      {doctor.wilaya ? `${doctor.wilaya} ` : ''} 
+                      {doctor.commune ? `- ${doctor.commune}` : ''}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center justify-center bg-amber-50 p-2.5 rounded-xl border border-amber-100 min-w-[55px]">
+                  <div className="flex items-center text-amber-500 font-black text-sm">
+                    {doctor.rating ? doctor.rating.toFixed(1) : '--'}
+                  </div>
+                  <div className="flex items-center text-amber-400 mt-0.5">
+                    <Star className="w-3 h-3 fill-amber-400 mr-0.5" />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/60 shadow-sm flex flex-col items-center">
+            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+              <Stethoscope className="w-8 h-8 text-indigo-500" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-700 mb-2">{t('home.browse_doctors')}</h3>
+            <p className="text-slate-500 text-sm mb-5 max-w-xs">{t('home.browse_doctors_desc')}</p>
+            <Link to="/doctors" className="inline-block bg-indigo-600 text-white px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all w-full md:w-auto">
+              {t('home.browse_doctors')}
+            </Link>
+          </div>
+        )}
       </motion.div>
 
       <motion.div variants={itemVariants} className="px-4 mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-slate-700">{t('home.permanences')} <span className="text-xs text-slate-400 font-normal">{language === 'ar' ? 'صيدليات ومخابر' : 'Pharmacies'}</span></h2>
+          <h2 className="text-xl font-bold text-slate-700">{t('home.permanences')} <span className="text-xs text-slate-400 font-normal">{language === 'ar' ? 'صيدليات ومخابر' : 'Pharmacies et laboratoires'}</span></h2>
           <Link to="/permanence" className="text-indigo-600 text-sm font-bold flex items-center">
             {t('home.view_all')}
             {language === 'ar' ? <ChevronLeft className="w-4 h-4 ml-1" /> : <ChevronRight className="w-4 h-4 ml-1" />}
