@@ -15,8 +15,6 @@ export function AIAssistantWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [errorError, setError] = useState<string | null>(null);
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
   // Initialize with a welcome message
   useEffect(() => {
     if (messages.length === 0) {
@@ -50,7 +48,27 @@ export function AIAssistantWidget() {
     setIsLoading(true);
     setError(null);
 
+    let apiKey = "";
     try {
+      apiKey =
+        process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || "";
+    } catch (e) {
+      // Ignore process/import errors if environments differ
+    }
+
+    if (!apiKey) {
+      setError(
+        language === "ar"
+          ? "مفتاح الذكاء الاصطناعي مفقود."
+          : "La clé API de l'IA est manquante.",
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+
       // Build conversation history for context
       const chatHistory = messages
         .map(
