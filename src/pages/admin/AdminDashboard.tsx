@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
 import { DoctorProfile, Permanence } from "../../types";
-import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock } from "lucide-react";
+import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getWilayas } from "../../lib/algeria_data";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -14,10 +14,11 @@ export default function AdminDashboard() {
   const { t, language } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'doctors' | 'permanences'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'doctors' | 'permanences' | 'settings'>('overview');
 
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [permanences, setPermanences] = useState<Permanence[]>([]);
+  const [isMaintenance, setIsMaintenance] = useState(false);
 
   // Add Permanence Form
   const [newPerm, setNewPerm] = useState<Partial<Permanence>>({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
@@ -46,8 +47,24 @@ export default function AdminDashboard() {
       const permSnap = await getDocs(collection(db, "permanences"));
       const permData = permSnap.docs.map(d => ({ ...d.data(), id: d.id } as Permanence));
       setPermanences(permData);
+
+      const configSnap = await getDoc(doc(db, "config", "maintenance"));
+      if (configSnap.exists()) {
+        setIsMaintenance(configSnap.data().active || false);
+      }
     } catch (e) {
       console.error("Error fetching admin data", e);
+    }
+  };
+
+  const handleToggleMaintenance = async () => {
+    try {
+      const newState = !isMaintenance;
+      await setDoc(doc(db, "config", "maintenance"), { active: newState }, { merge: true });
+      setIsMaintenance(newState);
+    } catch (e) {
+      console.error("Error toggle maintenance", e);
+      alert("حدث خطأ أثناء تعديل حالة الصيانة.");
     }
   };
 
@@ -156,6 +173,13 @@ export default function AdminDashboard() {
           >
             <Microscope className="w-5 h-5" />
             <span className="font-medium text-sm">{t('admin.permanences')}</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('settings')} 
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 whitespace-nowrap ${activeTab === 'settings' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white'}`}
+          >
+            <Settings className="w-5 h-5" />
+            <span className="font-medium text-sm">{t('admin.settings')}</span>
           </button>
         </nav>
 
@@ -421,6 +445,30 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center">
+                    <Wrench className="w-6 h-6" />
+                  </div>
+                  <div className="text-start">
+                    <h2 className="text-lg font-bold text-slate-800">وضع الصيانة</h2>
+                    <p className="text-sm text-slate-500">إيقاف الموقع مؤقتاً وعرض صفحة الصيانة للمستخدمين.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleToggleMaintenance}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${isMaintenance ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-md ${isMaintenance ? (language === 'ar' ? '-translate-x-6' : 'translate-x-6') : (language === 'ar' ? 'translate-x-0' : 'translate-x-0')}`}
+                  />
+                </button>
+              </div>
             </div>
           )}
 
