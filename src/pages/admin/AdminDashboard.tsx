@@ -19,6 +19,8 @@ export default function AdminDashboard() {
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [permanences, setPermanences] = useState<Permanence[]>([]);
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [globalApiKey, setGlobalApiKey] = useState('');
+  const [savingApiKey, setSavingApiKey] = useState(false);
 
   // Add Permanence Form
   const [newPerm, setNewPerm] = useState<Partial<Permanence>>({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
@@ -52,6 +54,11 @@ export default function AdminDashboard() {
       if (configSnap.exists()) {
         setIsMaintenance(configSnap.data().active || false);
       }
+
+      const settingsSnap = await getDoc(doc(db, "config", "settings"));
+      if (settingsSnap.exists()) {
+        setGlobalApiKey(settingsSnap.data().geminiApiKey || '');
+      }
     } catch (e) {
       console.error("Error fetching admin data", e);
     }
@@ -65,6 +72,19 @@ export default function AdminDashboard() {
     } catch (e) {
       console.error("Error toggle maintenance", e);
       alert("حدث خطأ أثناء تعديل حالة الصيانة.");
+    }
+  };
+
+  const handleSaveApiKey = async () => {
+    try {
+      setSavingApiKey(true);
+      await setDoc(doc(db, "config", "settings"), { geminiApiKey: globalApiKey.trim() }, { merge: true });
+      alert(language === 'ar' ? 'تم الحفظ بنجاح!' : 'Saved successfully!');
+    } catch (e) {
+      console.error("Error saving API Key", e);
+      alert("حدث خطأ أثناء الحفظ.");
+    } finally {
+      setSavingApiKey(false);
     }
   };
 
@@ -468,6 +488,37 @@ export default function AdminDashboard() {
                     className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-md ${isMaintenance ? (language === 'ar' ? '-translate-x-6' : 'translate-x-6') : (language === 'ar' ? 'translate-x-0' : 'translate-x-0')}`}
                   />
                 </button>
+              </div>
+
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 flex flex-col gap-4">
+                <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
+                  <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center">
+                    <Settings className="w-6 h-6" />
+                  </div>
+                  <div className="text-start">
+                    <h2 className="text-lg font-bold text-slate-800">إعدادات الذكاء الاصطناعي (Gemini API Key)</h2>
+                    <p className="text-sm text-slate-500">للحصول على ردود المساعد الطبي الذكي، قم بوضع المفتاح هنا ليتم تطبيقه على جميع المستخدمين.</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <input
+                    type="password"
+                    value={globalApiKey}
+                    onChange={(e) => setGlobalApiKey(e.target.value)}
+                    placeholder="AIzaSy..."
+                    dir="ltr"
+                    className="w-full max-w-lg bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left"
+                  />
+                  <div>
+                    <button
+                      onClick={handleSaveApiKey}
+                      disabled={savingApiKey}
+                      className="bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-indigo-700 shadow-sm transition-all disabled:opacity-50"
+                    >
+                      {savingApiKey ? 'جاري الحفظ...' : (language === 'ar' ? 'حفظ المفتاح' : 'Save Key')}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
