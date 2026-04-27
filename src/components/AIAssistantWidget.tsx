@@ -216,15 +216,8 @@ export function AIAssistantWidget() {
     let apiKey = globalApiKey;
     if (!apiKey) {
       try {
-        if (typeof process !== "undefined" && process.env) {
-          apiKey = process.env.GEMINI_API_KEY || "";
-        }
+        apiKey = process.env.GEMINI_API_KEY || "";
       } catch (e) {}
-    }
-    
-    // Check local storage as a fallback
-    if (!apiKey) {
-      apiKey = localStorage.getItem("GEMINI_API_KEY") || "";
     }
 
     if (!apiKey) {
@@ -300,7 +293,7 @@ Assistant:`;
       }
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.1-pro-preview",
         contents: requestContents,
       });
 
