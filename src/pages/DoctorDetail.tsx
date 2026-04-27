@@ -72,10 +72,6 @@ export default function DoctorDetail() {
       const finalTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
       const timeStamp = Date.now();
 
-      const countQuery = query(collection(db, "appointments"), where("doctorId", "==", doctorId), where("date", "==", finalDate));
-      const countSnap = await getDocs(countQuery);
-      const newQueueNumber = countSnap.size + 1;
-
       await addDoc(collection(db, "appointments"), {
         doctorId,
         patientName,
@@ -83,11 +79,8 @@ export default function DoctorDetail() {
         date: finalDate,
         time: finalTime,
         status: "pending",
-        queueNumber: newQueueNumber,
         createdAt: timeStamp
       });
-      
-      setQueueNumber(newQueueNumber);
       
       // We don't increment patientCount in the doctors doc directly since it's hard to 
       // secure atomically without Cloud Functions, and it leaks concurrency issues.
@@ -248,17 +241,8 @@ export default function DoctorDetail() {
               </div>
               <h3 className="text-lg font-bold text-green-700 mb-2 relative z-10">{language === 'ar' ? 'تم الحجز بنجاح!' : 'Réservation réussie !'}</h3>
               
-              {queueNumber && (
-                <div className="my-5 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 inline-block w-full max-w-[200px] relative z-10">
-                  <span className="block text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">
-                    {language === 'ar' ? 'رقم الحجز الخاص بك' : 'Votre Numéro'}
-                  </span>
-                  <div className="text-4xl font-black text-indigo-600 tracking-tight">#{queueNumber}</div>
-                </div>
-              )}
-
-              <p className="text-xs text-slate-600 max-w-[250px] mx-auto leading-relaxed relative z-10">
-                {language === 'ar' ? 'يرجى حفظ رقم الحجز الخاص بك وتزويده لمكتب الاستقبال عند وصولك.' : 'Veuillez conserver votre numéro et le présenter à l\'accueil.'}
+              <p className="text-xs text-slate-600 max-w-[250px] mx-auto leading-relaxed relative z-10 my-4">
+                {language === 'ar' ? 'سيتم التواصل معك قريباً لتأكيد الموعد.' : 'Vous serez contacté prochainement pour confirmer.'}
               </p>
 
               <button 
