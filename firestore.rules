@@ -85,14 +85,13 @@ service cloud.firestore {
 
     // Appointment Validation
     function isValidAppointment(data) {
-      return data.keys().hasAll(['doctorId', 'patientName', 'patientPhone', 'date', 'time', 'status', 'queueNumber', 'createdAt']) &&
+      return data.keys().hasAll(['doctorId', 'patientName', 'patientPhone', 'date', 'time', 'status', 'createdAt']) &&
              data.doctorId is string && data.doctorId.size() <= 128 &&
              data.patientName is string && data.patientName.size() > 0 && data.patientName.size() <= 100 &&
              data.patientPhone is string && data.patientPhone.size() > 0 && data.patientPhone.size() <= 20 &&
              data.date is string && data.date.size() <= 20 &&
              data.time is string && data.time.size() <= 10 &&
              data.status in ['pending', 'confirmed', 'cancelled', 'completed', 'no_show'] &&
-             data.queueNumber is number &&
              data.createdAt is number;
     }
 
@@ -103,7 +102,7 @@ service cloud.firestore {
       // but get(/databases/$(database)/documents/doctors/$(incoming().doctorId)) can verify the doctor is real).
       allow create: if isValidId(appointmentId) && 
                     isValidAppointment(incoming()) &&
-                    incoming().keys().size() == 8;
+                    incoming().keys().size() == 7;
 
       // ONLY the specific doctor who owns this appointment can read or update it.
       allow read, delete: if (isSignedIn() && existing().doctorId == request.auth.uid) || isAdmin();
