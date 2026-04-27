@@ -26,9 +26,10 @@
         "date": { "type": "string" },
         "time": { "type": "string" },
         "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "queueNumber": { "type": "number" },
         "createdAt": { "type": "number" }
       },
-      "required": ["doctorId", "patientName", "patientPhone", "date", "time", "status", "createdAt"]
+      "required": ["doctorId", "patientName", "patientPhone", "date", "time", "status", "queueNumber", "createdAt"]
     },
     "Permanence": {
       "title": "Permanence",
