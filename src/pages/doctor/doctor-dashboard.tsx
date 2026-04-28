@@ -56,6 +56,13 @@ export default function DoctorDashboard() {
   const [commune, setCommune] = useState("");
   const [phone, setPhone] = useState("");
   const [maxPatientsPerDay, setMaxPatientsPerDay] = useState<number>(20);
+  const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
+  const [workingHoursEnd, setWorkingHoursEnd] = useState("16:00");
+  const [bookingWindowStart, setBookingWindowStart] = useState("18:00");
+  const [bookingWindowEnd, setBookingWindowEnd] = useState("00:00");
+  const [isBookingOpenAllDay, setIsBookingOpenAllDay] = useState(true);
+  const [isAcceptingAppointments, setIsAcceptingAppointments] = useState(true);
+  const [noticeMessage, setNoticeMessage] = useState("");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [filter, setFilter] = useState<"today" | "upcoming" | "past">("today");
@@ -93,6 +100,21 @@ export default function DoctorDashboard() {
           if (profileData.maxPatientsPerDay) {
             setMaxPatientsPerDay(profileData.maxPatientsPerDay);
           }
+          if (profileData.workingHours) {
+            setWorkingHoursStart(profileData.workingHours.start);
+            setWorkingHoursEnd(profileData.workingHours.end);
+          }
+          if (profileData.bookingWindow) {
+            setBookingWindowStart(profileData.bookingWindow.start);
+            setBookingWindowEnd(profileData.bookingWindow.end);
+          }
+          if (profileData.isBookingOpenAllDay !== undefined) {
+            setIsBookingOpenAllDay(profileData.isBookingOpenAllDay);
+          }
+          if (profileData.isAcceptingAppointments !== undefined) {
+            setIsAcceptingAppointments(profileData.isAcceptingAppointments);
+          }
+          setNoticeMessage(profileData.noticeMessage || "");
 
           // Real-time listener for appointments
           const q = query(
@@ -155,6 +177,17 @@ export default function DoctorDashboard() {
         reviewCount: profile?.reviewCount ?? 0,
         patientCount: profile?.patientCount ?? 0,
         status: profile?.status ?? "pending",
+        workingHours: {
+          start: workingHoursStart,
+          end: workingHoursEnd
+        },
+        bookingWindow: {
+          start: bookingWindowStart,
+          end: bookingWindowEnd
+        },
+        isBookingOpenAllDay,
+        isAcceptingAppointments,
+        noticeMessage
       };
       await setDoc(doc(db, "doctors", uid), newProfile);
       setProfile(newProfile);
@@ -408,6 +441,103 @@ export default function DoctorDashboard() {
               }
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
               dir="ltr"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                بداية الدوام
+              </label>
+              <input
+                type="time"
+                value={workingHoursStart}
+                onChange={(e) => setWorkingHoursStart(e.target.value)}
+                className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
+                dir="ltr"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                نهاية الدوام
+              </label>
+              <input
+                type="time"
+                value={workingHoursEnd}
+                onChange={(e) => setWorkingHoursEnd(e.target.value)}
+                className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
+                dir="ltr"
+              />
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 border border-slate-200 rounded-2xl space-y-4">
+            <h3 className="font-bold text-slate-800 border-b border-slate-200 pb-2">نافذة الحجوزات</h3>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="bookingOpenAllDay"
+                checked={isBookingOpenAllDay}
+                onChange={(e) => setIsBookingOpenAllDay(e.target.checked)}
+                className="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+              />
+              <label htmlFor="bookingOpenAllDay" className="text-sm font-medium text-slate-700 select-none">
+                مفتوح طوال اليوم (24/7)
+              </label>
+            </div>
+            
+            {!isBookingOpenAllDay && (
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center justify-between">
+                    <span>من الساعة</span>
+                  </label>
+                  <input
+                    type="time"
+                    value={bookingWindowStart}
+                    onChange={(e) => setBookingWindowStart(e.target.value)}
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
+                    dir="ltr"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center justify-between">
+                    <span>إلى الساعة</span>
+                  </label>
+                  <input
+                    type="time"
+                    value={bookingWindowEnd}
+                    onChange={(e) => setBookingWindowEnd(e.target.value)}
+                    className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 bg-slate-50 p-4 border border-slate-200 rounded-2xl">
+            <input
+              type="checkbox"
+              id="acceptingAppointments"
+              checked={isAcceptingAppointments}
+              onChange={(e) => setIsAcceptingAppointments(e.target.checked)}
+              className="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+            />
+            <label htmlFor="acceptingAppointments" className="text-sm font-medium text-slate-700 select-none">
+              استقبال الحجوزات مفتوح (قم بإلغاء التحديد في حال الإجازة)
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              رسالة أو إشعار للمرضى (اختياري)
+            </label>
+            <textarea
+              value={noticeMessage}
+              onChange={(e) => setNoticeMessage(e.target.value)}
+              placeholder="مثال: أنا في عطلة حتى الأسبوع القادم، أو العيادة تستقبل الحالات المستعجلة فقط..."
+              className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none resize-none h-24 text-sm"
             />
           </div>
           <button
