@@ -230,70 +230,136 @@ export default function DoctorDetail() {
         <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-indigo-100 p-6 relative overflow-hidden" id="bookingForm">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
           <h2 className="text-lg font-bold text-slate-800 mb-5">{language === 'ar' ? 'احجز موعداً الآن' : 'Prendre un rendez-vous'}</h2>
-          
-          {success ? (
-            <div className="bg-green-50/50 p-6 rounded-2xl text-center border border-green-100 relative overflow-hidden">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
-              <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
-              
-              <div className="inline-block p-3 bg-green-500 rounded-full mb-4 shadow-sm shadow-green-200 relative z-10">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
-              </div>
-              <h3 className="text-lg font-bold text-green-700 mb-2 relative z-10">{language === 'ar' ? 'تم الحجز بنجاح!' : 'Réservation réussie !'}</h3>
-              
-              <p className="text-xs text-slate-600 max-w-[250px] mx-auto leading-relaxed relative z-10 my-4">
-                {language === 'ar' ? 'سيتم التواصل معك قريباً لتأكيد الموعد.' : 'Vous serez contacté prochainement pour confirmer.'}
-              </p>
 
-              <button 
-                onClick={() => { setSuccess(false); setQueueNumber(null); }}
-                className="mt-6 px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-50 hover:border-slate-300 transition-all w-full relative z-10"
-              >
-                {language === 'ar' ? 'حجز موعد آخر' : 'Nouveau rendez-vous'}
-              </button>
+          {doctor.noticeMessage && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl mb-5 text-sm font-bold shadow-sm flex flex-col gap-1 items-start">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> اشعار لتحديث الموعد:</span>
+              <pre className="font-sans whitespace-pre-wrap text-xs text-amber-700/90">{doctor.noticeMessage}</pre>
             </div>
-          ) : (
-            <form onSubmit={handleBooking} className="space-y-4 relative z-10">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'الاسم الكامل' : 'Nom complet'}</label>
-                <div className="relative">
-                  <UserRound className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
-                  <input 
-                    type="text" 
-                    required
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm transition-all`} 
-                    placeholder={language === 'ar' ? "مثال: محمد أحمد" : "Ex: Mohamed Ahmed"}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}</label>
-                <div className="relative">
-                  <Phone className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
-                  <input 
-                    type="tel" 
-                    required
-                    value={patientPhone}
-                    onChange={(e) => setPatientPhone(e.target.value)}
-                    className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm text-left transition-all`} 
-                    placeholder="05xx xx xx xx"
-                    dir="ltr"
-                  />
-                </div>
-              </div>
+          )}
 
-              <button 
-                type="submit" 
-                disabled={bookingLoading}
-                className="w-full bg-indigo-600 text-white font-bold rounded-2xl py-4 mt-2 shadow-md shadow-indigo-200 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {bookingLoading 
-                  ? (language === 'ar' ? "جاري الحجز..." : "Réservation...") 
-                  : (language === 'ar' ? "تأكيد الحجز" : "Confirmer le rendez-vous")}
-              </button>
-            </form>
+          {(() => {
+            if (doctor.isAcceptingAppointments === false) {
+              return (
+                 <div className="bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
+                   {language === 'ar' 
+                     ? 'عذراً! الطبيب لا يستقبل حجوزات جديدة في الوقت الحالي بسبب إجازة أو لظروف أخرى. يرجى المراجعة لاحقاً.'
+                     : 'Désolé! Ce médecin n\'accepte pas de nouvelles réservations pour le moment. Veuillez vérifier plus tard.'}
+                 </div>
+              );
+            }
+
+            if (!doctor.isBookingOpenAllDay && doctor.bookingWindow) {
+              const now = new Date();
+              const currentMinutes = now.getHours() * 60 + now.getMinutes();
+              
+              const [startH, startM] = doctor.bookingWindow.start.split(':').map(Number);
+              const startMinutes = startH * 60 + startM;
+              
+              const [endH, endM] = doctor.bookingWindow.end.split(':').map(Number);
+              let endMinutes = endH * 60 + endM;
+              
+              let isWithinWindow = false;
+              
+              if (endMinutes < startMinutes) {
+                // Window crosses midnight (e.g., 18:00 to 02:00)
+                isWithinWindow = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+              } else {
+                // Normal window (e.g., 08:00 to 16:00)
+                isWithinWindow = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+              }
+
+              if (!isWithinWindow) {
+                return (
+                 <div className="bg-indigo-50 border border-indigo-200 text-indigo-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
+                   {language === 'ar' 
+                     ? `الحجز غير متاح الآن. يرجى الحجز بين الساعة ${doctor.bookingWindow.start} و ${doctor.bookingWindow.end}.`
+                     : `La réservation n'est pas disponible actuellement. Veuillez réserver entre ${doctor.bookingWindow.start} et ${doctor.bookingWindow.end}.`}
+                 </div>
+                );
+              }
+            }
+
+            if (success) {
+              return (
+                <div className="bg-green-50/50 p-6 rounded-2xl text-center border border-green-100 relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
+                  <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
+                  
+                  <div className="inline-block p-3 bg-green-500 rounded-full mb-4 shadow-sm shadow-green-200 relative z-10">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-green-700 mb-2 relative z-10">{language === 'ar' ? 'تم الحجز بنجاح!' : 'Réservation réussie !'}</h3>
+                  
+                  <p className="text-xs text-slate-600 max-w-[250px] mx-auto leading-relaxed relative z-10 my-4">
+                    {language === 'ar' ? 'سيتم التواصل معك قريباً لتأكيد الموعد.' : 'Vous serez contacté prochainement pour confirmer.'}
+                  </p>
+
+                  <button 
+                    onClick={() => { setSuccess(false); setQueueNumber(null); }}
+                    className="mt-6 px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-50 hover:border-slate-300 transition-all w-full relative z-10"
+                  >
+                    {language === 'ar' ? 'حجز موعد آخر' : 'Nouveau rendez-vous'}
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <form onSubmit={handleBooking} className="space-y-4 relative z-10">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'الاسم الكامل' : 'Nom complet'}</label>
+                  <div className="relative">
+                    <UserRound className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
+                    <input 
+                      type="text" 
+                      required
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm transition-all`} 
+                      placeholder={language === 'ar' ? "مثال: محمد أحمد" : "Ex: Mohamed Ahmed"}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}</label>
+                  <div className="relative">
+                    <Phone className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
+                    <input 
+                      type="tel" 
+                      required
+                      value={patientPhone}
+                      onChange={(e) => setPatientPhone(e.target.value)}
+                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm text-left transition-all`} 
+                      placeholder="05xx xx xx xx"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={bookingLoading}
+                  className="w-full bg-indigo-600 text-white font-bold rounded-2xl py-4 mt-2 shadow-md shadow-indigo-200 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {bookingLoading 
+                    ? (language === 'ar' ? "جاري الحجز..." : "Réservation...") 
+                    : (language === 'ar' ? "تأكيد الحجز" : "Confirmer le rendez-vous")}
+                </button>
+              </form>
+            );
+          })()}
+
+          {/* Working Hours Display */}
+          {doctor.workingHours && (
+            <div className="mt-5 border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-500">
+              <div className="font-medium text-slate-600">
+                {language === 'ar' ? 'أوقات العمل:' : 'Heures de travail :'}
+              </div>
+              <div className="bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-700" dir="ltr">
+                {doctor.workingHours.start} - {doctor.workingHours.end}
+              </div>
+            </div>
           )}
         </div>
 

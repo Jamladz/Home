@@ -139,14 +139,18 @@ export default function Home() {
             <motion.div
               variants={itemVariants}
               key={idx}
-              className="flex-shrink-0 bg-white rounded-3xl p-4 shadow-sm border border-slate-200/60 w-28 flex flex-col items-center justify-center gap-3 hover:border-indigo-200 transition-colors"
             >
-              <div className={`p-4 rounded-2xl ${cat.color}`}>
-                <cat.icon className="w-6 h-6" />
-              </div>
-              <span className="font-bold text-slate-700 text-sm whitespace-nowrap">
-                {cat.title}
-              </span>
+              <Link
+                to={`/doctors?specialty=${cat.id}`}
+                className="flex-shrink-0 bg-white rounded-3xl p-4 shadow-sm border border-slate-200/60 w-28 flex flex-col items-center justify-center gap-3 hover:border-indigo-200 transition-colors block"
+              >
+                <div className={`p-4 rounded-2xl ${cat.color}`}>
+                  <cat.icon className="w-6 h-6" />
+                </div>
+                <span className="font-bold text-slate-700 text-sm whitespace-nowrap">
+                  {cat.title}
+                </span>
+              </Link>
             </motion.div>
           ))}
         </div>

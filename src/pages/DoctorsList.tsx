@@ -2,22 +2,36 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { DoctorProfile } from "../types";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MapPin, Star, UserRound, Search, Filter } from "lucide-react";
 import { getWilayas, getCommunesByWilaya } from "../lib/algeria_data";
+import { medicalSpecialties } from "../lib/medical_specialties";
 import { DoctorAvatar } from "../components/DoctorAvatar";
 import { useLanguage } from "../contexts/LanguageContext";
 import { motion } from "motion/react";
 
 export default function DoctorsList() {
   const { language } = useLanguage();
+  const location = useLocation();
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Filtering state
+  const [selectedSpecialty, setSelectedSpecialty] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('specialty') || "";
+  });
   const [selectedWilaya, setSelectedWilaya] = useState("");
   const [selectedCommune, setSelectedCommune] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const specialtyFromUrl = params.get('specialty');
+    if (specialtyFromUrl !== null && specialtyFromUrl !== selectedSpecialty) {
+      setSelectedSpecialty(specialtyFromUrl);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     async function fetchDoctors() {
@@ -28,6 +42,12 @@ export default function DoctorsList() {
         // Add pending check
         q = query(q, where("status", "==", "approved"));
         
+        if (selectedSpecialty) {
+          // Note: In a real app we might want to store specialty ID but right now doctors might store the translated string.
+          // Let's assume Firebase stores the localized specialty string based on the doctor's selection language, or maybe the ID? Let's check `doctor-dashboard.tsx`.
+          // If we must query by specialty string, we'll do it client side for now.
+        }
+
         if (selectedWilaya) {
           q = query(q, where("wilaya", "==", selectedWilaya));
         }
@@ -50,10 +70,22 @@ export default function DoctorsList() {
     fetchDoctors();
   }, [selectedWilaya, selectedCommune]);
 
-  const filteredDoctors = doctors.filter(doc => 
-    doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    doc.specialty.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Client side filtering for specialty and search
+  const filteredDoctors = doctors.filter(doc => {
+    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+                          
+    let matchesSpecialty = true;
+    if (selectedSpecialty) {
+      // Find the specialty label, doc.specialty might be the string in AR or FR.
+      const spec = medicalSpecialties.find(s => s.id === selectedSpecialty);
+      if (spec) {
+         matchesSpecialty = doc.specialty === spec.ar || doc.specialty === spec.fr || doc.specialty === selectedSpecialty;
+      }
+    }
+    
+    return matchesSearch && matchesSpecialty;
+  });
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -85,13 +117,26 @@ export default function DoctorsList() {
           <Search className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5`} />
         </div>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <select 
+            value={selectedSpecialty} 
+            onChange={(e) => setSelectedSpecialty(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            <option value="">{language === 'ar' ? 'التخصص' : 'Spécialité'}</option>
+            {medicalSpecialties.map(spec => (
+              <option key={spec.id} value={spec.id}>
+                {language === 'ar' ? spec.ar : spec.fr}
+              </option>
+            ))}
+          </select>
+          
           <select 
             value={selectedWilaya} 
             onChange={(e) => { setSelectedWilaya(e.target.value); setSelectedCommune(""); }}
-            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
-            <option value="">{language === 'ar' ? 'كل الولايات' : 'Toutes les wilayas'}</option>
+            <option value="">{language === 'ar' ? 'الولاية' : 'Wilaya'}</option>
             {getWilayas().map(w => (
               <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
             ))}
@@ -101,9 +146,9 @@ export default function DoctorsList() {
             value={selectedCommune} 
             onChange={(e) => setSelectedCommune(e.target.value)}
             disabled={!selectedWilaya}
-            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50 disabled:bg-slate-50"
+            className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50 disabled:bg-slate-50"
           >
-            <option value="">{language === 'ar' ? 'كل البلديات' : 'Toutes les communes'}</option>
+            <option value="">{language === 'ar' ? 'البلدية' : 'Commune'}</option>
             {selectedWilaya && getCommunesByWilaya(selectedWilaya).map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
