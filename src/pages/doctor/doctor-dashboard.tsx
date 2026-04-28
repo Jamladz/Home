@@ -26,7 +26,10 @@ import {
   Trash2,
   Star,
   MessageSquareText,
+  QrCode,
+  X,
 } from "lucide-react";
+import { QRCodeSVG } from 'qrcode.react';
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
 import { medicalSpecialties } from "../../lib/medical_specialties";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -54,6 +57,7 @@ export default function DoctorDashboard() {
   const [phone, setPhone] = useState("");
   const [maxPatientsPerDay, setMaxPatientsPerDay] = useState<number>(20);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [filter, setFilter] = useState<"today" | "upcoming" | "past">("today");
   const [expandedApptId, setExpandedApptId] = useState<string | null>(null);
 
@@ -434,6 +438,13 @@ export default function DoctorDashboard() {
           <h1 className="text-xl font-bold">لوحة تحكم الطبيب</h1>
           <div className="flex gap-4">
             <button
+              onClick={() => setShowQRModal(true)}
+              className="text-indigo-100 hover:text-white transition"
+              title={language === "ar" ? "رمز QR" : "Code QR"}
+            >
+              <QrCode className="w-6 h-6" />
+            </button>
+            <button
               onClick={() => setIsEditingProfile(true)}
               className="text-indigo-100 hover:text-white transition"
             >
@@ -748,6 +759,56 @@ export default function DoctorDashboard() {
           </div>
         )}
       </div>
+
+      {showQRModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-5 relative text-center flex flex-col items-center">
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="absolute top-3 right-3 p-2 bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-3">
+                <QrCode className="w-6 h-6" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-slate-800 mb-1">
+                {language === "ar" ? "رمز الحجز الخاص بك" : "Votre code de réservation"}
+              </h3>
+              
+              <p className="text-slate-500 text-xs mb-4 leading-relaxed px-2">
+                {language === "ar" 
+                  ? "دع مرضاك يمسحون هذا الرمز للوصول لصفحة الحجز." 
+                  : "Mettez ce code à disposition de vos patients pour accéder à la réservation."}
+              </p>
+
+              <div className="bg-white p-3 rounded-xl border-2 border-indigo-50 shadow-sm mb-5 inline-flex justify-center w-auto">
+                <QRCodeSVG 
+                  value={`${window.location.origin}/doctor/${uid}`} 
+                  size={160}
+                  level="H"
+                  includeMargin={false}
+                  bgColor="#ffffff"
+                  fgColor="#4f46e5"
+                />
+              </div>
+              
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/doctor/${uid}`);
+                  alert(language === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Lien copié avec succès !');
+                }}
+                className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
+              >
+                {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
