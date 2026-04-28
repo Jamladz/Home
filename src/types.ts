@@ -13,6 +13,17 @@ export interface DoctorProfile {
   reviewCount?: number;
   patientCount: number;
   status: 'pending' | 'approved';
+  workingHours?: {
+    start: string;
+    end: string;
+  };
+  bookingWindow?: {
+    start: string;
+    end: string;
+  };
+  isBookingOpenAllDay?: boolean;
+  isAcceptingAppointments?: boolean;
+  noticeMessage?: string;
 }
 
 export interface Review {
