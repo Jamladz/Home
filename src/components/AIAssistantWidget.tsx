@@ -112,9 +112,10 @@ export function AIAssistantWidget() {
     let apiKey = globalApiKey;
     if (!apiKey) {
       try {
-        // Try Vite env first
-        if (import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) {
-          apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        // Try Vite env first (using specific type bypass)
+        const env = (import.meta as any).env;
+        if (env && env.VITE_GEMINI_API_KEY) {
+          apiKey = env.VITE_GEMINI_API_KEY;
         } else {
           // Fallback to process.env for preview environment
           apiKey = process.env.GEMINI_API_KEY || "";

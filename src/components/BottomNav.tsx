@@ -36,15 +36,6 @@ export function BottomNav() {
           })}
         </div>
       </div>
-      
-      {/* Floating Language Toggle */}
-      <button 
-        onClick={() => setLanguage(language === 'ar' ? 'fr' : 'ar')}
-        className="fixed bottom-20 left-4 z-40 bg-white/90 backdrop-blur border border-slate-200 text-slate-600 p-3 rounded-full shadow-lg hover:bg-slate-50 transition flex items-center justify-center font-bold text-sm"
-      >
-        <Globe className="w-5 h-5 mr-1 text-indigo-500" />
-        {language === 'ar' ? 'FR' : 'AR'}
-      </button>
     </>
   );
 }
