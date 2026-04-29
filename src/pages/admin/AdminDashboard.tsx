@@ -4,7 +4,7 @@ import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc, getDoc, setDoc 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
 import { DoctorProfile, Permanence } from "../../types";
-import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench } from "lucide-react";
+import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getWilayas } from "../../lib/algeria_data";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -108,6 +108,16 @@ export default function AdminDashboard() {
     } catch (e) {
       console.error("Error modifying status", e);
       alert("حدث خطأ أثناء تعديل الحالة.");
+    }
+  };
+
+  const handleToggleVerification = async (doctorId: string, isVerified: boolean) => {
+    try {
+      await updateDoc(doc(db, "doctors", doctorId), { isVerified: !isVerified });
+      setDoctors(prev => prev.map(d => d.userId === doctorId ? { ...d, isVerified: !isVerified } : d));
+    } catch (e) {
+      console.error("Error modifying verification status", e);
+      alert("حدث خطأ أثناء تعديل حالة التوثيق.");
     }
   };
 
@@ -320,7 +330,12 @@ export default function AdminDashboard() {
                                 {doctor.name.charAt(0)}
                               </div>
                               <div className="text-start">
-                                <h3 className="font-bold text-slate-800 text-sm">د. {doctor.name}</h3>
+                                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1">
+                                  د. {doctor.name}
+                                  {doctor.isVerified && (
+                                    <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" />
+                                  )}
+                                </h3>
                                 <p className="text-slate-500 text-xs mt-0.5">{doctor.specialty}</p>
                               </div>
                             </div>
@@ -346,6 +361,14 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-4 px-6">
                             <div className="flex items-center justify-center gap-2">
+                              <button 
+                                onClick={() => handleToggleVerification(doctor.userId, !!doctor.isVerified)}
+                                className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border flex items-center gap-1 ${doctor.isVerified ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
+                                title={doctor.isVerified ? 'إلغاء التوثيق' : 'توثيق الحساب'}
+                              >
+                                <BadgeCheck className={`w-3.5 h-3.5 ${doctor.isVerified ? 'text-blue-600' : 'text-slate-400'}`} />
+                                {doctor.isVerified ? 'موثق' : 'توثيق'}
+                              </button>
                               <button 
                                 onClick={() => handleToggleApproval(doctor.userId, doctor.status || 'pending')}
                                 className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border ${doctor.status === 'approved' ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}
