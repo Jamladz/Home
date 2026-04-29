@@ -121,12 +121,13 @@ export default function Home() {
       {/* Header / Hero */}
       <motion.div
         variants={itemVariants}
-        className="bg-gradient-to-l from-indigo-600 to-indigo-800 rounded-b-[40px] p-6 pt-12 pb-16 text-white shadow-sm relative overflow-hidden"
+        className="bg-gradient-to-br from-indigo-800 via-indigo-700 to-blue-600 rounded-b-[40px] p-6 pt-16 pb-20 text-white shadow-lg relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-400 opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
         <div className="relative z-10 text-start">
-          <h1 className="text-3xl font-bold mb-2">{t("home.title")}</h1>
-          <p className="text-indigo-100 mb-6 opacity-90 max-w-sm">
+          <h1 className="text-4xl font-extrabold mb-3 tracking-tight">{t("home.title")}</h1>
+          <p className="text-indigo-100/90 mb-6 text-base max-w-sm font-medium leading-relaxed">
             {t("home.subtitle")}
           </p>
         </div>
@@ -234,7 +235,7 @@ export default function Home() {
             </p>
             <Link
               to="/doctors"
-              className="inline-block bg-indigo-600 text-white px-6 py-3.5 rounded-2xl font-bold shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all w-full md:w-auto"
+              className="inline-flex justify-center items-center bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-4 rounded-[20px] font-bold shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300 w-full md:w-auto"
             >
               {t("home.browse_doctors")}
             </Link>
@@ -279,7 +280,7 @@ export default function Home() {
           </p>
           <Link
             to="/permanence"
-            className="block text-center border-2 border-dashed border-slate-200 rounded-2xl py-3.5 text-slate-500 text-sm font-bold hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+            className="block text-center border-2 border-slate-200 bg-slate-50 rounded-[20px] py-4 text-slate-600 text-sm font-bold hover:border-indigo-200 hover:text-indigo-700 hover:bg-indigo-50/50 hover:shadow-sm transition-all duration-300"
           >
             {t("home.view_permanences")}
           </Link>

@@ -3,9 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, addDoc, query, where, getDocs, runTransaction } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { DoctorProfile, Appointment, Review } from "../types";
-import { MapPin, Phone, Star, UserRound, ArrowRight } from "lucide-react";
+import { MapPin, Phone, Star, UserRound, ArrowRight, QrCode, X, BadgeCheck } from "lucide-react";
 import { DoctorAvatar } from "../components/DoctorAvatar";
 import { useLanguage } from "../contexts/LanguageContext";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function DoctorDetail() {
   const { doctorId } = useParams();
@@ -19,6 +20,7 @@ export default function DoctorDetail() {
   const [patientPhone, setPatientPhone] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [shiftedDate, setShiftedDate] = useState<string | null>(null);
   const [queueNumber, setQueueNumber] = useState<number | null>(null);
 
@@ -197,7 +199,12 @@ export default function DoctorDetail() {
           <div className="w-24 h-24 mb-4 font-bold relative group">
             <DoctorAvatar gender={doctor.gender} className="w-24 h-24 border-4 border-indigo-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)]" />
           </div>
-          <h1 className="text-2xl font-bold">{language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}</h1>
+          <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
+            {language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}
+            {doctor.isVerified && (
+              <BadgeCheck className="w-6 h-6 text-blue-400 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
+            )}
+          </h1>
           <p className="text-indigo-100 font-medium mt-1 mb-4 opacity-90">{doctor.specialty}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-lg relative z-20">
@@ -340,7 +347,7 @@ export default function DoctorDetail() {
                 <button 
                   type="submit" 
                   disabled={bookingLoading}
-                  className="w-full bg-indigo-600 text-white font-bold rounded-2xl py-4 mt-2 shadow-md shadow-indigo-200 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold rounded-[20px] py-4 mt-2 shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {bookingLoading 
                     ? (language === 'ar' ? "جاري الحجز..." : "Réservation...") 
@@ -352,16 +359,41 @@ export default function DoctorDetail() {
 
           {/* Working Hours Display */}
           {doctor.workingHours && (
-            <div className="mt-5 border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-500">
-              <div className="font-medium text-slate-600">
-                {language === 'ar' ? 'أوقات العمل:' : 'Heures de travail :'}
+            <div className="mt-5 border-t border-slate-100 pt-4 flex flex-col gap-2 text-xs text-slate-500">
+              <div className="flex justify-between items-center">
+                <div className="font-medium text-slate-600">
+                  {language === 'ar' ? 'أوقات العمل:' : 'Heures de travail :'}
+                </div>
+                <div className="bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-700" dir="ltr">
+                  {doctor.workingHours.start} - {doctor.workingHours.end}
+                </div>
               </div>
-              <div className="bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-700" dir="ltr">
-                {doctor.workingHours.start} - {doctor.workingHours.end}
-              </div>
+              {doctor.workingDays && doctor.workingDays.length > 0 && (
+                <div className="flex justify-between items-start mt-2">
+                   <div className="font-medium text-slate-600 shrink-0">
+                    {language === 'ar' ? 'أيام العمل:' : 'Jours de travail :'}
+                  </div>
+                  <div className="flex flex-wrap justify-end gap-1 pl-4">
+                    {doctor.workingDays.map(day => (
+                      <span key={day} className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-[10px] font-bold">
+                        {day}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
+
+        {/* Share QR button */}
+        <button 
+          onClick={() => setShowQRModal(true)}
+          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all mt-4"
+        >
+          <QrCode className="w-5 h-5 text-indigo-600" />
+          <span>{language === 'ar' ? 'تبادل صفحة الحجز (QR)' : 'Partager la page de réservation (QR)'}</span>
+        </button>
 
         {/* Stats Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5">
@@ -466,6 +498,56 @@ export default function DoctorDetail() {
           </div>
         </div>
       </div>
+
+      {showQRModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-5 relative text-center flex flex-col items-center">
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="absolute top-3 right-3 p-2 bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-3">
+                <QrCode className="w-6 h-6" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-slate-800 mb-1">
+                {language === "ar" ? "تبادل صفحة الحجز" : "Partager la page"}
+              </h3>
+              
+              <p className="text-slate-500 text-xs mb-4 leading-relaxed px-2">
+                {language === "ar" 
+                  ? "امسح الرمز للوصول لصفحة الحجز الخاصة بهذا الطبيب." 
+                  : "Scannez ce code pour accéder à la page de réservation de ce médecin."}
+              </p>
+
+              <div className="bg-white p-3 rounded-xl border-2 border-indigo-50 shadow-sm mb-5 inline-flex justify-center w-auto">
+                <QRCodeSVG 
+                  value={window.location.href} 
+                  size={160}
+                  level="H"
+                  includeMargin={false}
+                  bgColor="#ffffff"
+                  fgColor="#0f172a"
+                />
+              </div>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert(language === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Lien copié avec succès !');
+                }}
+                className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
+              >
+                {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

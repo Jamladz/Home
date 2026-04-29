@@ -3,18 +3,20 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { DoctorProfile } from "../types";
 import { Link, useLocation } from "react-router-dom";
-import { MapPin, Star, UserRound, Search, Filter } from "lucide-react";
+import { MapPin, Star, UserRound, Search, Filter, QrCode, X, BadgeCheck } from "lucide-react";
 import { getWilayas, getCommunesByWilaya } from "../lib/algeria_data";
 import { medicalSpecialties } from "../lib/medical_specialties";
 import { DoctorAvatar } from "../components/DoctorAvatar";
 import { useLanguage } from "../contexts/LanguageContext";
 import { motion } from "motion/react";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function DoctorsList() {
   const { language } = useLanguage();
   const location = useLocation();
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [qrDoctorId, setQrDoctorId] = useState<string | null>(null);
   
   // Filtering state
   const [selectedSpecialty, setSelectedSpecialty] = useState(() => {
@@ -195,7 +197,12 @@ export default function DoctorsList() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-slate-800 text-sm mb-0.5">{language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}</h3>
+                  <h3 className="font-bold text-slate-800 text-sm mb-0.5 flex items-center gap-1">
+                    {language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}
+                    {doctor.isVerified && (
+                      <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
+                    )}
+                  </h3>
                   <p className="text-slate-500 text-[11px] mb-1.5 font-medium">{doctor.specialty}</p>
                   <div className="flex items-center text-slate-400 text-[10px] mb-1">
                     <MapPin className={`w-3 h-3 text-indigo-400 ${language === 'ar' ? 'ml-1' : 'mr-1'}`} />
@@ -220,9 +227,70 @@ export default function DoctorsList() {
                   </div>
                 </div>
               </Link>
+              
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setQrDoctorId(doctor.id);
+                }}
+                className={`absolute top-4 ${language === 'ar' ? 'left-4' : 'right-4'} p-2.5 bg-white/80 backdrop-blur text-indigo-600 rounded-full shadow-sm hover:scale-110 transition-transform hover:bg-slate-50`}
+              >
+                <QrCode className="w-5 h-5 flex-shrink-0" />
+              </button>
             </motion.div>
           ))}
         </motion.div>
+      )}
+
+      {qrDoctorId && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-5 relative text-center flex flex-col items-center">
+              <button
+                onClick={() => setQrDoctorId(null)}
+                className="absolute top-3 right-3 p-2 bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-3">
+                <QrCode className="w-6 h-6" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-slate-800 mb-1">
+                {language === "ar" ? "تبادل صفحة الحجز" : "Partager la page"}
+              </h3>
+              
+              <p className="text-slate-500 text-xs mb-4 leading-relaxed px-2">
+                {language === "ar" 
+                  ? "امسح الرمز للوصول لصفحة الحجز الخاصة بهذا الطبيب." 
+                  : "Scannez ce code pour accéder à la page de réservation de ce médecin."}
+              </p>
+
+              <div className="bg-white p-3 rounded-xl border-2 border-indigo-50 shadow-sm mb-5 inline-flex justify-center w-auto">
+                <QRCodeSVG 
+                  value={`${window.location.origin}/doctor/${qrDoctorId}`} 
+                  size={160}
+                  level="H"
+                  includeMargin={false}
+                  bgColor="#ffffff"
+                  fgColor="#0f172a"
+                />
+              </div>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/doctor/${qrDoctorId}`);
+                  alert(language === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Lien copié avec succès !');
+                }}
+                className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
+              >
+                {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
