@@ -33,10 +33,12 @@ service cloud.firestore {
              data.get('patientCount', 0) is number &&
              data.get('status', 'pending') in ['pending', 'approved'] &&
              data.get('workingHours', {}) is map &&
+             data.get('workingDays', []) is list &&
              data.get('bookingWindow', {}) is map &&
              data.get('isBookingOpenAllDay', true) is bool &&
              data.get('isAcceptingAppointments', true) is bool &&
-             data.get('noticeMessage', '') is string;
+             data.get('noticeMessage', '') is string &&
+             data.get('isVerified', false) is bool;
     }
 
     function isValidReview(data) {
@@ -64,14 +66,14 @@ service cloud.firestore {
                     doctorId == request.auth.uid && 
                     isValidDoctorProfile(incoming()) && 
                     incoming().get('status', 'pending') == 'pending' &&
-                    incoming().keys().size() <= 25) || isAdmin();
+                    incoming().keys().size() <= 27) || isAdmin();
                     
       allow update: if (isSignedIn() && 
                         doctorId == request.auth.uid && 
                         isValidDoctorProfile(incoming()) && 
                         incoming().userId == existing().userId &&
                         incoming().get('status', 'pending') == existing().get('status', 'pending') && // Block self-approval
-                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'gender', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status', 'workingHours', 'bookingWindow', 'isBookingOpenAllDay', 'isAcceptingAppointments', 'noticeMessage'])) ||
+                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'gender', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status', 'workingHours', 'workingDays', 'bookingWindow', 'isBookingOpenAllDay', 'isAcceptingAppointments', 'noticeMessage'])) ||
                        (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount', 'patientCount']) &&
                         incoming().rating is number && incoming().rating >= 0 && incoming().rating <= 5 &&
                         incoming().reviewCount is number && incoming().patientCount is number) || isAdmin();
