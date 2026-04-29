@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
 import { useLanguage } from "./contexts/LanguageContext";
 import { AnimatePresence, motion } from "motion/react";
+import { SplashScreen } from "./components/SplashScreen";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   return (
@@ -37,6 +38,7 @@ import { AIAssistantWidget } from "./components/AIAssistantWidget";
 function AppContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const { language } = useLanguage();
   const location = useLocation();
 
@@ -167,6 +169,10 @@ function AppContent() {
 
       {/* Fixed Navigation for Mobile */}
       <BottomNav />
+
+      <AnimatePresence>
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

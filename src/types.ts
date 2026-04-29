@@ -13,10 +13,12 @@ export interface DoctorProfile {
   reviewCount?: number;
   patientCount: number;
   status: 'pending' | 'approved';
+  isVerified?: boolean;
   workingHours?: {
     start: string;
     end: string;
   };
+  workingDays?: string[];
   bookingWindow?: {
     start: string;
     end: string;
