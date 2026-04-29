@@ -28,6 +28,8 @@ import {
   MessageSquareText,
   QrCode,
   X,
+  Check,
+  BadgeCheck,
 } from "lucide-react";
 import { QRCodeSVG } from 'qrcode.react';
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
@@ -58,6 +60,7 @@ export default function DoctorDashboard() {
   const [maxPatientsPerDay, setMaxPatientsPerDay] = useState<number>(20);
   const [workingHoursStart, setWorkingHoursStart] = useState("08:00");
   const [workingHoursEnd, setWorkingHoursEnd] = useState("16:00");
+  const [workingDays, setWorkingDays] = useState<string[]>(["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"]);
   const [bookingWindowStart, setBookingWindowStart] = useState("18:00");
   const [bookingWindowEnd, setBookingWindowEnd] = useState("00:00");
   const [isBookingOpenAllDay, setIsBookingOpenAllDay] = useState(true);
@@ -103,6 +106,9 @@ export default function DoctorDashboard() {
           if (profileData.workingHours) {
             setWorkingHoursStart(profileData.workingHours.start);
             setWorkingHoursEnd(profileData.workingHours.end);
+          }
+          if (profileData.workingDays) {
+            setWorkingDays(profileData.workingDays);
           }
           if (profileData.bookingWindow) {
             setBookingWindowStart(profileData.bookingWindow.start);
@@ -181,6 +187,7 @@ export default function DoctorDashboard() {
           start: workingHoursStart,
           end: workingHoursEnd
         },
+        workingDays,
         bookingWindow: {
           start: bookingWindowStart,
           end: bookingWindowEnd
@@ -471,6 +478,30 @@ export default function DoctorDashboard() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              أيام العمل
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"].map(day => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => {
+                    if (workingDays.includes(day)) {
+                      setWorkingDays(workingDays.filter(d => d !== day));
+                    } else {
+                      setWorkingDays([...workingDays, day]);
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${workingDays.includes(day) ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="bg-slate-50 p-4 border border-slate-200 rounded-2xl space-y-4">
             <h3 className="font-bold text-slate-800 border-b border-slate-200 pb-2">نافذة الحجوزات</h3>
             <div className="flex items-center gap-3">
@@ -542,7 +573,7 @@ export default function DoctorDashboard() {
           </div>
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white font-bold rounded-2xl py-3.5 mt-4 hover:bg-indigo-700 shadow-sm"
+            className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold rounded-[20px] py-4 mt-6 shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300"
           >
             حفظ البيانات
           </button>
@@ -594,7 +625,12 @@ export default function DoctorDashboard() {
             <UserRound className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">د. {profile.name}</h2>
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              د. {profile.name}
+              {profile.isVerified && (
+                <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
+              )}
+            </h2>
             <p className="text-indigo-200 text-sm">{profile.specialty}</p>
           </div>
         </div>
@@ -714,17 +750,28 @@ export default function DoctorDashboard() {
                       >
                         <div className="flex items-center gap-4">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-colors ${isExpanded ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-indigo-100 text-indigo-700"}`}
+                            className={`relative w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-all ${isExpanded ? "bg-green-600 text-white shadow-md shadow-green-200" : "bg-green-100 text-green-700"}`}
                           >
-                            {index + 1}
+                            <span className="absolute inset-0 rounded-full border-2 border-green-500 animate-[ping_2.5s_ease-in-out_infinite] opacity-75"></span>
+                            <span className="relative z-10 border-2 border-green-500 rounded-full w-full h-full flex items-center justify-center">{index + 1}</span>
                           </div>
                           <div>
                             <h4
-                              className={`font-bold text-md transition-colors ${isExpanded ? "text-indigo-900" : "text-slate-800"}`}
+                              className={`font-bold text-md transition-colors flex items-center gap-2 ${isExpanded ? "text-indigo-900" : "text-slate-800"}`}
                             >
                               {appt.patientName}
+                              {appt.status === "confirmed" && (
+                                <span className="text-white flex items-center justify-center bg-green-500 rounded-full p-0.5 shadow-sm" title="تم التأكيد">
+                                  <Check className="w-3.5 h-3.5" />
+                                </span>
+                              )}
                             </h4>
                             <span className="text-xs text-slate-500 font-medium">
+                              {appt.status === "confirmed" && (
+                                <span className="text-green-600">
+                                  تم التأكيد ✅
+                                </span>
+                              )}
                               {appt.status === "pending" && (
                                 <span className="text-amber-500">
                                   في الانتظار ⏳
@@ -742,6 +789,7 @@ export default function DoctorDashboard() {
                               )}
                               {(!appt.status ||
                                 (appt.status !== "pending" &&
+                                  appt.status !== "confirmed" &&
                                   appt.status !== "completed" &&
                                   appt.status !== "no_show")) && (
                                 <span className="text-slate-500">
@@ -786,13 +834,22 @@ export default function DoctorDashboard() {
                             </div>
                           </div>
 
-                          <div className="flex gap-2 mb-3">
+                          <div className="grid grid-cols-2 gap-2 mb-3">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateStatus(appt.id!, "confirmed");
+                              }}
+                              className={`font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "confirmed" ? "bg-green-100 text-green-800 border-green-300 shadow-sm ring-2 ring-green-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                            >
+                              تم التأكيد ✅
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 updateStatus(appt.id!, "pending");
                               }}
-                              className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "pending" ? "bg-amber-100 text-amber-800 border-amber-300 shadow-sm ring-2 ring-amber-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                              className={`font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "pending" ? "bg-amber-100 text-amber-800 border-amber-300 shadow-sm ring-2 ring-amber-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
                             >
                               في الانتظار ⏳
                             </button>
@@ -801,7 +858,7 @@ export default function DoctorDashboard() {
                                 e.stopPropagation();
                                 updateStatus(appt.id!, "completed");
                               }}
-                              className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "completed" ? "bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm ring-2 ring-emerald-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                              className={`font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "completed" ? "bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm ring-2 ring-emerald-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
                             >
                               تم الفحص ✅
                             </button>
@@ -810,7 +867,7 @@ export default function DoctorDashboard() {
                                 e.stopPropagation();
                                 updateStatus(appt.id!, "no_show");
                               }}
-                              className={`flex-1 font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "no_show" ? "bg-rose-100 text-rose-800 border-rose-300 shadow-sm ring-2 ring-rose-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                              className={`font-bold py-2.5 rounded-xl text-xs transition border ${appt.status === "no_show" ? "bg-rose-100 text-rose-800 border-rose-300 shadow-sm ring-2 ring-rose-500/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
                             >
                               لم يأتي ❌
                             </button>
