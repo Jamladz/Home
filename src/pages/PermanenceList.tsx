@@ -37,14 +37,14 @@ export default function PermanenceList() {
       <div className="flex bg-slate-200/50 rounded-2xl p-1 mb-6 border border-slate-200">
         <button 
           onClick={() => setActiveTab('pharmacy')}
-          className={`flex-1 flex justify-center items-center py-3 rounded-xl text-xs font-bold transition ${activeTab === 'pharmacy' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 flex justify-center items-center py-3 rounded-xl text-xs font-bold transition ${activeTab === 'pharmacy' ? 'bg-white shadow-sm text-[#1E6DFF]' : 'text-slate-500 hover:text-slate-700'}`}
         >
           <Cross className="w-4 h-4 mr-2" />
           الصيدليات
         </button>
         <button 
           onClick={() => setActiveTab('laboratory')}
-          className={`flex-1 flex justify-center items-center py-3 rounded-xl text-xs font-bold transition ${activeTab === 'laboratory' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 flex justify-center items-center py-3 rounded-xl text-xs font-bold transition ${activeTab === 'laboratory' ? 'bg-white shadow-sm text-[#1E6DFF]' : 'text-slate-500 hover:text-slate-700'}`}
         >
           <Microscope className="w-4 h-4 mr-2" />
           المخابر
@@ -75,10 +75,10 @@ export default function PermanenceList() {
                 </div>
                 
                 {item.phone && (
-                  <div className="flex items-center text-slate-500 text-xs">
-                    <Phone className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                  <a href={`tel:${item.phone}`} className="flex items-center text-white bg-gradient-to-r from-[#18C5B5] to-[#1E6DFF] text-xs font-bold px-4 py-2.5 rounded-xl hover:shadow-[0_4px_12px_rgba(24,197,181,0.3)] transition-all">
+                    <Phone className="w-4 h-4 mr-2 shrink-0 text-white" />
                     <span dir="ltr">{item.phone}</span>
-                  </div>
+                  </a>
                 )}
                 
                 {item.openUntil && (

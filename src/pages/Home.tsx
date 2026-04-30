@@ -121,7 +121,7 @@ export default function Home() {
       {/* Header / Hero */}
       <motion.div
         variants={itemVariants}
-        className="bg-gradient-to-br from-indigo-800 via-indigo-700 to-blue-600 rounded-b-[40px] p-6 pt-16 pb-20 text-white shadow-lg relative overflow-hidden"
+        className="bg-gradient-to-br from-[#1E6DFF] to-[#18C5B5] rounded-b-[40px] p-6 pt-16 pb-20 text-white shadow-lg relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-400 opacity-10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
@@ -167,7 +167,7 @@ export default function Home() {
           </h2>
           <Link
             to="/doctors"
-            className="text-indigo-600 text-sm font-bold flex items-center bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors"
+            className="text-[#1E6DFF] text-sm font-bold flex items-center bg-[#1E6DFF]/10 px-3 py-1.5 rounded-full hover:bg-[#1E6DFF]/20 transition-colors"
           >
             {t("home.view_all")}
             {language === "ar" ? (
@@ -224,8 +224,8 @@ export default function Home() {
           </div>
         ) : (
           <div className="bg-white rounded-3xl p-6 text-center border border-slate-200/60 shadow-sm flex flex-col items-center">
-            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
-              <Stethoscope className="w-8 h-8 text-indigo-500" />
+            <div className="w-16 h-16 bg-[#1E6DFF]/10 rounded-2xl flex items-center justify-center mb-4">
+              <Stethoscope className="w-8 h-8 text-[#1E6DFF]" />
             </div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">
               {t("home.browse_doctors")}
@@ -235,7 +235,7 @@ export default function Home() {
             </p>
             <Link
               to="/doctors"
-              className="inline-flex justify-center items-center bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-4 rounded-[20px] font-bold shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300 w-full md:w-auto"
+              className="inline-flex justify-center items-center bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white px-8 py-4 rounded-[20px] font-bold shadow-[0_8px_20px_rgba(24,197,181,0.25)] hover:shadow-[0_12px_25px_rgba(30,109,255,0.35)] hover:-translate-y-0.5 transition-all duration-300 w-full md:w-auto"
             >
               {t("home.browse_doctors")}
             </Link>
@@ -255,7 +255,7 @@ export default function Home() {
           </h2>
           <Link
             to="/permanence"
-            className="text-indigo-600 text-sm font-bold flex items-center"
+            className="text-[#1E6DFF] text-sm font-bold flex items-center"
           >
             {t("home.view_all")}
             {language === "ar" ? (
@@ -280,7 +280,7 @@ export default function Home() {
           </p>
           <Link
             to="/permanence"
-            className="block text-center border-2 border-slate-200 bg-slate-50 rounded-[20px] py-4 text-slate-600 text-sm font-bold hover:border-indigo-200 hover:text-indigo-700 hover:bg-indigo-50/50 hover:shadow-sm transition-all duration-300"
+            className="block text-center border-2 border-slate-200 bg-slate-50 rounded-[20px] py-4 text-slate-600 text-sm font-bold hover:border-[#1E6DFF]/30 hover:text-[#1E6DFF] hover:bg-[#1E6DFF]/5 hover:shadow-sm transition-all duration-300"
           >
             {t("home.view_permanences")}
           </Link>

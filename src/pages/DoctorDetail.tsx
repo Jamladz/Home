@@ -65,28 +65,59 @@ export default function DoctorDetail() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!doctorId || !doctor) return;
+
+    // Validate Algerian phone number
+    const isValidPhone = /^(05|06|07)\d{8}$/.test(patientPhone);
+    if (!isValidPhone) {
+      alert(language === 'ar' ? "يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)" : "Veuillez entrer un numéro de téléphone algérien valide.");
+      return;
+    }
+
     setBookingLoading(true);
     setShiftedDate(null);
 
     try {
+      // Get user IP for rate limiting
+      let userIp = "unknown";
+      try {
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        userIp = ipData.ip;
+      } catch (err) {
+        console.warn("Could not fetch IP", err);
+      }
+
+      // Rate limiting: check recent bookings in the last hour
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
+      const recentBookingsQuery = query(
+        collection(db, "doctors", doctorId, "appointments"),
+        where("ip", "==", userIp),
+        where("createdAt", ">", oneHourAgo)
+      );
+      const recentDocs = await getDocs(recentBookingsQuery);
+      
+      if (recentDocs.size >= 3) {
+        alert(language === 'ar' ? "لقد وصلت للحد الأقصى من الحجوزات. يرجى المحاولة لاحقاً." : "Limite de réservation atteinte. Veuillez réessayer plus tard.");
+        setBookingLoading(false);
+        return;
+      }
+
       const now = new Date();
       const finalDate = now.toISOString().split('T')[0];
       const finalTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
       const timeStamp = Date.now();
 
-      await addDoc(collection(db, "appointments"), {
+      await addDoc(collection(db, "doctors", doctorId, "appointments"), {
         doctorId,
         patientName,
         patientPhone,
         date: finalDate,
         time: finalTime,
         status: "pending",
-        createdAt: timeStamp
+        createdAt: timeStamp,
+        ip: userIp
       });
       
-      // We don't increment patientCount in the doctors doc directly since it's hard to 
-      // secure atomically without Cloud Functions, and it leaks concurrency issues.
-      // But we will update UI purely for optimism.
       if (doctor) {
         setDoctor({ ...doctor, patientCount: (doctor.patientCount || 0) + 1 });
       }
@@ -191,13 +222,13 @@ export default function DoctorDetail() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="bg-gradient-to-l from-indigo-600 to-indigo-800 text-white p-4 pt-8 pb-16 relative rounded-b-[40px] shadow-sm">
+      <div className="bg-gradient-to-l from-[#1E6DFF] to-[#18C5B5] text-white p-4 pt-8 pb-16 relative rounded-b-[40px] shadow-sm">
         <button onClick={() => navigate(-1)} className={`absolute top-6 ${language === 'ar' ? 'right-4' : 'left-4'} p-2 bg-white/20 rounded-full hover:bg-white/30 transition`}>
           {language === 'ar' ? <ArrowRight className="w-5 h-5" /> : <svg className="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>}
         </button>
         <div className="flex flex-col items-center mt-6">
           <div className="w-24 h-24 mb-4 font-bold relative group">
-            <DoctorAvatar gender={doctor.gender} className="w-24 h-24 border-4 border-indigo-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)]" />
+            <DoctorAvatar gender={doctor.gender} className="w-24 h-24 border-4 border-[#1E6DFF]/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)]" />
           </div>
           <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
             {language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}
@@ -205,12 +236,12 @@ export default function DoctorDetail() {
               <BadgeCheck className="w-6 h-6 text-blue-400 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
             )}
           </h1>
-          <p className="text-indigo-100 font-medium mt-1 mb-4 opacity-90">{doctor.specialty}</p>
+          <p className="inline-block bg-white/20 text-white px-4 py-1.5 rounded-full font-medium mt-1 mb-4 text-sm border border-white/30 shadow-sm backdrop-blur-sm">{doctor.specialty}</p>
 
-          <div className="flex flex-wrap items-center justify-center gap-2 w-full max-w-lg relative z-20">
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-lg relative z-20">
             {(doctor.wilaya || doctor.commune) && (
-              <div className="flex items-center text-white/90 bg-white/10 px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-md border border-white/10">
-                <MapPin className={`w-3.5 h-3.5 opacity-80 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
+              <div className="flex items-center text-white bg-[#18C5B5] px-4 py-2 rounded-full text-xs font-bold shadow-md border border-white/20 hover:scale-105 transition-transform">
+                <MapPin className={`w-4 h-4 opacity-90 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
                 <span>
                   {doctor.wilaya ? `${doctor.wilaya} ` : ''} 
                   {doctor.commune ? `- ${doctor.commune}` : ''}
@@ -218,13 +249,13 @@ export default function DoctorDetail() {
               </div>
             )}
             {doctor.clinicAddress && (
-              <div className="flex items-center text-white/80 bg-white/5 px-3 py-1.5 rounded-full text-[11px] border border-white/5 shadow-inner max-w-xs">
+              <div className="flex items-center text-slate-800 bg-amber-300 px-4 py-2 rounded-full text-[11px] font-bold shadow-md hover:scale-105 transition-transform max-w-xs">
                  <span className="truncate">{doctor.clinicAddress}</span>
               </div>
             )}
             {doctor.phone && (
-              <a href={`tel:${doctor.phone}`} className="flex items-center text-white font-bold bg-indigo-500/50 hover:bg-indigo-500 transition-all px-3 py-1.5 rounded-full text-xs backdrop-blur-md border border-indigo-400/50 shadow-sm transform hover:scale-105 active:scale-95">
-                <Phone className={`w-3.5 h-3.5 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
+              <a href={`tel:${doctor.phone}`} className="flex items-center text-white font-bold bg-[#1E6DFF] transition-all px-5 py-2.5 rounded-full text-sm shadow-[0_4px_12px_rgba(30,109,255,0.4)] border border-white/20 transform hover:scale-105 active:scale-95">
+                <Phone className={`w-4 h-4 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
                 <span dir="ltr">{doctor.phone}</span>
               </a>
             )}
@@ -234,8 +265,8 @@ export default function DoctorDetail() {
 
       <div className="px-4 mt-[-2rem] relative z-20 space-y-4">
         {/* Booking Form */}
-        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-indigo-100 p-6 relative overflow-hidden" id="bookingForm">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#1E6DFF]/20 p-6 relative overflow-hidden" id="bookingForm">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5]"></div>
           <h2 className="text-lg font-bold text-slate-800 mb-5">{language === 'ar' ? 'احجز موعداً الآن' : 'Prendre un rendez-vous'}</h2>
 
           {doctor.noticeMessage && (
@@ -347,7 +378,7 @@ export default function DoctorDetail() {
                 <button 
                   type="submit" 
                   disabled={bookingLoading}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold rounded-[20px] py-4 mt-2 shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white font-bold rounded-[20px] py-4 mt-2 shadow-[0_8px_20px_rgba(24,197,181,0.25)] hover:shadow-[0_12px_25px_rgba(30,109,255,0.35)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {bookingLoading 
                     ? (language === 'ar' ? "جاري الحجز..." : "Réservation...") 
@@ -375,7 +406,7 @@ export default function DoctorDetail() {
                   </div>
                   <div className="flex flex-wrap justify-end gap-1 pl-4">
                     {doctor.workingDays.map(day => (
-                      <span key={day} className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-[10px] font-bold">
+                      <span key={day} className="bg-[#1E6DFF]/10 text-[#1E6DFF] px-2 py-1 rounded-md text-[10px] font-bold">
                         {day}
                       </span>
                     ))}
@@ -391,7 +422,7 @@ export default function DoctorDetail() {
           onClick={() => setShowQRModal(true)}
           className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all mt-4"
         >
-          <QrCode className="w-5 h-5 text-indigo-600" />
+          <QrCode className="w-5 h-5 text-[#1E6DFF]" />
           <span>{language === 'ar' ? 'تبادل صفحة الحجز (QR)' : 'Partager la page de réservation (QR)'}</span>
         </button>
 
@@ -510,7 +541,7 @@ export default function DoctorDetail() {
                 <X className="w-4 h-4" />
               </button>
               
-              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-3">
+              <div className="w-12 h-12 bg-[#1E6DFF]/10 text-[#1E6DFF] rounded-2xl flex items-center justify-center mb-3">
                 <QrCode className="w-6 h-6" />
               </div>
               
