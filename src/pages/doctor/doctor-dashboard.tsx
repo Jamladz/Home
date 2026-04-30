@@ -124,8 +124,7 @@ export default function DoctorDashboard() {
 
           // Real-time listener for appointments
           const q = query(
-            collection(db, "appointments"),
-            where("doctorId", "==", user.uid),
+            collection(db, "doctors", user.uid, "appointments")
           );
           unsubscribeAppointments = onSnapshot(q, (apptSnap) => {
             const appts = apptSnap.docs.map(
@@ -209,7 +208,8 @@ export default function DoctorDashboard() {
 
   const updateStatus = async (apptId: string, status: string) => {
     try {
-      await updateDoc(doc(db, "appointments", apptId), { status });
+      if (!auth.currentUser?.uid) return;
+      await updateDoc(doc(db, "doctors", auth.currentUser.uid, "appointments", apptId), { status });
       setAppointments((prev) =>
         prev.map((a) => (a.id === apptId ? { ...a, status } : a)),
       );
@@ -225,7 +225,8 @@ export default function DoctorDashboard() {
       )
     ) {
       try {
-        await deleteDoc(doc(db, "appointments", apptId));
+        if (!auth.currentUser?.uid) return;
+        await deleteDoc(doc(db, "doctors", auth.currentUser.uid, "appointments", apptId));
         setAppointments((prev) => prev.filter((a) => a.id !== apptId));
       } catch (error) {
         console.error("Error deleting appointment:", error);
@@ -573,7 +574,7 @@ export default function DoctorDashboard() {
           </div>
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold rounded-[20px] py-4 mt-6 shadow-[0_8px_20px_rgb(79,70,229,0.25)] hover:shadow-[0_12px_25px_rgb(79,70,229,0.35)] hover:-translate-y-0.5 transition-all duration-300"
+            className="w-full bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white font-bold rounded-[20px] py-4 mt-6 shadow-[0_8px_20px_rgba(24,197,181,0.25)] hover:shadow-[0_12px_25px_rgba(30,109,255,0.35)] hover:-translate-y-0.5 transition-all duration-300"
           >
             حفظ البيانات
           </button>
@@ -594,7 +595,7 @@ export default function DoctorDashboard() {
         </div>
       )}
       {/* Header */}
-      <div className="bg-gradient-to-l from-indigo-600 to-indigo-800 text-white p-4 pt-8 pb-12 rounded-b-[40px] shadow-sm">
+      <div className="bg-gradient-to-l from-[#1E6DFF] to-[#18C5B5] text-white p-4 pt-8 pb-12 rounded-b-[40px] shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-bold">لوحة تحكم الطبيب</h1>
           <div className="flex gap-4">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../lib/firebase";
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
 import { Stethoscope, Mail, Lock } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
 
@@ -52,7 +52,7 @@ export default function DoctorLogin() {
         errorMessage = language === 'ar' ? "البريد الإلكتروني مستخدم بالفعل، يرجى تسجيل الدخول بدلاً من ذلك." : "Email already in use. Please sign in instead.";
         setIsRegistering(false); // Switch back to login mode automatically
       } else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        errorMessage = language === 'ar' ? "البريد الإلكتروني أو كلمة المرور غير صحيحة. هل قمت بالتسجيل عبر جوجل مسبقاً؟" : "Invalid email or password. Did you sign up with Google previously?";
+        errorMessage = language === 'ar' ? "البريد الإلكتروني أو كلمة المرور غير صحيحة." : "Invalid email or password.";
       } else if (error.code === 'auth/weak-password') {
         errorMessage = language === 'ar' ? "كلمة المرور ضعيفة جداً. استخدم 6 أحرف على الأقل." : "Password should be at least 6 characters.";
       } else if (error.code === 'auth/operation-not-allowed') {
@@ -66,34 +66,6 @@ export default function DoctorLogin() {
       setMessage({ type: 'error', text: errorMessage });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setMessage(null);
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error: any) {
-      console.error("Login Error:", error);
-      let errorMessage = language === 'ar' ? "حدث خطأ أثناء تسجيل الدخول." : "An error occurred during sign in.";
-      
-      if (error.code) {
-        if (error.code === 'auth/popup-blocked') {
-          errorMessage = language === 'ar' ? "تم حظر النافذة المنبثقة! المتصفح يمنع تسجيل الدخول. يرجى فتح التطبيق في نافذة جديدة أو السماح بالنوافذ المنبثقة." : "Popup blocked. Please open in a new window or allow popups.";
-        } else if (error.code === 'auth/popup-closed-by-user') {
-          errorMessage = language === 'ar' ? "لقد قمت بإغلاق نافذة تسجيل الدخول قبل اكتمال العملية." : "Popup was closed by user.";
-        } else if (error.code === 'auth/unauthorized-domain') {
-          errorMessage = language === 'ar' ? "هذا النطاق غير مصرح له بتسجيل الدخول. تأكد من إعدادات Firebase." : "Unauthorized domain. Check Firebase settings.";
-        } else {
-          errorMessage += `\nالرمز: ${error.code}`;
-        }
-      }
-      
-      setMessage({ type: 'error', text: errorMessage });
     }
   };
 
@@ -157,7 +129,7 @@ export default function DoctorLogin() {
           <button 
             type="submit"
             disabled={isLoading}
-            className="w-full bg-indigo-600 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition shadow-sm disabled:opacity-70"
+            className="w-full bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center transition shadow-sm disabled:opacity-70"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -179,23 +151,6 @@ export default function DoctorLogin() {
               : (language === 'ar' ? 'ليس لدي حساب؟ إنشاء حساب' : 'Need an account? Sign up')}
           </button>
         </div>
-
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-px bg-slate-200 flex-1"></div>
-          <span className="text-xs text-slate-400 font-medium font-sans">
-            {language === 'ar' ? 'أو' : 'OR'}
-          </span>
-          <div className="h-px bg-slate-200 flex-1"></div>
-        </div>
-        
-        <button 
-          type="button"
-          onClick={handleGoogleLogin}
-          className="w-full bg-white border border-slate-200/80 text-slate-700 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition shadow-sm"
-        >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 ml-2" />
-          {language === 'ar' ? 'المتابعة بحساب جوجل' : 'Continue with Google'}
-        </button>
       </div>
     </div>
   );
