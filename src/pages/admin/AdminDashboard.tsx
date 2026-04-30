@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
-import { DoctorProfile, Permanence } from "../../types";
-import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck } from "lucide-react";
+import { DoctorProfile, Permanence, DirectoryDoctor } from "../../types";
+import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck, Users } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { getWilayas } from "../../lib/algeria_data";
+import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
+import { medicalSpecialties } from "../../lib/medical_specialties";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function AdminDashboard() {
@@ -17,14 +18,22 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'doctors' | 'permanences' | 'settings'>('overview');
 
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
+  const [directoryDoctors, setDirectoryDoctors] = useState<DirectoryDoctor[]>([]);
   const [permanences, setPermanences] = useState<Permanence[]>([]);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [globalApiKey, setGlobalApiKey] = useState('');
   const [savingApiKey, setSavingApiKey] = useState(false);
 
+  // Sub-tabs for Doctors
+  const [doctorSubTab, setDoctorSubTab] = useState<'platform' | 'directory'>('platform');
+
   // Add Permanence Form
   const [newPerm, setNewPerm] = useState<Partial<Permanence>>({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
   const [isAddingPerm, setIsAddingPerm] = useState(false);
+
+  // Add Directory Doctor Form
+  const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', specialty: '', wilaya: '', commune: '', address: '' });
+  const [isAddingDirDoctor, setIsAddingDirDoctor] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -49,6 +58,10 @@ export default function AdminDashboard() {
       const permSnap = await getDocs(collection(db, "permanences"));
       const permData = permSnap.docs.map(d => ({ ...d.data(), id: d.id } as Permanence));
       setPermanences(permData);
+
+      const dirDocsSnap = await getDocs(collection(db, "directory_doctors"));
+      const dirDocsData = dirDocsSnap.docs.map(d => ({ ...d.data(), id: d.id } as DirectoryDoctor));
+      setDirectoryDoctors(dirDocsData);
 
       const configSnap = await getDoc(doc(db, "config", "maintenance"));
       if (configSnap.exists()) {
@@ -139,6 +152,30 @@ export default function AdminDashboard() {
       setPermanences([{ ...newPerm, id: docRef.id } as Permanence, ...permanences]);
       setIsAddingPerm(false);
       setNewPerm({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
+    } catch (e) {
+      console.error(e);
+      alert("حدث خطأ أثناء الإضافة.");
+    }
+  };
+
+  const handleDeleteDirDoctor = async (id: string) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا الطبيب من الدليل؟")) {
+      try {
+        await deleteDoc(doc(db, "directory_doctors", id));
+        setDirectoryDoctors(prev => prev.filter(d => d.id !== id));
+      } catch (e) {
+        console.error("Error deleting directory doctor", e);
+      }
+    }
+  };
+
+  const handleAddDirDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const docRef = await addDoc(collection(db, "directory_doctors"), newDirDoctor);
+      setDirectoryDoctors([{ ...newDirDoctor, id: docRef.id } as DirectoryDoctor, ...directoryDoctors]);
+      setIsAddingDirDoctor(false);
+      setNewDirDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '' });
     } catch (e) {
       console.error(e);
       alert("حدث خطأ أثناء الإضافة.");
@@ -292,7 +329,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 shadow-md text-white flex flex-col justify-center">
+                <div className="bg-gradient-to-br from-[#1E6DFF] to-[#18C5B5] rounded-3xl p-8 shadow-md text-white flex flex-col justify-center">
                   <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md mb-6">
                     <CheckCircle className="w-8 h-8 text-white" />
                   </div>
@@ -307,87 +344,238 @@ export default function AdminDashboard() {
 
           {/* TAB: DOCTORS */}
           {activeTab === 'doctors' && (
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {doctors.length === 0 ? (
-                <div className="p-12 text-center text-slate-500">{t('admin.no_doctors')}</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    <thead>
-                      <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
-                        <th className="font-semibold py-4 px-6 text-start">الطبيب / Doctor</th>
-                        <th className="font-semibold py-4 px-6 text-start">الموقع / Location</th>
-                        <th className="font-semibold py-4 px-6 text-start">الحالة / Status</th>
-                        <th className="font-semibold py-4 px-6 text-center">إجراءات / Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {doctors.map(doctor => (
-                        <tr key={doctor.userId} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0">
-                                {doctor.name.charAt(0)}
-                              </div>
-                              <div className="text-start">
-                                <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1">
-                                  د. {doctor.name}
-                                  {doctor.isVerified && (
-                                    <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" />
-                                  )}
-                                </h3>
-                                <p className="text-slate-500 text-xs mt-0.5">{doctor.specialty}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center text-slate-600 text-xs text-start">
-                              <MapPin className="w-3.5 h-3.5 ml-1 mr-1 shrink-0" />
-                              <span className="truncate max-w-[150px]">{doctor.clinicAddress}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6 text-start">
-                            {(!doctor.status || doctor.status === 'pending') ? (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                {t('admin.pending')}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                {t('admin.approved')}
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center justify-center gap-2">
-                              <button 
-                                onClick={() => handleToggleVerification(doctor.userId, !!doctor.isVerified)}
-                                className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border flex items-center gap-1 ${doctor.isVerified ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
-                                title={doctor.isVerified ? 'إلغاء التوثيق' : 'توثيق الحساب'}
-                              >
-                                <BadgeCheck className={`w-3.5 h-3.5 ${doctor.isVerified ? 'text-blue-600' : 'text-slate-400'}`} />
-                                {doctor.isVerified ? 'موثق' : 'توثيق'}
-                              </button>
-                              <button 
-                                onClick={() => handleToggleApproval(doctor.userId, doctor.status || 'pending')}
-                                className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border ${doctor.status === 'approved' ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}
-                              >
-                                {doctor.status === 'approved' ? t('admin.revoke') : t('admin.approve')}
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteDoctor(doctor.userId)}
-                                className="p-2 bg-white text-rose-600 rounded-xl hover:bg-rose-50 transition border border-slate-200 hover:border-rose-200 flex items-center justify-center shrink-0"
-                                title={t('admin.delete')}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Doctor Sub Tabs */}
+              <div className="flex bg-slate-200/50 rounded-2xl p-1 shrink-0 w-full max-w-sm border border-slate-200">
+                <button
+                  onClick={() => setDoctorSubTab('platform')}
+                  className={`flex-1 flex justify-center items-center py-2.5 rounded-xl text-xs font-bold transition ${doctorSubTab === 'platform' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  أطباء المنصة (Platform)
+                </button>
+                <button
+                  onClick={() => setDoctorSubTab('directory')}
+                  className={`flex-1 flex justify-center items-center py-2.5 rounded-xl text-xs font-bold transition ${doctorSubTab === 'directory' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  أطباء الدليل (Directory)
+                </button>
+              </div>
+
+              {doctorSubTab === 'platform' && (
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
+                  {doctors.length === 0 ? (
+                    <div className="p-12 text-center text-slate-500">{t('admin.no_doctors')}</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <thead>
+                          <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                            <th className="font-semibold py-4 px-6 text-start">الطبيب / Doctor</th>
+                            <th className="font-semibold py-4 px-6 text-start">الموقع / Location</th>
+                            <th className="font-semibold py-4 px-6 text-start">الحالة / Status</th>
+                            <th className="font-semibold py-4 px-6 text-center">إجراءات / Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {doctors.map(doctor => (
+                            <tr key={doctor.userId} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="py-4 px-6">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0">
+                                    {doctor.name.charAt(0)}
+                                  </div>
+                                  <div className="text-start">
+                                    <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1">
+                                      د. {doctor.name}
+                                      {doctor.isVerified && (
+                                        <BadgeCheck className="w-4 h-4 text-blue-500 shrink-0" />
+                                      )}
+                                    </h3>
+                                    <p className="text-slate-500 text-xs mt-0.5">{doctor.specialty}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-4 px-6">
+                                <div className="flex items-center text-slate-600 text-xs text-start">
+                                  <MapPin className="w-3.5 h-3.5 ml-1 mr-1 shrink-0" />
+                                  <span className="truncate max-w-[150px]">{doctor.clinicAddress}</span>
+                                </div>
+                              </td>
+                              <td className="py-4 px-6 text-start">
+                                {(!doctor.status || doctor.status === 'pending') ? (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    {t('admin.pending')}
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    {t('admin.approved')}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-4 px-6">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button 
+                                    onClick={() => handleToggleVerification(doctor.userId, !!doctor.isVerified)}
+                                    className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border flex items-center gap-1 ${doctor.isVerified ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
+                                    title={doctor.isVerified ? 'إلغاء التوثيق' : 'توثيق الحساب'}
+                                  >
+                                    <BadgeCheck className={`w-3.5 h-3.5 ${doctor.isVerified ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    {doctor.isVerified ? 'موثق' : 'توثيق'}
+                                  </button>
+                                  <button 
+                                    onClick={() => handleToggleApproval(doctor.userId, doctor.status || 'pending')}
+                                    className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border ${doctor.status === 'approved' ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}
+                                  >
+                                    {doctor.status === 'approved' ? t('admin.revoke') : t('admin.approve')}
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteDoctor(doctor.userId)}
+                                    className="p-2 bg-white text-rose-600 rounded-xl hover:bg-rose-50 transition border border-slate-200 hover:border-rose-200 flex items-center justify-center shrink-0"
+                                    title={t('admin.delete')}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {doctorSubTab === 'directory' && (
+                <div className="space-y-6">
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={() => setIsAddingDirDoctor(!isAddingDirDoctor)}
+                      className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition flex items-center shadow-sm"
+                    >
+                      <Plus className="w-4 h-4 mr-2" /> إضافة طبيب الدليل (غير معتمد)
+                    </button>
+                  </div>
+
+                  {isAddingDirDoctor && (
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 mb-6">
+                      <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-100 pb-4">
+                        إضافة طبيب إلى الدليل (غير مسجل بالمنصة)
+                      </h3>
+                      <form onSubmit={handleAddDirDoctor} className="space-y-4 text-start">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <input required type="text" value={newDirDoctor.name} onChange={e => setNewDirDoctor({...newDirDoctor, name: e.target.value})}
+                              placeholder="مثال: محمد امين"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
+                            <select required value={newDirDoctor.specialty} onChange={e => setNewDirDoctor({...newDirDoctor, specialty: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                                <option value="">اختر التخصص...</option>
+                                {medicalSpecialties.map(spec => (
+                                  <option key={spec.id} value={spec.ar}>{spec.ar} / {spec.fr}</option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
+                            <select required value={newDirDoctor.wilaya} onChange={e => setNewDirDoctor({...newDirDoctor, wilaya: e.target.value, commune: ""})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                                <option value="">اختر الولاية...</option>
+                                {getWilayas().map(w => (
+                                  <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
+                                ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
+                            <select required value={newDirDoctor.commune} onChange={e => setNewDirDoctor({...newDirDoctor, commune: e.target.value})}
+                              disabled={!newDirDoctor.wilaya}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50">
+                                <option value="">اختر البلدية...</option>
+                                {newDirDoctor.wilaya && getCommunesByWilaya(newDirDoctor.wilaya).map(c => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                          <input required type="text" value={newDirDoctor.address} onChange={e => setNewDirDoctor({...newDirDoctor, address: e.target.value})}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                        </div>
+                        <div className="pt-2 flex justify-end">
+                          <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
+                            {language === 'ar' ? 'حفظ البيانات' : 'Save Data'}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
+                    {directoryDoctors.length === 0 ? (
+                      <div className="p-12 text-center text-slate-500">لا يوجد أطباء في الدليل حالياً.</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                          <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+                              <th className="font-semibold py-4 px-6 text-start">الطبيب / Doctor</th>
+                              <th className="font-semibold py-4 px-6 text-start">التخصص / Specialty</th>
+                              <th className="font-semibold py-4 px-6 text-start">الموقع / Location</th>
+                              <th className="font-semibold py-4 px-6 text-center">إجراءات / Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {directoryDoctors.map(doctor => (
+                              <tr key={doctor.id} className="hover:bg-slate-50/50 transition-colors">
+                                <td className="py-4 px-6">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 font-bold shrink-0">
+                                      {doctor.name.charAt(0)}
+                                    </div>
+                                    <div className="text-start">
+                                      <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1">
+                                        د. {doctor.name}
+                                      </h3>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-4 px-6">
+                                  <p className="text-slate-600 text-xs text-start">{doctor.specialty}</p>
+                                </td>
+                                <td className="py-4 px-6">
+                                  <div className="flex items-center text-slate-600 text-xs text-start">
+                                    <MapPin className="w-3.5 h-3.5 ml-1 mr-1 shrink-0" />
+                                    <span className="truncate max-w-[150px]">{doctor.address} - {doctor.commune}, {doctor.wilaya}</span>
+                                  </div>
+                                </td>
+                                <td className="py-4 px-6">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button 
+                                      onClick={() => handleDeleteDirDoctor(doctor.id!)}
+                                      className="p-2 bg-white text-rose-600 rounded-xl hover:bg-rose-50 transition border border-slate-200 hover:border-rose-200 flex items-center justify-center shrink-0"
+                                      title={t('admin.delete')}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
