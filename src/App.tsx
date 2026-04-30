@@ -18,6 +18,7 @@ import { LayoutDashboard } from "lucide-react";
 import { useLanguage } from "./contexts/LanguageContext";
 import { AnimatePresence, motion } from "motion/react";
 import { SplashScreen } from "./components/SplashScreen";
+import { Toaster, toast } from "react-hot-toast";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   return (
@@ -41,6 +42,24 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
   const { language } = useLanguage();
   const location = useLocation();
+
+  useEffect(() => {
+    // Show non-intrusive welcome message on load
+    const timer = setTimeout(() => {
+      toast('نسأل الله أن يديم عليك الصحة والعافية', {
+        icon: '🤲',
+        style: {
+          borderRadius: '20px',
+          background: '#f8fafc',
+          color: '#1e293b',
+          fontSize: '14px',
+          fontWeight: '500',
+        },
+        duration: 4000,
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
@@ -166,6 +185,8 @@ function AppContent() {
 
       {/* AI Assistant Widget */}
       <AIAssistantWidget />
+
+      <Toaster position="bottom-center" />
 
       {/* Fixed Navigation for Mobile */}
       <BottomNav />

@@ -48,6 +48,15 @@ export interface Appointment {
   createdAt: number;
 }
 
+export interface DirectoryDoctor {
+  id?: string;
+  name: string;
+  specialty: string;
+  wilaya: string;
+  commune: string;
+  address: string;
+}
+
 export interface Permanence {
   id?: string;
   name: string;
