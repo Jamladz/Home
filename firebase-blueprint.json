@@ -22,11 +22,12 @@
       "properties": {
         "doctorId": { "type": "string" },
         "patientName": { "type": "string" },
-        "patientPhone": { "type": "string" },
+        "patientPhone": { "type": "string", "description": "Algerian phone format 05/06/07" },
         "date": { "type": "string" },
         "time": { "type": "string" },
         "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
-        "createdAt": { "type": "number" }
+        "createdAt": { "type": "number" },
+        "ip": { "type": "string", "description": "Client IP for rate limiting" }
       },
       "required": ["doctorId", "patientName", "patientPhone", "date", "time", "status", "createdAt"]
     },
@@ -49,9 +50,9 @@
       "schema": { "$ref": "#/entities/DoctorProfile" },
       "description": "Profiles of doctors registered on the platform"
     },
-    "/appointments/{appointmentId}": {
+    "/doctors/{doctorId}/appointments/{appointmentId}": {
       "schema": { "$ref": "#/entities/Appointment" },
-      "description": "All booked appointments"
+      "description": "All booked appointments for a doctor"
     },
     "/permanences/{permanenceId}": {
       "schema": { "$ref": "#/entities/Permanence" },
