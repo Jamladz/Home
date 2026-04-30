@@ -127,29 +127,47 @@ export default function DoctorsList() {
   return (
     <div className="pb-20">
       {/* View Mode Toggle - Sticky right below the top header */}
-      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 mb-6 shadow-sm">
-        <div className="flex p-1 bg-slate-100 shadow-inner rounded-xl border border-slate-200/60 w-full max-w-sm mx-auto">
+      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 mb-6 shadow-sm -mx-0">
+        <div className="flex p-1.5 bg-slate-100/80 shadow-inner rounded-xl border border-slate-200/50 w-full max-w-md mx-auto relative">
           <button
             onClick={() => setViewMode('platform')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 relative z-10 ${
               viewMode === 'platform' 
-                ? 'bg-white text-indigo-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]' 
+                ? 'text-indigo-600' 
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
             }`}
           >
-            <BadgeCheck className={`w-4 h-4 ${viewMode === 'platform' ? 'text-indigo-500' : 'opacity-70'}`} />
-            {language === 'ar' ? 'أطباء معتمدين' : 'Médecins vérifiés'}
+            {viewMode === 'platform' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-200/50"
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <BadgeCheck className={`w-4 h-4 ${viewMode === 'platform' ? 'text-indigo-500' : 'opacity-70'}`} />
+              {language === 'ar' ? 'أطباء معتمدين' : 'Médecins vérifiés'}
+            </span>
           </button>
           <button
             onClick={() => setViewMode('directory')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 relative z-10 ${
               viewMode === 'directory' 
-                ? 'bg-white text-emerald-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]' 
+                ? 'text-emerald-600' 
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
             }`}
           >
-            <BookUser className={`w-4 h-4 ${viewMode === 'directory' ? 'text-emerald-500' : 'opacity-70'}`} />
-            {language === 'ar' ? 'دليل الأطباء' : 'Annuaire Médical'}
+            {viewMode === 'directory' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-200/50"
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <BookUser className={`w-4 h-4 ${viewMode === 'directory' ? 'text-emerald-500' : 'opacity-70'}`} />
+              {language === 'ar' ? 'دليل الأطباء' : 'Annuaire Médical'}
+            </span>
           </button>
         </div>
       </div>
