@@ -50,7 +50,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
             alt="شعار التطبيق" 
             className="w-72 md:w-96 h-auto object-contain drop-shadow-2xl"
           />
-          <div className="absolute inset-0 bg-indigo-500 blur-[100px] opacity-10 -z-10 rounded-full"></div>
+          <div className="absolute inset-0 bg-[#1E6DFF] blur-[100px] opacity-10 -z-10 rounded-full"></div>
         </motion.div>
 
         <motion.div 
@@ -65,7 +65,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
           </div>
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
             <motion.div 
-              className="h-full bg-indigo-600 rounded-full relative overflow-hidden flex items-center justify-center p-0"
+              className="h-full bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] rounded-full relative overflow-hidden flex items-center justify-center p-0"
               style={{ width: `${progress}%` }}
               transition={{ ease: "linear" }}
             >

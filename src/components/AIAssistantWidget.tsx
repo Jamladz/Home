@@ -239,7 +239,7 @@ Assistant:`;
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className={`fixed bottom-20 ${language === "ar" ? "left-6" : "right-6"} z-[9990] bg-indigo-600 text-white p-4 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-indigo-700 transition flex items-center justify-center border-4 border-white`}
+            className={`fixed bottom-20 ${language === "ar" ? "left-6" : "right-6"} z-[9990] bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-4 rounded-full shadow-[0_8px_30px_rgba(24,197,181,0.25)] hover:shadow-lg transition flex items-center justify-center border-4 border-white`}
             aria-label="Open Medical Assistant"
           >
             <Bot className="w-6 h-6" />
@@ -256,7 +256,7 @@ Assistant:`;
             className={`fixed bottom-20 ${language === "ar" ? "left-4 md:left-6" : "right-4 md:right-6"} z-[9995] w-[calc(100vw-32px)] md:w-[380px] h-[550px] max-h-[85vh] bg-white rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.15)] overflow-hidden flex flex-col border border-slate-200`}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 flex justify-between items-center shrink-0">
+            <div className="bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-4 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-2 rounded-full">
                   <Bot className="w-5 h-5" />
@@ -298,7 +298,7 @@ Assistant:`;
                   <div
                     className={`max-w-[85%] flex flex-col gap-2 rounded-2xl p-3.5 text-sm whitespace-pre-wrap ${
                       msg.role === "user"
-                        ? "bg-indigo-600 text-white rounded-bl-sm"
+                        ? "bg-[#1E6DFF] text-white rounded-bl-sm"
                         : "bg-white text-slate-700 border border-slate-100 shadow-sm rounded-br-sm"
                     }`}
                   >
@@ -394,7 +394,7 @@ Assistant:`;
                     <button
                       type="submit"
                       disabled={(!input.trim() && !selectedImage) || isLoading}
-                      className="bg-indigo-600 text-white p-2.5 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send
                         className={`w-4 h-4 ${language === "ar" ? "-scale-x-100" : ""}`}

@@ -26,10 +26,10 @@ export function BottomNav() {
                 to={item.to}
                 className={cn(
                   "flex flex-col items-center p-2 rounded-xl transition-all duration-300",
-                  isActive ? "text-indigo-600 bg-indigo-50" : "text-slate-400 hover:text-indigo-600"
+                  isActive ? "text-[#1E6DFF] bg-[#1E6DFF]/10" : "text-slate-400 hover:text-[#1E6DFF]"
                 )}
               >
-                <item.icon className={cn("w-6 h-6 mb-1", isActive && "fill-indigo-100")} />
+                <item.icon className={cn("w-6 h-6 mb-1", isActive && "fill-[#1E6DFF]/20")} />
                 <span className="text-[10px] sm:text-xs font-medium">{item.label}</span>
               </Link>
             );

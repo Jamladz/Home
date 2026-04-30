@@ -37,7 +37,7 @@ export function TopHeader() {
             alt="Dawini Logo" 
             className="w-10 h-10 object-cover rounded-full shadow-sm border-2 border-white ring-1 ring-slate-100"
           />
-          <h1 className="text-xl font-bold text-indigo-700 tracking-tight">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] bg-clip-text text-transparent tracking-tight">
              Dawini - داويني
           </h1>
         </div>
@@ -77,11 +77,11 @@ export function TopHeader() {
                       }}
                       className="w-full text-start px-4 py-2.5 text-sm flex items-center justify-between hover:bg-indigo-50 transition-colors"
                     >
-                      <span className={`font-medium ${language === lang.code ? 'text-indigo-600' : 'text-slate-600'}`}>
+                      <span className={`font-medium ${language === lang.code ? 'text-[#1E6DFF]' : 'text-slate-600'}`}>
                         {lang.native}
                       </span>
                       {language === lang.code && (
-                        <Check className="w-4 h-4 text-indigo-600" />
+                        <Check className="w-4 h-4 text-[#1E6DFF]" />
                       )}
                     </button>
                   ))}
