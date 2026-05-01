@@ -264,11 +264,15 @@ export default function DoctorDetail() {
                 </span>
               </div>
             )}
-            {doctor.clinicAddress && (
+            {doctor.clinicAddress && doctor.googleMapsLink ? (
+              <a href={doctor.googleMapsLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-slate-800 bg-amber-300 px-4 py-2 rounded-full text-[11px] font-bold shadow-md hover:scale-105 transition-transform max-w-xs cursor-pointer">
+                 <span className="truncate">{doctor.clinicAddress}</span>
+              </a>
+            ) : doctor.clinicAddress ? (
               <div className="flex items-center text-slate-800 bg-amber-300 px-4 py-2 rounded-full text-[11px] font-bold shadow-md hover:scale-105 transition-transform max-w-xs">
                  <span className="truncate">{doctor.clinicAddress}</span>
               </div>
-            )}
+            ) : null}
             {doctor.phone && (
               <a href={`tel:${doctor.phone}`} className="flex items-center text-white font-bold bg-[#1E6DFF] transition-all px-5 py-2.5 rounded-full text-sm shadow-[0_4px_12px_rgba(30,109,255,0.4)] border border-white/20 transform hover:scale-105 active:scale-95">
                 <Phone className={`w-4 h-4 ${tx('ml-1.5', 'mr-1.5', "mr-1.5")}`} />

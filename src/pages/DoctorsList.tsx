@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { DoctorProfile, DirectoryDoctor } from "../types";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MapPin, Star, UserRound, Search, Filter, QrCode, X, BadgeCheck, BookUser, Phone, Map as MapIcon } from "lucide-react";
 import { getWilayas, getCommunesByWilaya } from "../lib/algeria_data";
 import { medicalSpecialties } from "../lib/medical_specialties";
+import { CustomSelect } from "../components/CustomSelect";
 import { DoctorAvatar } from "../components/DoctorAvatar";
 import { useLanguage } from "../contexts/LanguageContext";
 import { motion } from "motion/react";
@@ -26,6 +27,7 @@ export default function DoctorsList() {
     tx: tx
   } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const [unifiedDoctors, setUnifiedDoctors] = useState<UnifiedDoctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [qrDoctorId, setQrDoctorId] = useState<string | null>(null);
@@ -195,41 +197,33 @@ export default function DoctorsList() {
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          <select 
-            value={selectedSpecialty} 
-            onChange={(e) => setSelectedSpecialty(e.target.value)}
-            className="w-full bg-[#1E6DFF]/5 border border-[#1E6DFF]/30 rounded-xl px-2 py-2.5 text-xs font-semibold text-[#1E6DFF] focus:outline-none focus:ring-2 focus:ring-[#1E6DFF]/40 focus:border-[#1E6DFF]/50 hover:bg-[#1E6DFF]/10 transition-colors cursor-pointer"
-          >
-            <option value="">{tx('التخصص', 'Spécialité', "Specialty")}</option>
-            {medicalSpecialties.map(spec => (
-              <option key={spec.id} value={spec.id}>
-                {tx(spec.ar, spec.fr, spec.fr)}
-              </option>
-            ))}
-          </select>
+          <CustomSelect
+            value={selectedSpecialty}
+            onChange={(val) => setSelectedSpecialty(val)}
+            placeholder={tx('التخصص', 'Spécialité', "Specialty")}
+            options={medicalSpecialties.map(spec => ({ value: spec.id, label: tx(spec.ar, spec.fr, spec.fr) }))}
+            className="w-full bg-[#1E6DFF]/5 border border-[#1E6DFF]/30 rounded-xl px-2 py-2.5 text-xs font-semibold text-[#1E6DFF] hover:bg-[#1E6DFF]/10 shrink-0"
+            dropdownClassName="w-min sm:w-auto"
+          />
           
-          <select 
-            value={selectedWilaya} 
-            onChange={(e) => { setSelectedWilaya(e.target.value); setSelectedCommune(""); }}
-            className="w-full bg-[#18C5B5]/5 border border-[#18C5B5]/30 rounded-xl px-2 py-2.5 text-xs font-semibold text-[#18C5B5] focus:outline-none focus:ring-2 focus:ring-[#18C5B5]/40 focus:border-[#18C5B5]/50 hover:bg-[#18C5B5]/10 transition-colors cursor-pointer"
-          >
-            <option value="">{tx('الولاية', 'Wilaya', "State")}</option>
-            {getWilayas().map(w => (
-              <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
-            ))}
-          </select>
+          <CustomSelect
+            value={selectedWilaya}
+            onChange={(val) => { setSelectedWilaya(val); setSelectedCommune(""); }}
+            placeholder={tx('الولاية', 'Wilaya', "State")}
+            options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+            className="w-full bg-[#18C5B5]/5 border border-[#18C5B5]/30 rounded-xl px-2 py-2.5 text-xs font-semibold text-[#18C5B5] hover:bg-[#18C5B5]/10 shrink-0"
+            dropdownClassName="w-min sm:w-auto"
+          />
           
-          <select 
-            value={selectedCommune} 
-            onChange={(e) => setSelectedCommune(e.target.value)}
+          <CustomSelect
+            value={selectedCommune}
+            onChange={(val) => setSelectedCommune(val)}
             disabled={!selectedWilaya}
-            className="w-full bg-indigo-50 border border-indigo-200 rounded-xl px-2 py-2.5 text-xs font-semibold text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-400/50 hover:bg-indigo-100/50 transition-colors cursor-pointer disabled:opacity-50 disabled:bg-slate-50 disabled:border-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
-          >
-            <option value="">{tx('البلدية', 'Commune', "City")}</option>
-            {selectedWilaya && getCommunesByWilaya(selectedWilaya).map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+            placeholder={tx('البلدية', 'Commune', "City")}
+            options={selectedWilaya ? getCommunesByWilaya(selectedWilaya).map(c => ({ value: c, label: c })) : []}
+            className="w-full bg-indigo-50 border border-indigo-200 rounded-xl px-2 py-2.5 text-xs font-semibold text-indigo-600 focus:ring-indigo-400/40 hover:bg-indigo-100/50 shrink-0"
+            dropdownClassName="w-min sm:w-auto"
+          />
         </div>
       </div>
 
@@ -268,9 +262,9 @@ export default function DoctorsList() {
               const doc = item.data as DoctorProfile;
               return (
                 <motion.div variants={itemVariants} key={doc.userId} className="relative">
-                  <Link 
-                    to={`/doctors/${doc.userId}`}
-                    className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex items-center gap-4 transition hover:border-indigo-300 hover:shadow-md group block relative overflow-hidden"
+                  <div 
+                    onClick={() => navigate(`/doctors/${doc.userId}`)}
+                    className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex items-center gap-4 transition hover:border-indigo-300 hover:shadow-md group relative overflow-hidden cursor-pointer"
                   >
                     <div className="w-16 h-16 shrink-0 relative">
                       <DoctorAvatar gender={doc.gender} className="w-16 h-16 group-hover:scale-105 transition-transform" />
@@ -302,8 +296,33 @@ export default function DoctorsList() {
                         )}
                       </div>
                       
-                      <div className={`text-slate-400 text-[9px] truncate max-w-[150px] ${tx('mr-4', 'ml-4', "ml-4")}`}>
+                      <div className={`text-slate-400 text-[10px] truncate max-w-[200px] ${tx('mr-4', 'ml-4', "ml-4")}`}>
                         {doc.clinicAddress}
+                      </div>
+
+                      <div className={`mt-2 flex flex-wrap gap-2 ${tx('mr-4', 'ml-4', "ml-4")}`}>
+                         {doc.phone && (
+                           <a
+                             href={`tel:${doc.phone}`}
+                             onClick={(e) => e.stopPropagation()}
+                             className="inline-flex text-[10px] items-center px-2 py-1 rounded-md font-bold bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                           >
+                             <Phone className={`w-3 h-3 ${tx('ml-1', 'mr-1', "mr-1")}`} />
+                             <span dir="ltr">{doc.phone}</span>
+                           </a>
+                         )}
+                         {doc.googleMapsLink && (
+                           <a
+                             href={doc.googleMapsLink}
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             onClick={(e) => e.stopPropagation()}
+                             className="inline-flex text-[10px] items-center px-2 py-1 rounded-md font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                           >
+                             <MapIcon className={`w-3 h-3 ${tx('ml-1', 'mr-1', "mr-1")}`} />
+                             {tx('الموقع على الخريطة', 'Localisation sur la carte', "Location on Map")}
+                           </a>
+                         )}
                       </div>
                     </div>
                     <div className="flex flex-col items-center justify-center bg-amber-50 p-2.5 rounded-xl border border-amber-100 min-w-[55px]">
@@ -317,7 +336,7 @@ export default function DoctorsList() {
                         </span>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
