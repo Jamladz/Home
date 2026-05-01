@@ -10,6 +10,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
+  tx: (ar: any, fr: any, en?: any) => any;
   dir: 'rtl' | 'ltr';
 }
 
@@ -34,17 +35,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = lang;
   };
 
-  useEffect(() => {
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = language;
-  }, [language]);
-
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
 
+  const tx = (ar: any, fr: any, en?: any): any => {
+    if (language === 'ar') return ar;
+    if (language === 'en') return en || fr || ar;
+    return fr || ar;
+  };
+
+  useEffect(() => {
+    document.documentElement.dir = tx('rtl', 'ltr', "ltr");
+    document.documentElement.lang = language;
+  }, [language]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir: language === 'ar' ? 'rtl' : 'ltr' }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tx, dir: tx('rtl', 'ltr', "ltr") }}>
       {children}
     </LanguageContext.Provider>
   );
