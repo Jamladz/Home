@@ -35,6 +35,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
 import { medicalSpecialties } from "../../lib/medical_specialties";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { CustomSelect } from "../../components/CustomSelect";
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ export default function DoctorDashboard() {
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [specialty, setSpecialty] = useState("");
   const [clinicAddress, setClinicAddress] = useState("");
+  const [googleMapsLink, setGoogleMapsLink] = useState("");
   const [wilaya, setWilaya] = useState("");
   const [commune, setCommune] = useState("");
   const [phone, setPhone] = useState("");
@@ -100,6 +102,7 @@ export default function DoctorDashboard() {
           setGender(profileData.gender || "");
           setSpecialty(profileData.specialty || "");
           setClinicAddress(profileData.clinicAddress || "");
+          setGoogleMapsLink(profileData.googleMapsLink || "");
           setWilaya(profileData.wilaya || "");
           setCommune(profileData.commune || "");
           setPhone(profileData.phone || "");
@@ -183,6 +186,7 @@ export default function DoctorDashboard() {
         gender: gender as "male" | "female",
         specialty,
         clinicAddress,
+        googleMapsLink,
         wilaya,
         commune,
         phone,
@@ -348,76 +352,56 @@ export default function DoctorDashboard() {
             <label className="block text-sm font-medium text-slate-700 mb-1">
               الجنس
             </label>
-            <select
-              required
+            <CustomSelect
               value={gender}
-              onChange={(e) =>
-                setGender(e.target.value as "male" | "female" | "")
-              }
+              onChange={(val) => setGender(val as "male" | "female" | "")}
+              placeholder="اختر الجنس"
+              options={[
+                { value: 'male', label: 'ذكر (طبيب)' },
+                { value: 'female', label: 'أنثى (طبيبة)' }
+              ]}
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
-            >
-              <option value="">اختر الجنس</option>
-              <option value="male">ذكر (طبيب)</option>
-              <option value="female">أنثى (طبيبة)</option>
-            </select>
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               التخصص
             </label>
-            <select
-              required
+            <CustomSelect
               value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
+              onChange={(val) => setSpecialty(val)}
+              placeholder="اختر التخصص"
+              options={medicalSpecialties.map((s) => ({ value: tx(s.ar, s.fr, s.fr), label: tx(s.ar, s.fr, s.fr) }))}
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
-            >
-              <option value="">اختر التخصص</option>
-              {medicalSpecialties.map((s) => (
-                <option key={s.id} value={tx(s.ar, s.fr, s.fr)}>
-                  {tx(s.ar, s.fr, s.fr)}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               الولاية
             </label>
-            <select
-              required
+            <CustomSelect
               value={wilaya}
-              onChange={(e) => {
-                setWilaya(e.target.value);
+              onChange={(val) => {
+                setWilaya(val);
                 setCommune("");
               }}
+              placeholder="اختر الولاية"
+              options={getWilayas().map((w) => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none"
-            >
-              <option value="">اختر الولاية</option>
-              {getWilayas().map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.id} - {w.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               البلدية
             </label>
-            <select
-              required
+            <CustomSelect
               value={commune}
-              onChange={(e) => setCommune(e.target.value)}
+              onChange={(val) => setCommune(val)}
               disabled={!wilaya}
+              placeholder="اختر البلدية"
+              options={getCommunesByWilaya(wilaya).map((c) => ({ value: c, label: c }))}
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none disabled:opacity-50"
-            >
-              <option value="">اختر البلدية</option>
-              {getCommunesByWilaya(wilaya).map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -440,6 +424,19 @@ export default function DoctorDashboard() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               dir="ltr"
+              className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              رابط موقع العيادة على خرائط جوجل (اختياري)
+            </label>
+            <input
+              type="url"
+              value={googleMapsLink}
+              onChange={(e) => setGoogleMapsLink(e.target.value)}
+              dir="ltr"
+              placeholder="https://maps.google.com/..."
               className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-indigo-400 outline-none text-left"
             />
           </div>
