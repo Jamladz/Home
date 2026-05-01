@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
   // Add Platform Doctor Form
   const [newPlatformDoctor, setNewPlatformDoctor] = useState({
-    name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', gender: 'male' as 'male'|'female', email: '', password: ''
+    name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male' as 'male'|'female', email: '', password: ''
   });
   const [isAddingPlatformDoctor, setIsAddingPlatformDoctor] = useState(false);
 
@@ -210,6 +210,7 @@ export default function AdminDashboard() {
         wilaya: newPlatformDoctor.wilaya,
         commune: newPlatformDoctor.commune,
         clinicAddress: newPlatformDoctor.address,
+        googleMapsLink: newPlatformDoctor.googleMapsLink,
         phone: newPlatformDoctor.phone,
         gender: newPlatformDoctor.gender,
         status: 'approved',
@@ -222,7 +223,7 @@ export default function AdminDashboard() {
       
       setDoctors([{ ...doctorData, userId: uid }, ...doctors]);
       setIsAddingPlatformDoctor(false);
-      setNewPlatformDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', gender: 'male', email: '', password: '' });
+      setNewPlatformDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male', email: '', password: '' });
       
       alert("تمت إضافة الطبيب بنجاح. يمكنه الآن تسجيل الدخول.");
     } catch (e: any) {
@@ -449,24 +450,29 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
-                            <select required value={newPlatformDoctor.gender} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, gender: e.target.value as 'male'|'female'})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                                <option value="male">ذكر (Male)</option>
-                                <option value="female">أنثى (Female)</option>
-                            </select>
+                            <CustomSelect 
+                              value={newPlatformDoctor.gender} 
+                              onChange={val => setNewPlatformDoctor({...newPlatformDoctor, gender: val as 'male'|'female'})}
+                              placeholder="اختر الجنس..."
+                              options={[
+                                { value: 'male', label: 'ذكر (Male)' },
+                                { value: 'female', label: 'أنثى (Female)' }
+                              ]}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
-                            <select required value={newPlatformDoctor.specialty} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, specialty: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                                <option value="">اختر التخصص...</option>
-                                {medicalSpecialties.map(spec => (
-                                  <option key={spec.id} value={spec.ar}>{spec.ar} / {spec.fr}</option>
-                                ))}
-                            </select>
+                            <CustomSelect 
+                              value={newPlatformDoctor.specialty || ""} 
+                              onChange={val => setNewPlatformDoctor({...newPlatformDoctor, specialty: val})}
+                              placeholder="اختر التخصص..."
+                              options={medicalSpecialties.map(spec => ({ value: spec.ar, label: `${spec.ar} / ${spec.fr}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">رقم الهاتف (اختياري) / Phone (Optional)</label>
@@ -479,32 +485,41 @@ export default function AdminDashboard() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
-                            <select required value={newPlatformDoctor.wilaya} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, wilaya: e.target.value, commune: ""})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                                <option value="">اختر الولاية...</option>
-                                {getWilayas().map(w => (
-                                  <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
-                                ))}
-                            </select>
+                            <CustomSelect 
+                              value={newPlatformDoctor.wilaya || ""} 
+                              onChange={val => setNewPlatformDoctor({...newPlatformDoctor, wilaya: val, commune: ""})}
+                              placeholder="اختر الولاية..."
+                              options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
-                            <select required value={newPlatformDoctor.commune} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, commune: e.target.value})}
+                            <CustomSelect 
+                              value={newPlatformDoctor.commune || ""} 
+                              onChange={val => setNewPlatformDoctor({...newPlatformDoctor, commune: val})}
                               disabled={!newPlatformDoctor.wilaya}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50">
-                                <option value="">اختر البلدية...</option>
-                                {newPlatformDoctor.wilaya && getCommunesByWilaya(newPlatformDoctor.wilaya).map(c => (
-                                  <option key={c} value={c}>{c}</option>
-                                ))}
-                            </select>
+                              placeholder="اختر البلدية..."
+                              options={newPlatformDoctor.wilaya ? getCommunesByWilaya(newPlatformDoctor.wilaya).map(c => ({ value: c, label: c })) : []}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                         </div>
 
-                        <div>
-                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
-                          <input required type="text" value={newPlatformDoctor.address} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, address: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                            <input required type="text" value={newPlatformDoctor.address} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, address: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">رابط جوجل ماب (اختياري) / Google Maps Link</label>
+                            <input type="url" value={newPlatformDoctor.googleMapsLink} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, googleMapsLink: e.target.value})}
+                              dir="ltr" placeholder="https://maps.google.com/..."
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
+                          </div>
                         </div>
+
                         <div className="pt-2 flex justify-end">
                           <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
                             {tx('حفظ البيانات', 'Save Data', "Save Data")}
@@ -627,36 +642,36 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
-                            <select required value={newDirDoctor.specialty} onChange={e => setNewDirDoctor({...newDirDoctor, specialty: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                                <option value="">اختر التخصص...</option>
-                                {medicalSpecialties.map(spec => (
-                                  <option key={spec.id} value={spec.ar}>{spec.ar} / {spec.fr}</option>
-                                ))}
-                            </select>
+                            <CustomSelect 
+                              value={newDirDoctor.specialty || ""} 
+                              onChange={val => setNewDirDoctor({...newDirDoctor, specialty: val})}
+                              placeholder="اختر التخصص..."
+                              options={medicalSpecialties.map(spec => ({ value: spec.ar, label: `${spec.ar} / ${spec.fr}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
-                            <select required value={newDirDoctor.wilaya} onChange={e => setNewDirDoctor({...newDirDoctor, wilaya: e.target.value, commune: ""})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                                <option value="">اختر الولاية...</option>
-                                {getWilayas().map(w => (
-                                  <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
-                                ))}
-                            </select>
+                            <CustomSelect 
+                              value={newDirDoctor.wilaya || ""} 
+                              onChange={val => setNewDirDoctor({...newDirDoctor, wilaya: val, commune: ""})}
+                              placeholder="اختر الولاية..."
+                              options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
-                            <select required value={newDirDoctor.commune} onChange={e => setNewDirDoctor({...newDirDoctor, commune: e.target.value})}
+                            <CustomSelect 
+                              value={newDirDoctor.commune || ""} 
+                              onChange={val => setNewDirDoctor({...newDirDoctor, commune: val})}
                               disabled={!newDirDoctor.wilaya}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50">
-                                <option value="">اختر البلدية...</option>
-                                {newDirDoctor.wilaya && getCommunesByWilaya(newDirDoctor.wilaya).map(c => (
-                                  <option key={c} value={c}>{c}</option>
-                                ))}
-                            </select>
+                              placeholder="اختر البلدية..."
+                              options={newDirDoctor.wilaya ? getCommunesByWilaya(newDirDoctor.wilaya).map(c => ({ value: c, label: c })) : []}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                            />
                           </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -769,11 +784,16 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-slate-600 text-xs font-semibold mb-1.5">النوع / Type</label>
-                        <select required value={newPerm.type} onChange={e => setNewPerm({...newPerm, type: e.target.value as 'pharmacy'|'laboratory'})}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                          <option value="pharmacy">{tx('صيدلية', 'Pharmacy', "Pharmacy")}</option>
-                          <option value="laboratory">{tx('مخبر', 'Laboratory', "Laboratory")}</option>
-                        </select>
+                        <CustomSelect 
+                          value={newPerm.type || ""}
+                          onChange={val => setNewPerm({...newPerm, type: val as 'pharmacy'|'laboratory'})}
+                          placeholder="اختر النوع..."
+                          options={[
+                            { value: 'pharmacy', label: tx('صيدلية', 'Pharmacy', 'Pharmacy') },
+                            { value: 'laboratory', label: tx('مخبر', 'Laboratory', 'Laboratory') }
+                          ]}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        />
                       </div>
                       <div>
                         <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
