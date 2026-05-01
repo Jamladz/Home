@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, addDoc, query, where, getDocs, runTransaction } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { DoctorProfile, Appointment, Review } from "../types";
-import { MapPin, Phone, Star, UserRound, ArrowRight, QrCode, X, BadgeCheck } from "lucide-react";
+import { MapPin, Phone, Star, UserRound, ArrowRight, QrCode, X, BadgeCheck, ShieldCheck, Scale, AlertTriangle, Info, CalendarClock, ScrollText } from "lucide-react";
 import { DoctorAvatar } from "../components/DoctorAvatar";
 import { useLanguage } from "../contexts/LanguageContext";
 import { QRCodeSVG } from "qrcode.react";
@@ -23,6 +23,8 @@ export default function DoctorDetail() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [shiftedDate, setShiftedDate] = useState<string | null>(null);
   const [queueNumber, setQueueNumber] = useState<number | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   // Review System State
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -78,6 +80,11 @@ export default function DoctorDetail() {
     const isValidPhone = /^(05|06|07)\d{8}$/.test(sanitizedPhone);
     if (!isValidPhone) {
       alert(language === 'ar' ? "يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)" : "Veuillez entrer un numéro de téléphone algérien valide.");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      alert(language === 'ar' ? "يرجى الموافقة على شروط الاستخدام وسياسة الخصوصية لإتمام عملية الحجز" : "Veuillez accepter les conditions d'utilisation et la politique de confidentialité pour procéder à la réservation.");
       return;
     }
 
@@ -367,6 +374,29 @@ export default function DoctorDetail() {
                     />
                   </div>
                 </div>
+                
+                <div className="flex items-start gap-3 mt-4 mb-2">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="terms"
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="w-4 h-4 text-[#1E6DFF] bg-white border-slate-300 rounded focus:ring-[#1E6DFF] focus:ring-2 cursor-pointer mt-0.5"
+                    />
+                  </div>
+                  <label htmlFor="terms" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
+                    {language === 'ar' ? (
+                      <>
+                        أوافق على <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">شروط الاستخدام وسياسة الخصوصية</button>، وأقر بأنني سأحضر في الموعد المحدد.
+                      </>
+                    ) : (
+                      <>
+                        J'accepte les <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">conditions d'utilisation et la politique de confidentialité</button>, et je m'engage à me présenter au rendez-vous.
+                      </>
+                    )}
+                  </label>
+                </div>
 
                 <button 
                   type="submit" 
@@ -567,6 +597,229 @@ export default function DoctorDetail() {
                 className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
               >
                 {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md">
+          <div className="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <ScrollText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 text-lg leading-tight">
+                    {language === 'ar' ? 'شروط الاستخدام وسياسة الخصوصية' : 'Conditions Générales & Confidentialité'}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {language === 'ar' ? 'تاريخ آخر تحديث: مايو 2026' : 'Dernière mise à jour: Mai 2026'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTermsModal(false)}
+                className="p-2.5 bg-slate-100 text-slate-500 hover:text-slate-800 hover:bg-slate-200 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-5 sm:p-8 overflow-y-auto text-sm text-slate-600 flex-1 relative custom-scrollbar bg-slate-50/30">
+              {language === 'ar' ? (
+                <div className="space-y-8">
+                  <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                    تمثل هذه الشروط اتفاقية ملزمة بين مستخدم خدمة داويني (Dawini) والمنصة. باستخدامك للمنصة، فإنك توافق على الالتزام بهذه الشروط والأحكام.
+                  </p>
+
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <Info className="w-4 h-4" />
+                      </div>
+                      1. طبيعة الخدمات المقدمة
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed">
+                        داويني هي منصة وساطة رقمية تهدف إلى تسهيل عملية الربط بين المرضى ومقدمي الرعاية الصحية. المدرجين في الدليل.
+                      </p>
+                      <ul className="list-disc pr-5 space-y-1 text-slate-500 marker:text-slate-300">
+                        <li>لا تقدم المنصة استشارات طبية، تشخيصاً، أو علاجاً.</li>
+                        <li>المعلومات المتوفرة على المنصة هي للاسترشاد فقط ولا تغني بأي حال من الأحوال عن الزيارة الطبية المتخصصة.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                        <CalendarClock className="w-4 h-4" />
+                      </div>
+                      2. سياسة حجز المواعيد والالتزام
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                       <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
+                        <li>المواعيد المحجوزة عبر المنصة هي مواعيد تنظيمية مبدئية وتخضع لظروف وطبيعة عمل العيادة.</li>
+                        <li>يُقر المريض بضرورة <strong className="text-slate-700">الحضور قبل الموعد بـ 15 دقيقة على الأقل</strong> لتأكيد الوصول وضمان حقه في الفحص.</li>
+                        <li>المنصة غير مسؤولة عن التأخير الناتج عن الحالات الطارئة في العيادة والتي قد تؤدي لتغيير ترتيب الأدوار.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      3. الخصوصية وحماية البيانات (GDPR)
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed text-slate-600">
+                        نحن نأخذ خصوصيتك بصرامة بالغة. تُجمع البيانات بطريقة آمنة لغرض واحد فقط.
+                      </p>
+                      <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
+                        <li>تجمع المنصة البيانات الأساسية (الاسم، رقم الهاتف) حصرياً لغرض إدارة الحجز الطبي وإرسالها للطبيب.</li>
+                        <li>نلتزم بأعلى معايير التشفير والأمان لمنع اختراق أو تسريب معلوماتك، ولا يمكن إستخدامها للبحث عنك عبر محركات البحث.</li>
+                        <li><strong>لن يتم بيع، تأجير، أو مشاركة</strong> بياناتك الشخصية مع أي أطراف ثالثة أو شركات إعلانية تحت أي ظرف.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                        <Scale className="w-4 h-4" />
+                      </div>
+                      4. الاستخدام العادل والمحظورات
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed text-slate-600">
+                        تُمنع الحجوزات الوهمية أو المتكررة بغرض التخريب أو حجز مواعيد لأشخاص غير موجودين. 
+                        يحق للمنصة تتبع عناوين IP وحظر الأرقام التي يثبت قيامها بنشاط مشبوه دون إشعار مسبق لضمان جودة الخدمة للمرضى الحقيقيين.
+                      </p>
+                    </div>
+                  </section>
+
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      5. إخلاء المسؤولية (Disclaimer)
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                       <p className="leading-relaxed text-slate-600">
+                        المنصة تُخلي مسؤوليتها التامة عن أي مضاعفات طبية، أخطاء في التشخيص، أو خلافات مادية أو معنوية تنشأ بين المريض والطبيب. العلاقة الطبية والتعاقدية هي حصراً بين المريض ومقدم الرعاية الصحية المختار.
+                      </p>
+                    </div>
+                  </section>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                    Ces conditions représentent un accord contraignant entre l'utilisateur du service Dawini et la plateforme. En utilisant la plateforme, vous acceptez de respecter ces termes et conditions.
+                  </p>
+
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <Info className="w-4 h-4" />
+                      </div>
+                      1. Nature des Services Fournis
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed">
+                        Dawini est une plateforme d'intermédiation numérique visant à faciliter la mise en relation entre les patients et les professionnels de la santé.
+                      </p>
+                      <ul className="list-disc pl-5 space-y-1 text-slate-500 marker:text-slate-300">
+                        <li>La plateforme ne fournit pas de consultations médicales, de diagnostics ou de traitements.</li>
+                        <li>Les informations disponibles sur la plateforme sont fournies à titre indicatif et ne remplacent en aucun cas une visite médicale spécialisée.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                        <CalendarClock className="w-4 h-4" />
+                      </div>
+                      2. Politique de Prise de Rendez-vous
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                       <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                        <li>Les rendez-vous pris via la plateforme sont des rendez-vous organisationnels préliminaires.</li>
+                        <li>Le patient s'engage à <strong className="text-slate-700">se présenter au moins 15 minutes avant</strong> le rendez-vous pour confirmer son arrivée.</li>
+                        <li>La plateforme n'est pas responsable des retards dus à des urgences à la clinique qui pourraient modifier l'ordre des patients.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      3. Confidentialité et Protection des Données (RGPD)
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed text-slate-600">
+                        Nous prenons votre vie privée très au sérieux. Les données sont collectées en toute sécurité dans un seul but.
+                      </p>
+                      <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                        <li>La plateforme collecte les données essentielles (nom, numéro) exclusivement pour la gestion de la réservation médicale.</li>
+                        <li>Nous nous engageons à respecter les normes de cryptage et de sécurité les plus élevées.</li>
+                        <li>Vos données personnelles ne seront <strong>jamais vendues, louées ou partagées</strong> avec des tiers ou des sociétés publicitaires.</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                        <Scale className="w-4 h-4" />
+                      </div>
+                      4. Utilisation Raisonnable
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                      <p className="leading-relaxed text-slate-600">
+                        Il est interdit d'utiliser la plateforme pour des réservations fictives ou des abus. 
+                        La plateforme a le droit de tracer les adresses IP et de bloquer automatiquement les numéros dont il est prouvé qu'ils ont une activité suspecte sans préavis.
+                      </p>
+                    </div>
+                  </section>
+
+                  <section className="space-y-3">
+                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                        <AlertTriangle className="w-4 h-4" />
+                      </div>
+                      5. Clause de Non-responsabilité
+                    </h4>
+                    <div className="pl-11 pr-4 space-y-2">
+                       <p className="leading-relaxed text-slate-600">
+                        La plateforme décline toute responsabilité pour toute complication médicale, erreur de diagnostic ou litige survenant entre le patient et le médecin. La relation médicale et contractuelle est exclusivement entre le patient et le professionnel de la santé.
+                      </p>
+                    </div>
+                  </section>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-5 sm:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-10 flex flex-col sm:flex-row items-center gap-4 mt-auto">
+               <button
+                onClick={() => {
+                  setAcceptedTerms(true);
+                  setShowTermsModal(false);
+                }}
+                className="w-full bg-slate-900 text-white font-bold rounded-2xl py-3.5 px-6 shadow-md shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-0.5 transition-all text-[15px] flex items-center justify-center gap-2"
+              >
+                <ShieldCheck className="w-5 h-5" />
+                {language === 'ar' ? 'أوافق على الشروط والسياسة بشكل كامل' : 'J\'accepte les conditions et la politique'}
               </button>
             </div>
           </div>
