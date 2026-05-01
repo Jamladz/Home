@@ -7,6 +7,7 @@ export interface DoctorProfile {
   wilaya?: string;
   commune?: string;
   phone: string;
+  googleMapsLink?: string;
   googleSheetWebhookUrl?: string;
   maxPatientsPerDay?: number;
   rating: number;
