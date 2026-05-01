@@ -38,7 +38,10 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const {
+    language,
+    tx: tx
+  } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [uid, setUid] = useState<string | null>(null);
 
@@ -128,7 +131,10 @@ export default function DoctorDashboard() {
           );
           unsubscribeAppointments = onSnapshot(q, (apptSnap) => {
             const appts = apptSnap.docs.map(
-              (d) => ({ ...d.data(), id: d.id }) as Appointment,
+              (d) => (({
+                ...d.data(),
+                id: d.id
+              }) as Appointment),
             );
             // Sort ascending (First to book is first)
             appts.sort((a, b) => a.createdAt - b.createdAt);
@@ -143,7 +149,10 @@ export default function DoctorDashboard() {
           getDocs(reviewQ)
             .then((rSnap) => {
               const revs = rSnap.docs.map(
-                (d) => ({ ...d.data(), id: d.id }) as Review,
+                (d) => (({
+                  ...d.data(),
+                  id: d.id
+                }) as Review),
               );
               revs.sort((a, b) => b.createdAt - a.createdAt);
               setReviews(revs);
@@ -319,7 +328,6 @@ export default function DoctorDashboard() {
             </button>
           )}
         </div>
-
         <form
           onSubmit={handleRegisterProfile}
           className="space-y-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200"
@@ -365,8 +373,8 @@ export default function DoctorDashboard() {
             >
               <option value="">اختر التخصص</option>
               {medicalSpecialties.map((s) => (
-                <option key={s.id} value={language === "ar" ? s.ar : s.fr}>
-                  {language === "ar" ? s.ar : s.fr}
+                <option key={s.id} value={tx(s.ar, s.fr, s.fr)}>
+                  {tx(s.ar, s.fr, s.fr)}
                 </option>
               ))}
             </select>
@@ -589,9 +597,11 @@ export default function DoctorDashboard() {
       {profile.status === "pending" && (
         <div className="sticky top-[68px] z-40 bg-amber-100 text-amber-800 p-4 text-sm font-bold text-center border-b border-amber-200 shadow-sm">
           ⚠️{" "}
-          {language === "ar"
-            ? "حسابك قيد المراجعة من الإدارة. لن تظهر للمرضى حتى تتم الموافقة."
-            : "Your account is under review. It will not be visible to patients until approved."}
+          {tx(
+            "حسابك قيد المراجعة من الإدارة. لن تظهر للمرضى حتى تتم الموافقة.",
+            "Your account is under review. It will not be visible to patients until approved.",
+            "Your account is under administration review. You will not be visible to patients until approved."
+          )}
         </div>
       )}
       {/* Header */}
@@ -602,7 +612,7 @@ export default function DoctorDashboard() {
             <button
               onClick={() => setShowQRModal(true)}
               className="text-indigo-100 hover:text-white transition"
-              title={language === "ar" ? "رمز QR" : "Code QR"}
+              title={tx("رمز QR", "Code QR", "QR Code")}
             >
               <QrCode className="w-6 h-6" />
             </button>
@@ -629,14 +639,13 @@ export default function DoctorDashboard() {
             <h2 className="text-xl font-bold flex items-center gap-2">
               د. {profile.name}
               {profile.isVerified && (
-                <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
+                <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" title={tx('حساب موثق', 'Compte vérifié', "Verified Account")} />
               )}
             </h2>
             <p className="text-indigo-200 text-sm">{profile.specialty}</p>
           </div>
         </div>
       </div>
-
       <div className="px-4 mt-[-2rem]">
         {/* Stats */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 flex justify-between mb-6">
@@ -691,7 +700,7 @@ export default function DoctorDashboard() {
 
         {activeTab === "appointments" ? (
           /* Appointments List (Sheet) */
-          <div>
+          (<div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-slate-700 text-lg flex items-center">
                 <CalendarCheck className="w-5 h-5 mr-2 text-indigo-500" />
@@ -705,7 +714,6 @@ export default function DoctorDashboard() {
                 تصدير إلى إكسل 📊
               </button>
             </div>
-
             {/* Tabs Filter */}
             <div className="flex bg-slate-200/50 rounded-2xl p-1 mb-6 border border-slate-200/60">
               <button
@@ -727,7 +735,6 @@ export default function DoctorDashboard() {
                 السابقة
               </button>
             </div>
-
             {filteredAppointments.length === 0 ? (
               <div className="bg-white rounded-3xl p-8 text-center border border-slate-200 shadow-sm">
                 <p className="text-slate-500 text-sm">
@@ -894,17 +901,16 @@ export default function DoctorDashboard() {
                 })}
               </div>
             )}
-          </div>
+          </div>)
         ) : (
           /* Reviews Tab */
-          <div>
+          (<div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-slate-700 text-lg flex items-center">
                 <MessageSquareText className="w-5 h-5 mr-2 text-amber-500" />
                 آراء المرضى
               </h3>
             </div>
-
             {reviews.length === 0 ? (
               <div className="bg-white rounded-3xl p-8 text-center border border-slate-200 shadow-sm">
                 <p className="text-slate-500 text-sm">
@@ -944,10 +950,9 @@ export default function DoctorDashboard() {
                 ))}
               </div>
             )}
-          </div>
+          </div>)
         )}
       </div>
-
       {showQRModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
@@ -964,13 +969,15 @@ export default function DoctorDashboard() {
               </div>
               
               <h3 className="text-lg font-bold text-slate-800 mb-1">
-                {language === "ar" ? "رمز الحجز الخاص بك" : "Votre code de réservation"}
+                {tx("رمز الحجز الخاص بك", "Votre code de réservation", "Your Booking Code")}
               </h3>
               
               <p className="text-slate-500 text-xs mb-4 leading-relaxed px-2">
-                {language === "ar" 
-                  ? "دع مرضاك يمسحون هذا الرمز للوصول لصفحة الحجز." 
-                  : "Mettez ce code à disposition de vos patients pour accéder à la réservation."}
+                {tx(
+                  "دع مرضاك يمسحون هذا الرمز للوصول لصفحة الحجز.",
+                  "Mettez ce code à disposition de vos patients pour accéder à la réservation.",
+                  "Let your patients scan this code to access your booking page."
+                )}
               </p>
 
               <div className="bg-white p-3 rounded-xl border-2 border-indigo-50 shadow-sm mb-5 inline-flex justify-center w-auto">
@@ -987,11 +994,15 @@ export default function DoctorDashboard() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`${window.location.origin}/doctor/${uid}`);
-                  alert(language === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Lien copié avec succès !');
+                  alert(tx(
+                    'تم نسخ الرابط بنجاح!',
+                    'Lien copié avec succès !',
+                    "Link copied successfully!"
+                  ));
                 }}
                 className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
               >
-                {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+                {tx('نسخ الرابط المباشر', 'Copier le lien direct', "Copy direct link")}
               </button>
             </div>
           </div>
