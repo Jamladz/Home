@@ -1,0 +1,370 @@
+[
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "مرحباً بك! أنا مساعدك الطبي الذكي. واش نقدر نعاونك اليوم بخصوص صحتك؟",
+    "fr": "Bonjour ! Je suis votre assistant médical intelligent. Comment puis-je vous aider aujourd'hui ?"
+  },
+  {
+    "ar": "الرجاء اختيار صورة صالحة.",
+    "fr": "Veuillez sélectionner une image valide."
+  },
+  {
+    "ar": "عذراً، المساعد الذكي غير متوفر حالياً. يرجى مراجعة الإدارة للتحقق من إعدادات الذكاء الاصطناعي.",
+    "fr": "Désolé, l'assistant est indisponible. Veuillez vérifier les paramètres avec l'administration."
+  },
+  {
+    "ar": "عذراً، حدث خطأ ما حاول مجدداً.",
+    "fr": "Désolé, une erreur s'est produite. Veuillez réessayer."
+  },
+  {
+    "ar": "المعذرة، يوجد ضغط كبير على الخدمة حالياً. حاول بعد قليل.",
+    "fr": "Le service est saturé. Veuillez réessayer plus tard."
+  },
+  {
+    "ar": "عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.",
+    "fr": "Désolé, une erreur de connexion s'est produite. Veuillez réessayer plus tard."
+  },
+  {
+    "ar": "left-6",
+    "fr": "right-6"
+  },
+  {
+    "ar": "left-4 md:left-6",
+    "fr": "right-4 md:right-6"
+  },
+  {
+    "ar": "المساعد الطبي المباشر",
+    "fr": "Assistant Médical"
+  },
+  {
+    "ar": "متصل الآن",
+    "fr": "En ligne"
+  },
+  {
+    "ar": "justify-end",
+    "fr": "justify-end"
+  },
+  {
+    "ar": "justify-start",
+    "fr": "justify-start"
+  },
+  {
+    "ar": "justify-start",
+    "fr": "justify-start"
+  },
+  {
+    "ar": "أرفق صورة، أو اكتب سؤالك هنا...",
+    "fr": "Joignez une image ou écrivez votre question..."
+  },
+  {
+    "ar": "أرفق صورة طبية",
+    "fr": "Joindre une image"
+  },
+  {
+    "ar": "-scale-x-100",
+    "fr": ""
+  },
+  {
+    "ar": "المساعد للإرشاد فقط ولا يغني عن الطبيب المختص.",
+    "fr": "Résultats à titre indicatif, consultez un médecin."
+  },
+  {
+    "ar": "أفضل الأطباء المتاحين",
+    "fr": "Meilleurs Médecins Disponibles"
+  },
+  {
+    "ar": "صيدليات ومخابر",
+    "fr": "Pharmacies et laboratoires"
+  },
+  {
+    "ar": "أطباء معتمدين",
+    "fr": "Médecins vérifiés"
+  },
+  {
+    "ar": "دليل الأطباء",
+    "fr": "Annuaire Médical"
+  },
+  {
+    "ar": "قائمة الأطباء",
+    "fr": "Liste des Médecins"
+  },
+  {
+    "ar": "ابحث بالاسم أو التخصص...",
+    "fr": "Chercher par nom ou spécialité..."
+  },
+  {
+    "ar": "pl-4 pr-11",
+    "fr": "pl-11 pr-4"
+  },
+  {
+    "ar": "right-4",
+    "fr": "left-4"
+  },
+  {
+    "ar": "التخصص",
+    "fr": "Spécialité"
+  },
+  {
+    "ar": "الولاية",
+    "fr": "Wilaya"
+  },
+  {
+    "ar": "البلدية",
+    "fr": "Commune"
+  },
+  {
+    "ar": "لا يوجد أطباء مطابِقين لبحثك حالياً.",
+    "fr": "Aucun médecin ne correspond à votre recherche."
+  },
+  {
+    "ar": "د. ",
+    "fr": "Dr. "
+  },
+  {
+    "ar": "حساب موثق",
+    "fr": "Compte vérifié"
+  },
+  {
+    "ar": "ml-0.5",
+    "fr": "mr-0.5"
+  },
+  {
+    "ar": "mr-4",
+    "fr": "ml-4"
+  },
+  {
+    "ar": "ml-0.5",
+    "fr": "mr-0.5"
+  },
+  {
+    "ar": "left-4",
+    "fr": "right-4"
+  },
+  {
+    "ar": "هذا الطبيب لم ينضم بعد إلى التطبيق، سيتوفر قريباً إن شاء الله",
+    "fr": "Ce médecin n'a pas encore rejoint l'application, il sera bientôt disponible Insha'Allah"
+  },
+  {
+    "ar": "د. ",
+    "fr": "Dr. "
+  },
+  {
+    "ar": "غير معتمد",
+    "fr": "Non vérifié"
+  },
+  {
+    "ar": "ml-0.5",
+    "fr": "mr-0.5"
+  },
+  {
+    "ar": "mr-4",
+    "fr": "ml-4"
+  },
+  {
+    "ar": "تبادل صفحة الحجز",
+    "fr": "Partager la page"
+  },
+  {
+    "ar": "امسح الرمز للوصول لصفحة الحجز الخاصة بهذا الطبيب.",
+    "fr": "Scannez ce code pour accéder à la page de réservation de ce médecin."
+  },
+  {
+    "ar": "تم نسخ الرابط بنجاح!",
+    "fr": "Lien copié avec succès !"
+  },
+  {
+    "ar": "نسخ الرابط المباشر",
+    "fr": "Copier le lien direct"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "الموقع تحت الصيانة",
+    "fr": "Under Maintenance"
+  },
+  {
+    "ar": "نحن نقوم ببعض التحسينات الاحترافية على منصة داويني لتوفير تجربة أفضل لكم. سنعود في أقرب وقت ممكن. شكراً لتفهمكم وصبركم.",
+    "fr": "We are performing some professional improvements on Dawini to provide you with a better experience. We will be back shortly."
+  },
+  {
+    "ar": "جاري العمل...",
+    "fr": "Work in progress..."
+  },
+  {
+    "ar": "جميع الحقوق محفوظة.",
+    "fr": "All rights reserved."
+  },
+  {
+    "ar": "حسابك قيد المراجعة من الإدارة. لن تظهر للمرضى حتى تتم الموافقة.",
+    "fr": "Your account is under review. It will not be visible to patients until approved."
+  },
+  {
+    "ar": "رمز QR",
+    "fr": "Code QR"
+  },
+  {
+    "ar": "حساب موثق",
+    "fr": "Compte vérifié"
+  },
+  {
+    "ar": "رمز الحجز الخاص بك",
+    "fr": "Votre code de réservation"
+  },
+  {
+    "ar": "دع مرضاك يمسحون هذا الرمز للوصول لصفحة الحجز.",
+    "fr": "Mettez ce code à disposition de vos patients pour accéder à la réservation."
+  },
+  {
+    "ar": "تم نسخ الرابط بنجاح!",
+    "fr": "Lien copié avec succès !"
+  },
+  {
+    "ar": "نسخ الرابط المباشر",
+    "fr": "Copier le lien direct"
+  },
+  {
+    "ar": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+    "fr": "Please enter email and password."
+  },
+  {
+    "ar": "تم إنشاء الحساب بنجاح! جاري التوجيه...",
+    "fr": "Account created! Redirecting..."
+  },
+  {
+    "ar": "جاري تسجيل الدخول...",
+    "fr": "Signing in..."
+  },
+  {
+    "ar": "حدث خطأ.",
+    "fr": "An error occurred."
+  },
+  {
+    "ar": "البريد الإلكتروني مستخدم بالفعل، يرجى تسجيل الدخول بدلاً من ذلك.",
+    "fr": "Email already in use. Please sign in instead."
+  },
+  {
+    "ar": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "fr": "Invalid email or password."
+  },
+  {
+    "ar": "كلمة المرور ضعيفة جداً. استخدم 6 أحرف على الأقل.",
+    "fr": "Password should be at least 6 characters."
+  },
+  {
+    "ar": "تسجيل الدخول بالبريد الإلكتروني غير مفعل. يرجى تفعيله من لوحة تحكم Firebase.",
+    "fr": "Email/Password sign-in is disabled. Please enable it in Firebase console."
+  },
+  {
+    "ar": "بوابة الأطباء",
+    "fr": "Doctor Portal"
+  },
+  {
+    "ar": "سجل دخولك لإدارة مواعيدك وعيادتك في داويني.",
+    "fr": "Sign in to manage your clinic and appointments."
+  },
+  {
+    "ar": "البريد الإلكتروني",
+    "fr": "Email Address"
+  },
+  {
+    "ar": "كلمة المرور",
+    "fr": "Password"
+  },
+  {
+    "ar": "إنشاء حساب جديد",
+    "fr": "Create Account"
+  },
+  {
+    "ar": "تسجيل الدخول",
+    "fr": "Sign In"
+  },
+  {
+    "ar": "لدي حساب بالفعل؟ تسجيل الدخول",
+    "fr": "Already have an account? Sign in"
+  },
+  {
+    "ar": "ليس لدي حساب؟ إنشاء حساب",
+    "fr": "Need an account? Sign up"
+  },
+  {
+    "ar": "تم الحفظ بنجاح!",
+    "fr": "Saved successfully!"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "حفظ البيانات",
+    "fr": "Save Data"
+  },
+  {
+    "ar": "rtl",
+    "fr": "ltr"
+  },
+  {
+    "ar": "إضافة مناوبة",
+    "fr": "Add Permanence"
+  },
+  {
+    "ar": "إضافة مناوبة جديدة",
+    "fr": "Add New Permanence"
+  },
+  {
+    "ar": "صيدلية",
+    "fr": "Pharmacy"
+  },
+  {
+    "ar": "مخبر",
+    "fr": "Laboratory"
+  },
+  {
+    "ar": "حفظ البيانات",
+    "fr": "Save Data"
+  },
+  {
+    "ar": "لا توجد مناوبات مسجلة حالياً.",
+    "fr": "No permanences registered yet."
+  },
+  {
+    "ar": "صيدلية",
+    "fr": "Pharmacist"
+  },
+  {
+    "ar": "مخبر",
+    "fr": "Laboratory"
+  },
+  {
+    "ar": "مفتوح حتى: ",
+    "fr": "Open until: "
+  },
+  {
+    "ar": "-translate-x-6",
+    "fr": "translate-x-6"
+  },
+  {
+    "ar": "translate-x-0",
+    "fr": "translate-x-0"
+  },
+  {
+    "ar": "حفظ المفتاح",
+    "fr": "Save Key"
+  }
+]
