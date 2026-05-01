@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc, getDoc, setDoc } from "firebase/firestore";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import firebaseConfig from "../../../firebase-applet-config.json";
 import { auth, db } from "../../lib/firebase";
 import { DoctorProfile, Permanence, DirectoryDoctor } from "../../types";
 import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck, Users } from "lucide-react";
@@ -12,7 +14,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const {
+    t,
+    language,
+    tx: tx
+  } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'doctors' | 'permanences' | 'settings'>('overview');
@@ -32,8 +38,14 @@ export default function AdminDashboard() {
   const [isAddingPerm, setIsAddingPerm] = useState(false);
 
   // Add Directory Doctor Form
-  const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', specialty: '', wilaya: '', commune: '', address: '' });
+  const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
   const [isAddingDirDoctor, setIsAddingDirDoctor] = useState(false);
+
+  // Add Platform Doctor Form
+  const [newPlatformDoctor, setNewPlatformDoctor] = useState({
+    name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', gender: 'male' as 'male'|'female', email: '', password: ''
+  });
+  const [isAddingPlatformDoctor, setIsAddingPlatformDoctor] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -92,7 +104,7 @@ export default function AdminDashboard() {
     try {
       setSavingApiKey(true);
       await setDoc(doc(db, "config", "settings"), { geminiApiKey: globalApiKey.trim() }, { merge: true });
-      alert(language === 'ar' ? 'تم الحفظ بنجاح!' : 'Saved successfully!');
+      alert(tx('تم الحفظ بنجاح!', 'Saved successfully!', "Saved successfully!"));
     } catch (e) {
       console.error("Error saving API Key", e);
       alert("حدث خطأ أثناء الحفظ.");
@@ -175,10 +187,47 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, "directory_doctors"), newDirDoctor);
       setDirectoryDoctors([{ ...newDirDoctor, id: docRef.id } as DirectoryDoctor, ...directoryDoctors]);
       setIsAddingDirDoctor(false);
-      setNewDirDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '' });
+      setNewDirDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
     } catch (e) {
       console.error(e);
       alert("حدث خطأ أثناء الإضافة.");
+    }
+  };
+
+  const handleAddPlatformDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Create a secondary app to avoid signing out the current admin user
+      const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp_" + Date.now());
+      const secondaryAuth = getAuth(secondaryApp);
+      
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, newPlatformDoctor.email, newPlatformDoctor.password);
+      const uid = userCredential.user.uid;
+      
+      const doctorData: DoctorProfile = {
+        name: newPlatformDoctor.name,
+        specialty: newPlatformDoctor.specialty,
+        wilaya: newPlatformDoctor.wilaya,
+        commune: newPlatformDoctor.commune,
+        clinicAddress: newPlatformDoctor.address,
+        phone: newPlatformDoctor.phone,
+        gender: newPlatformDoctor.gender,
+        status: 'approved',
+        isVerified: true
+      };
+      
+      await setDoc(doc(db, "doctors", uid), doctorData);
+      
+      await signOut(secondaryAuth);
+      
+      setDoctors([{ ...doctorData, userId: uid }, ...doctors]);
+      setIsAddingPlatformDoctor(false);
+      setNewPlatformDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', gender: 'male', email: '', password: '' });
+      
+      alert("تمت إضافة الطبيب بنجاح. يمكنه الآن تسجيل الدخول.");
+    } catch (e: any) {
+      console.error(e);
+      alert("حدث خطأ أثناء الإضافة: " + e.message);
     }
   };
 
@@ -205,8 +254,7 @@ export default function AdminDashboard() {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row overflow-hidden font-sans" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row overflow-hidden font-sans" dir={tx('rtl', 'ltr', "ltr")}>
       {/* Sidebar for Desktop / Top nav for mobile */}
       <div className="md:w-64 bg-slate-900 text-slate-300 md:min-h-screen flex flex-col shadow-2xl z-20 shrink-0">
         <div className="p-6 md:p-8 flex justify-between md:justify-center items-center border-b border-slate-800">
@@ -257,7 +305,6 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="flex-1 h-screen overflow-y-auto w-full">
         <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
@@ -362,12 +409,117 @@ export default function AdminDashboard() {
               </div>
 
               {doctorSubTab === 'platform' && (
+                <div className="space-y-6">
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={() => setIsAddingPlatformDoctor(!isAddingPlatformDoctor)}
+                      className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition flex items-center shadow-sm"
+                    >
+                      <Plus className="w-4 h-4 mr-2" /> إضافة طبيب للمنصة (معتمد تلقائياً)
+                    </button>
+                  </div>
+
+                  {isAddingPlatformDoctor && (
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 mb-6">
+                      <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-100 pb-4">
+                        إضافة طبيب جديد وتسليمه الحساب
+                      </h3>
+                      <form onSubmit={handleAddPlatformDoctor} className="space-y-4 text-start">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">البريد الإلكتروني / Email</label>
+                            <input required type="email" value={newPlatformDoctor.email} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, email: e.target.value})}
+                              dir="ltr"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">كلمة المرور / Password</label>
+                            <input required type="password" value={newPlatformDoctor.password} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, password: e.target.value})}
+                              dir="ltr" minLength={6}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <input required type="text" value={newPlatformDoctor.name} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, name: e.target.value})}
+                              placeholder="مثال: محمد امين"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
+                            <select required value={newPlatformDoctor.gender} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, gender: e.target.value as 'male'|'female'})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                                <option value="male">ذكر (Male)</option>
+                                <option value="female">أنثى (Female)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
+                            <select required value={newPlatformDoctor.specialty} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, specialty: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                                <option value="">اختر التخصص...</option>
+                                {medicalSpecialties.map(spec => (
+                                  <option key={spec.id} value={spec.ar}>{spec.ar} / {spec.fr}</option>
+                                ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">رقم الهاتف (اختياري) / Phone (Optional)</label>
+                            <input type="text" value={newPlatformDoctor.phone} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, phone: e.target.value})}
+                              dir="ltr" placeholder="0550123456"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
+                            <select required value={newPlatformDoctor.wilaya} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, wilaya: e.target.value, commune: ""})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                                <option value="">اختر الولاية...</option>
+                                {getWilayas().map(w => (
+                                  <option key={w.id} value={w.id}>{w.id} - {w.name}</option>
+                                ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
+                            <select required value={newPlatformDoctor.commune} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, commune: e.target.value})}
+                              disabled={!newPlatformDoctor.wilaya}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50">
+                                <option value="">اختر البلدية...</option>
+                                {newPlatformDoctor.wilaya && getCommunesByWilaya(newPlatformDoctor.wilaya).map(c => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                          <input required type="text" value={newPlatformDoctor.address} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, address: e.target.value})}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                        </div>
+                        <div className="pt-2 flex justify-end">
+                          <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
+                            {tx('حفظ البيانات', 'Save Data', "Save Data")}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
                 <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
                   {doctors.length === 0 ? (
                     <div className="p-12 text-center text-slate-500">{t('admin.no_doctors')}</div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                      <table className="w-full text-left border-collapse" dir={tx('rtl', 'ltr', "ltr")}>
                         <thead>
                           <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                             <th className="font-semibold py-4 px-6 text-start">الطبيب / Doctor</th>
@@ -446,6 +598,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </div>
+                </div>
               )}
 
               {doctorSubTab === 'directory' && (
@@ -506,14 +659,28 @@ export default function AdminDashboard() {
                             </select>
                           </div>
                         </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                            <input required type="text" value={newDirDoctor.address} onChange={e => setNewDirDoctor({...newDirDoctor, address: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">رقم الهاتف (اختياري) / Phone (Optional)</label>
+                            <input type="text" value={newDirDoctor.phone} onChange={e => setNewDirDoctor({...newDirDoctor, phone: e.target.value})}
+                              dir="ltr" placeholder="0550123456"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
+                          </div>
+                        </div>
                         <div>
-                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
-                          <input required type="text" value={newDirDoctor.address} onChange={e => setNewDirDoctor({...newDirDoctor, address: e.target.value})}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">رابط جوجل ماب (اختياري) / Google Maps Link (Optional)</label>
+                          <input type="url" value={newDirDoctor.googleMapsLink} onChange={e => setNewDirDoctor({...newDirDoctor, googleMapsLink: e.target.value})}
+                            dir="ltr" placeholder="https://maps.google.com/..."
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
                         </div>
                         <div className="pt-2 flex justify-end">
                           <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
-                            {language === 'ar' ? 'حفظ البيانات' : 'Save Data'}
+                            {tx('حفظ البيانات', 'Save Data', "Save Data")}
                           </button>
                         </div>
                       </form>
@@ -525,7 +692,7 @@ export default function AdminDashboard() {
                       <div className="p-12 text-center text-slate-500">لا يوجد أطباء في الدليل حالياً.</div>
                     ) : (
                       <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                        <table className="w-full text-left border-collapse" dir={tx('rtl', 'ltr', "ltr")}>
                           <thead>
                             <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
                               <th className="font-semibold py-4 px-6 text-start">الطبيب / Doctor</th>
@@ -589,14 +756,14 @@ export default function AdminDashboard() {
                   onClick={() => setIsAddingPerm(!isAddingPerm)}
                   className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition flex items-center shadow-sm"
                 >
-                  <Plus className="w-4 h-4 mr-2" /> {language === 'ar' ? 'إضافة مناوبة' : 'Add Permanence'}
+                  <Plus className="w-4 h-4 mr-2" /> {tx('إضافة مناوبة', 'Add Permanence', "Add Duty")}
                 </button>
               </div>
 
               {isAddingPerm && (
                 <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 mb-6">
                   <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-100 pb-4">
-                    {language === 'ar' ? 'إضافة مناوبة جديدة' : 'Add New Permanence'}
+                    {tx('إضافة مناوبة جديدة', 'Add New Permanence', "Add new duty")}
                   </h3>
                   <form onSubmit={handleAddPermanence} className="space-y-4 text-start">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -604,8 +771,8 @@ export default function AdminDashboard() {
                         <label className="block text-slate-600 text-xs font-semibold mb-1.5">النوع / Type</label>
                         <select required value={newPerm.type} onChange={e => setNewPerm({...newPerm, type: e.target.value as 'pharmacy'|'laboratory'})}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
-                          <option value="pharmacy">{language === 'ar' ? 'صيدلية' : 'Pharmacy'}</option>
-                          <option value="laboratory">{language === 'ar' ? 'مخبر' : 'Laboratory'}</option>
+                          <option value="pharmacy">{tx('صيدلية', 'Pharmacy', "Pharmacy")}</option>
+                          <option value="laboratory">{tx('مخبر', 'Laboratory', "Laboratory")}</option>
                         </select>
                       </div>
                       <div>
@@ -633,7 +800,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="pt-2 flex justify-end">
                       <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
-                        {language === 'ar' ? 'حفظ البيانات' : 'Save Data'}
+                        {tx('حفظ البيانات', 'Save Data', "Save Data")}
                       </button>
                     </div>
                   </form>
@@ -642,7 +809,11 @@ export default function AdminDashboard() {
 
               {permanences.length === 0 ? (
                 <div className="bg-white p-12 rounded-3xl border border-slate-200/60 text-center text-slate-500 shadow-sm">
-                  {language === 'ar' ? 'لا توجد مناوبات مسجلة حالياً.' : 'No permanences registered yet.'}
+                  {tx(
+                    'لا توجد مناوبات مسجلة حالياً.',
+                    'No permanences registered yet.',
+                    "No duties registered currently."
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -656,12 +827,12 @@ export default function AdminDashboard() {
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-bold text-slate-800">{perm.name}</h3>
                             <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${perm.type === 'pharmacy' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
-                              {perm.type === 'pharmacy' ? (language === 'ar' ? 'صيدلية' : 'Pharmacist') : (language === 'ar' ? 'مخبر' : 'Laboratory')}
+                              {perm.type === 'pharmacy' ? (tx('صيدلية', 'Pharmacist', "Pharmacy")) : (tx('مخبر', 'Laboratory', "Laboratory"))}
                             </span>
                           </div>
                           <p className="text-slate-500 text-sm mb-1">{perm.address}</p>
                           <div className="text-xs text-slate-400 font-medium">
-                            {language === 'ar' ? 'مفتوح حتى: ' : 'Open until: '} {perm.openUntil}
+                            {tx('مفتوح حتى: ', 'Open until: ', "Open until: ")} {perm.openUntil}
                           </div>
                         </div>
                       </div>
@@ -696,7 +867,7 @@ export default function AdminDashboard() {
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${isMaintenance ? 'bg-indigo-600' : 'bg-slate-300'}`}
                 >
                   <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-md ${isMaintenance ? (language === 'ar' ? '-translate-x-6' : 'translate-x-6') : (language === 'ar' ? 'translate-x-0' : 'translate-x-0')}`}
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-300 shadow-md ${isMaintenance ? (tx('-translate-x-6', 'translate-x-6', "translate-x-6")) : (tx('translate-x-0', 'translate-x-0', "translate-x-0"))}`}
                   />
                 </button>
               </div>
@@ -726,7 +897,7 @@ export default function AdminDashboard() {
                       disabled={savingApiKey}
                       className="bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-indigo-700 shadow-sm transition-all disabled:opacity-50"
                     >
-                      {savingApiKey ? 'جاري الحفظ...' : (language === 'ar' ? 'حفظ المفتاح' : 'Save Key')}
+                      {savingApiKey ? 'جاري الحفظ...' : (tx('حفظ المفتاح', 'Save Key', "Save Key"))}
                     </button>
                   </div>
                 </div>
