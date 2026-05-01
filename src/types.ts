@@ -55,6 +55,8 @@ export interface DirectoryDoctor {
   wilaya: string;
   commune: string;
   address: string;
+  phone?: string;
+  googleMapsLink?: string;
 }
 
 export interface Permanence {

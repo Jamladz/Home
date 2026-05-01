@@ -40,7 +40,10 @@ function AppContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
-  const { language } = useLanguage();
+  const {
+    language,
+    tx: tx
+  } = useLanguage();
   const location = useLocation();
 
   useEffect(() => {
@@ -102,10 +105,9 @@ function AppContent() {
   return (
     <div
       className="font-sans min-h-screen bg-slate-50 pb-16 lg:pb-0 text-slate-800 transition-colors duration-300"
-      dir={language === "ar" ? "rtl" : "ltr"}
+      dir={tx("rtl", "ltr", "ltr")}
     >
       <TopHeader />
-
       {/* Admin floating button */}
       {isAdmin && (
         <Link
@@ -115,7 +117,6 @@ function AppContent() {
           <LayoutDashboard className="w-5 h-5" />
         </Link>
       )}
-
       <AnimatePresence mode="wait">
         {/* @ts-ignore */}
         <Routes location={location} key={location.pathname}>
@@ -182,15 +183,11 @@ function AppContent() {
           />
         </Routes>
       </AnimatePresence>
-
       {/* AI Assistant Widget */}
       <AIAssistantWidget />
-
       <Toaster position="bottom-center" />
-
       {/* Fixed Navigation for Mobile */}
       <BottomNav />
-
       <AnimatePresence>
         {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </AnimatePresence>
