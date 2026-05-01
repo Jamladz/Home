@@ -67,7 +67,15 @@ export default function DoctorDetail() {
     if (!doctorId || !doctor) return;
 
     // Validate Algerian phone number
-    const isValidPhone = /^(05|06|07)\d{8}$/.test(patientPhone);
+    // Clean up phone number (remove spaces, replace +213 with 0)
+    let sanitizedPhone = patientPhone.replace(/[\s-]/g, '');
+    if (sanitizedPhone.startsWith('+213')) {
+      sanitizedPhone = '0' + sanitizedPhone.slice(4);
+    } else if (sanitizedPhone.startsWith('00213')) {
+      sanitizedPhone = '0' + sanitizedPhone.slice(5);
+    }
+
+    const isValidPhone = /^(05|06|07)\d{8}$/.test(sanitizedPhone);
     if (!isValidPhone) {
       alert(language === 'ar' ? "يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)" : "Veuillez entrer un numéro de téléphone algérien valide.");
       return;
@@ -77,7 +85,7 @@ export default function DoctorDetail() {
     setShiftedDate(null);
 
     try {
-      // Get user IP for rate limiting
+      // Get user IP for tracking
       let userIp = "unknown";
       try {
         const ipRes = await fetch("https://api.ipify.org?format=json");
@@ -85,21 +93,6 @@ export default function DoctorDetail() {
         userIp = ipData.ip;
       } catch (err) {
         console.warn("Could not fetch IP", err);
-      }
-
-      // Rate limiting: check recent bookings in the last hour
-      const oneHourAgo = Date.now() - 60 * 60 * 1000;
-      const recentBookingsQuery = query(
-        collection(db, "doctors", doctorId, "appointments"),
-        where("ip", "==", userIp),
-        where("createdAt", ">", oneHourAgo)
-      );
-      const recentDocs = await getDocs(recentBookingsQuery);
-      
-      if (recentDocs.size >= 3) {
-        alert(language === 'ar' ? "لقد وصلت للحد الأقصى من الحجوزات. يرجى المحاولة لاحقاً." : "Limite de réservation atteinte. Veuillez réessayer plus tard.");
-        setBookingLoading(false);
-        return;
       }
 
       const now = new Date();
@@ -110,7 +103,7 @@ export default function DoctorDetail() {
       await addDoc(collection(db, "doctors", doctorId, "appointments"), {
         doctorId,
         patientName,
-        patientPhone,
+        patientPhone: sanitizedPhone,
         date: finalDate,
         time: finalTime,
         status: "pending",
