@@ -5,7 +5,12 @@ import { useLanguage } from "../contexts/LanguageContext";
 
 export function BottomNav() {
   const location = useLocation();
-  const { t, language, setLanguage } = useLanguage();
+  const {
+    t,
+    language,
+    setLanguage,
+    tx: tx
+  } = useLanguage();
 
   const navItems = [
     { to: "/", icon: Home, label: t('nav.home') },
