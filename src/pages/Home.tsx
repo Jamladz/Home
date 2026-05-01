@@ -22,7 +22,11 @@ import { DoctorAvatar } from "../components/DoctorAvatar";
 import { medicalSpecialties } from "../lib/medical_specialties";
 
 export default function Home() {
-  const { t, language } = useLanguage();
+  const {
+    t,
+    language,
+    tx: tx
+  } = useLanguage();
   const [topDoctors, setTopDoctors] = useState<DoctorProfile[]>([]);
   const [loadingTop, setLoadingTop] = useState(true);
 
@@ -35,7 +39,10 @@ export default function Home() {
         );
         const snap = await getDocs(q);
         const docs = snap.docs.map(
-          (d) => ({ ...d.data(), userId: d.id }) as DoctorProfile,
+          (d) => (({
+            ...d.data(),
+            userId: d.id
+          }) as DoctorProfile),
         );
         // Sort and limit in memory
         docs.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -52,7 +59,7 @@ export default function Home() {
   const getSpecialtyLabel = (id: string) => {
     const spec = medicalSpecialties.find((s) => s.id === id);
     if (!spec) return "";
-    return language === "ar" ? spec.ar : spec.fr;
+    return tx(spec.ar, spec.fr, spec.fr);
   };
 
   const categories = [
@@ -132,7 +139,6 @@ export default function Home() {
           </p>
         </div>
       </motion.div>
-
       {/* Categories */}
       <div className="mt-[-2rem] px-4 relative z-10">
         <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
@@ -156,24 +162,25 @@ export default function Home() {
           ))}
         </div>
       </div>
-
       {/* Quick Access sections */}
       <motion.div variants={itemVariants} className="px-4 mt-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-slate-700">
-            {language === "ar"
-              ? "أفضل الأطباء المتاحين"
-              : "Meilleurs Médecins Disponibles"}
+            {tx(
+              "أفضل الأطباء المتاحين",
+              "Meilleurs Médecins Disponibles",
+              "Best Available Doctors"
+            )}
           </h2>
           <Link
             to="/doctors"
             className="text-[#1E6DFF] text-sm font-bold flex items-center bg-[#1E6DFF]/10 px-3 py-1.5 rounded-full hover:bg-[#1E6DFF]/20 transition-colors"
           >
             {t("home.view_all")}
-            {language === "ar" ? (
-              <ChevronLeft className="w-4 h-4 ml-1" />
-            ) : (
-              <ChevronRight className="w-4 h-4 ml-1" />
+            {tx(
+              (<ChevronLeft className="w-4 h-4 ml-1" />),
+              (<ChevronRight className="w-4 h-4 ml-1" />),
+              (<ChevronRight className="w-4 h-4 ml-1" />)
             )}
           </Link>
         </div>
@@ -242,15 +249,12 @@ export default function Home() {
           </div>
         )}
       </motion.div>
-
       <motion.div variants={itemVariants} className="px-4 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-slate-700">
             {t("home.permanences")}{" "}
             <span className="text-xs text-slate-400 font-normal">
-              {language === "ar"
-                ? "صيدليات ومخابر"
-                : "Pharmacies et laboratoires"}
+              {tx("صيدليات ومخابر", "Pharmacies et laboratoires", "Pharmacies and Labs")}
             </span>
           </h2>
           <Link
@@ -258,10 +262,10 @@ export default function Home() {
             className="text-[#1E6DFF] text-sm font-bold flex items-center"
           >
             {t("home.view_all")}
-            {language === "ar" ? (
-              <ChevronLeft className="w-4 h-4 ml-1" />
-            ) : (
-              <ChevronRight className="w-4 h-4 ml-1" />
+            {tx(
+              (<ChevronLeft className="w-4 h-4 ml-1" />),
+              (<ChevronRight className="w-4 h-4 ml-1" />),
+              (<ChevronRight className="w-4 h-4 ml-1" />)
             )}
           </Link>
         </div>

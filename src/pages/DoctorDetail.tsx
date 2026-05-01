@@ -11,7 +11,11 @@ import { QRCodeSVG } from "qrcode.react";
 export default function DoctorDetail() {
   const { doctorId } = useParams();
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const {
+    t,
+    language,
+    tx: tx
+  } = useLanguage();
   const [doctor, setDoctor] = useState<DoctorProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -79,12 +83,20 @@ export default function DoctorDetail() {
 
     const isValidPhone = /^(05|06|07)\d{8}$/.test(sanitizedPhone);
     if (!isValidPhone) {
-      alert(language === 'ar' ? "يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)" : "Veuillez entrer un numéro de téléphone algérien valide.");
+      alert(tx(
+        "يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)",
+        "Veuillez entrer un numéro de téléphone algérien valide.",
+        "Please enter a valid Algerian phone number (e.g., 0550123456)."
+      ));
       return;
     }
 
     if (!acceptedTerms) {
-      alert(language === 'ar' ? "يرجى الموافقة على شروط الاستخدام وسياسة الخصوصية لإتمام عملية الحجز" : "Veuillez accepter les conditions d'utilisation et la politique de confidentialité pour procéder à la réservation.");
+      alert(tx(
+        "يرجى الموافقة على شروط الاستخدام وسياسة الخصوصية لإتمام عملية الحجز",
+        "Veuillez accepter les conditions d'utilisation et la politique de confidentialité pour procéder à la réservation.",
+        "Please agree to the Terms of Use and Privacy Policy to complete the booking."
+      ));
       return;
     }
 
@@ -214,7 +226,7 @@ export default function DoctorDetail() {
   if (!doctor) {
     return (
       <div className="p-4 pt-8 text-center text-slate-500">
-        {language === 'ar' ? 'لم يتم العثور على الطبيب.' : 'Médecin introuvable.'}
+        {tx('لم يتم العثور على الطبيب.', 'Médecin introuvable.', "Doctor not found.")}
       </div>
     );
   }
@@ -223,17 +235,21 @@ export default function DoctorDetail() {
     <div className="pb-8">
       {/* Header */}
       <div className="bg-gradient-to-l from-[#1E6DFF] to-[#18C5B5] text-white p-4 pt-8 pb-16 relative rounded-b-[40px] shadow-sm">
-        <button onClick={() => navigate(-1)} className={`absolute top-6 ${language === 'ar' ? 'right-4' : 'left-4'} p-2 bg-white/20 rounded-full hover:bg-white/30 transition`}>
-          {language === 'ar' ? <ArrowRight className="w-5 h-5" /> : <svg className="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>}
+        <button onClick={() => navigate(-1)} className={`absolute top-6 ${tx('right-4', 'left-4', "left-4")} p-2 bg-white/20 rounded-full hover:bg-white/30 transition`}>
+          {tx(
+            <ArrowRight className="w-5 h-5" />,
+            <svg className="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>,
+            <svg className="w-5 h-5 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          )}
         </button>
         <div className="flex flex-col items-center mt-6">
           <div className="w-24 h-24 mb-4 font-bold relative group">
             <DoctorAvatar gender={doctor.gender} className="w-24 h-24 border-4 border-[#1E6DFF]/30 shadow-[0_4px_20px_rgba(0,0,0,0.1)]" />
           </div>
           <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
-            {language === 'ar' ? 'د. ' : 'Dr. '}{doctor.name}
+            {tx('د. ', 'Dr. ', "Dr. ")}{doctor.name}
             {doctor.isVerified && (
-              <BadgeCheck className="w-6 h-6 text-blue-400 shrink-0" title={language === 'ar' ? 'حساب موثق' : 'Compte vérifié'} />
+              <BadgeCheck className="w-6 h-6 text-blue-400 shrink-0" title={tx('حساب موثق', 'Compte vérifié', "Verified Account")} />
             )}
           </h1>
           <p className="inline-block bg-white/20 text-white px-4 py-1.5 rounded-full font-medium mt-1 mb-4 text-sm border border-white/30 shadow-sm backdrop-blur-sm">{doctor.specialty}</p>
@@ -241,7 +257,7 @@ export default function DoctorDetail() {
           <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-lg relative z-20">
             {(doctor.wilaya || doctor.commune) && (
               <div className="flex items-center text-white bg-[#18C5B5] px-4 py-2 rounded-full text-xs font-bold shadow-md border border-white/20 hover:scale-105 transition-transform">
-                <MapPin className={`w-4 h-4 opacity-90 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
+                <MapPin className={`w-4 h-4 opacity-90 ${tx('ml-1.5', 'mr-1.5', "mr-1.5")}`} />
                 <span>
                   {doctor.wilaya ? `${doctor.wilaya} ` : ''} 
                   {doctor.commune ? `- ${doctor.commune}` : ''}
@@ -255,19 +271,18 @@ export default function DoctorDetail() {
             )}
             {doctor.phone && (
               <a href={`tel:${doctor.phone}`} className="flex items-center text-white font-bold bg-[#1E6DFF] transition-all px-5 py-2.5 rounded-full text-sm shadow-[0_4px_12px_rgba(30,109,255,0.4)] border border-white/20 transform hover:scale-105 active:scale-95">
-                <Phone className={`w-4 h-4 ${language === 'ar' ? 'ml-1.5' : 'mr-1.5'}`} />
+                <Phone className={`w-4 h-4 ${tx('ml-1.5', 'mr-1.5', "mr-1.5")}`} />
                 <span dir="ltr">{doctor.phone}</span>
               </a>
             )}
           </div>
         </div>
       </div>
-
       <div className="px-4 mt-[-2rem] relative z-20 space-y-4">
         {/* Booking Form */}
         <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#1E6DFF]/20 p-6 relative overflow-hidden" id="bookingForm">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5]"></div>
-          <h2 className="text-lg font-bold text-slate-800 mb-5">{language === 'ar' ? 'احجز موعداً الآن' : 'Prendre un rendez-vous'}</h2>
+          <h2 className="text-lg font-bold text-slate-800 mb-5">{tx('احجز موعداً الآن', 'Prendre un rendez-vous', "Book an Appointment Now")}</h2>
 
           {doctor.noticeMessage && (
             <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl mb-5 text-sm font-bold shadow-sm flex flex-col gap-1 items-start">
@@ -279,11 +294,13 @@ export default function DoctorDetail() {
           {(() => {
             if (doctor.isAcceptingAppointments === false) {
               return (
-                 <div className="bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
-                   {language === 'ar' 
-                     ? 'عذراً! الطبيب لا يستقبل حجوزات جديدة في الوقت الحالي بسبب إجازة أو لظروف أخرى. يرجى المراجعة لاحقاً.'
-                     : 'Désolé! Ce médecin n\'accepte pas de nouvelles réservations pour le moment. Veuillez vérifier plus tard.'}
-                 </div>
+                <div className="bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
+                  {tx(
+                    'عذراً! الطبيب لا يستقبل حجوزات جديدة في الوقت الحالي بسبب إجازة أو لظروف أخرى. يرجى المراجعة لاحقاً.',
+                    'Désolé! Ce médecin n\'accepte pas de nouvelles réservations pour le moment. Veuillez vérifier plus tard.',
+                    "Sorry! This doctor is not accepting new appointments currently due to leave or other circumstances. Please check back later."
+                  )}
+                </div>
               );
             }
 
@@ -309,11 +326,13 @@ export default function DoctorDetail() {
 
               if (!isWithinWindow) {
                 return (
-                 <div className="bg-indigo-50 border border-indigo-200 text-indigo-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
-                   {language === 'ar' 
-                     ? `الحجز غير متاح الآن. يرجى الحجز بين الساعة ${doctor.bookingWindow.start} و ${doctor.bookingWindow.end}.`
-                     : `La réservation n'est pas disponible actuellement. Veuillez réserver entre ${doctor.bookingWindow.start} et ${doctor.bookingWindow.end}.`}
-                 </div>
+                  <div className="bg-indigo-50 border border-indigo-200 text-indigo-800 p-6 rounded-2xl mt-4 text-sm font-bold text-center shadow-[inset_0_2px_10px_rgba(200,0,0,0.05)]">
+                    {tx(
+                      `الحجز غير متاح الآن. يرجى الحجز بين الساعة ${doctor.bookingWindow.start} و ${doctor.bookingWindow.end}.`,
+                      `La réservation n'est pas disponible actuellement. Veuillez réserver entre ${doctor.bookingWindow.start} et ${doctor.bookingWindow.end}.`,
+                      `La réservation n'est pas disponible actuellement. Veuillez réserver entre ${doctor.bookingWindow.start} et ${doctor.bookingWindow.end}.`
+                    )}
+                  </div>
                 );
               }
             }
@@ -323,21 +342,22 @@ export default function DoctorDetail() {
                 <div className="bg-green-50/50 p-6 rounded-2xl text-center border border-green-100 relative overflow-hidden">
                   <div className="absolute -right-4 -top-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
                   <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-green-100/50 rounded-full blur-2xl"></div>
-                  
                   <div className="inline-block p-3 bg-green-500 rounded-full mb-4 shadow-sm shadow-green-200 relative z-10">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
                   </div>
-                  <h3 className="text-lg font-bold text-green-700 mb-2 relative z-10">{language === 'ar' ? 'تم الحجز بنجاح!' : 'Réservation réussie !'}</h3>
-                  
+                  <h3 className="text-lg font-bold text-green-700 mb-2 relative z-10">{tx('تم الحجز بنجاح!', 'Réservation réussie !', "Booking Successful!")}</h3>
                   <p className="text-xs text-slate-600 max-w-[250px] mx-auto leading-relaxed relative z-10 my-4">
-                    {language === 'ar' ? 'سيتم التواصل معك قريباً لتأكيد الموعد.' : 'Vous serez contacté prochainement pour confirmer.'}
+                    {tx(
+                      'سيتم التواصل معك قريباً لتأكيد الموعد.',
+                      'Vous serez contacté prochainement pour confirmer.',
+                      "You will be contacted shortly to confirm your appointment."
+                    )}
                   </p>
-
                   <button 
                     onClick={() => { setSuccess(false); setQueueNumber(null); }}
                     className="mt-6 px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-50 hover:border-slate-300 transition-all w-full relative z-10"
                   >
-                    {language === 'ar' ? 'حجز موعد آخر' : 'Nouveau rendez-vous'}
+                    {tx('حجز موعد آخر', 'Nouveau rendez-vous', "Book Another Appointment")}
                   </button>
                 </div>
               );
@@ -346,35 +366,34 @@ export default function DoctorDetail() {
             return (
               <form onSubmit={handleBooking} className="space-y-4 relative z-10">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'الاسم الكامل' : 'Nom complet'}</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{tx('الاسم الكامل', 'Nom complet', "Full Name")}</label>
                   <div className="relative">
-                    <UserRound className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
+                    <UserRound className={`absolute ${tx('right-4', 'left-4', "left-4")} top-3.5 w-5 h-5 text-slate-400`} />
                     <input 
                       type="text" 
                       required
                       value={patientName}
                       onChange={(e) => setPatientName(e.target.value)}
-                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm transition-all`} 
-                      placeholder={language === 'ar' ? "مثال: محمد أحمد" : "Ex: Mohamed Ahmed"}
+                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${tx('pr-12 pl-4', 'pl-12 pr-4', "pl-12 pr-4")} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm transition-all`} 
+                      placeholder={tx("مثال: محمد أحمد", "Ex: Mohamed Ahmed", "Ex: Mohamed Ahmed")}
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">{tx('رقم الهاتف', 'Numéro de téléphone', "Phone Number")}</label>
                   <div className="relative">
-                    <Phone className={`absolute ${language === 'ar' ? 'right-4' : 'left-4'} top-3.5 w-5 h-5 text-slate-400`} />
+                    <Phone className={`absolute ${tx('right-4', 'left-4', "left-4")} top-3.5 w-5 h-5 text-slate-400`} />
                     <input 
                       type="tel" 
                       required
                       value={patientPhone}
                       onChange={(e) => setPatientPhone(e.target.value)}
-                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${language === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4'} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm text-left transition-all`} 
+                      className={`w-full border border-slate-200 bg-slate-50/50 rounded-2xl py-3.5 ${tx('pr-12 pl-4', 'pl-12 pr-4', "pl-12 pr-4")} focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 focus:outline-none focus:bg-white text-sm text-left transition-all`} 
                       placeholder="05xx xx xx xx"
                       dir="ltr"
                     />
                   </div>
                 </div>
-                
                 <div className="flex items-start gap-3 mt-4 mb-2">
                   <div className="flex items-center h-5">
                     <input
@@ -386,26 +405,24 @@ export default function DoctorDetail() {
                     />
                   </div>
                   <label htmlFor="terms" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
-                    {language === 'ar' ? (
-                      <>
-                        أوافق على <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">شروط الاستخدام وسياسة الخصوصية</button>، وأقر بأنني سأحضر في الموعد المحدد.
-                      </>
-                    ) : (
-                      <>
-                        J'accepte les <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">conditions d'utilisation et la politique de confidentialité</button>, et je m'engage à me présenter au rendez-vous.
-                      </>
+                    {tx(
+                      (<>أوافق على <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">شروط الاستخدام وسياسة الخصوصية</button>، وأقر بأنني سأحضر في الموعد المحدد.
+                                              </>),
+                      (<>J'accepte les <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">conditions d'utilisation et la politique de confidentialité</button>, et je m'engage à me présenter au rendez-vous.
+                                              </>),
+                      (<>J'accepte les <button type="button" onClick={() => setShowTermsModal(true)} className="text-[#1E6DFF] font-medium hover:underline inline-flex">conditions d'utilisation et la politique de confidentialité</button>, et je m'engage à me présenter au rendez-vous.
+                                              </>)
                     )}
                   </label>
                 </div>
-
                 <button 
                   type="submit" 
                   disabled={bookingLoading}
                   className="w-full bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white font-bold rounded-[20px] py-4 mt-2 shadow-[0_8px_20px_rgba(24,197,181,0.25)] hover:shadow-[0_12px_25px_rgba(30,109,255,0.35)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {bookingLoading 
-                    ? (language === 'ar' ? "جاري الحجز..." : "Réservation...") 
-                    : (language === 'ar' ? "تأكيد الحجز" : "Confirmer le rendez-vous")}
+                    ? (tx("جاري الحجز...", "Réservation...", "Booking...")) 
+                    : (tx("تأكيد الحجز", "Confirmer le rendez-vous", "Confirm Appointment"))}
                 </button>
               </form>
             );
@@ -416,7 +433,7 @@ export default function DoctorDetail() {
             <div className="mt-5 border-t border-slate-100 pt-4 flex flex-col gap-2 text-xs text-slate-500">
               <div className="flex justify-between items-center">
                 <div className="font-medium text-slate-600">
-                  {language === 'ar' ? 'أوقات العمل:' : 'Heures de travail :'}
+                  {tx('أوقات العمل:', 'Heures de travail :', "Working Hours:")}
                 </div>
                 <div className="bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-700" dir="ltr">
                   {doctor.workingHours.start} - {doctor.workingHours.end}
@@ -425,7 +442,7 @@ export default function DoctorDetail() {
               {doctor.workingDays && doctor.workingDays.length > 0 && (
                 <div className="flex justify-between items-start mt-2">
                    <div className="font-medium text-slate-600 shrink-0">
-                    {language === 'ar' ? 'أيام العمل:' : 'Jours de travail :'}
+                    {tx('أيام العمل:', 'Jours de travail :', "Working Days:")}
                   </div>
                   <div className="flex flex-wrap justify-end gap-1 pl-4">
                     {doctor.workingDays.map(day => (
@@ -446,14 +463,18 @@ export default function DoctorDetail() {
           className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all mt-4"
         >
           <QrCode className="w-5 h-5 text-[#1E6DFF]" />
-          <span>{language === 'ar' ? 'تبادل صفحة الحجز (QR)' : 'Partager la page de réservation (QR)'}</span>
+          <span>{tx(
+            'تبادل صفحة الحجز (QR)',
+            'Partager la page de réservation (QR)',
+            "Share Booking Page (QR)"
+          )}</span>
         </button>
 
         {/* Stats Card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-5">
           <div className="flex justify-between items-center">
             <div className="text-center w-1/3">
-              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{language === 'ar' ? 'التقييم' : 'Note'}</span>
+              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{tx('التقييم', 'Note', "Rating")}</span>
               <div className="flex items-center justify-center text-amber-500 font-bold text-lg cursor-pointer hover:scale-105 transition" onClick={() => document.getElementById('reviewsSection')?.scrollIntoView({ behavior: 'smooth' })}>
                 <Star className="w-4 h-4 fill-amber-500 mr-1" />
                 {doctor.rating ? doctor.rating.toFixed(1) : '--'}
@@ -461,12 +482,12 @@ export default function DoctorDetail() {
             </div>
             <div className="w-px h-10 bg-slate-100"></div>
             <div className="text-center w-1/3">
-              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{language === 'ar' ? 'المراجعات' : 'Avis'}</span>
+              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{tx('المراجعات', 'Avis', "Reviews")}</span>
               <div className="font-bold text-slate-700 text-lg">{doctor.reviewCount || 0}</div>
             </div>
             <div className="w-px h-10 bg-slate-100"></div>
             <div className="text-center w-1/3">
-              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{language === 'ar' ? 'المرضى' : 'Patients'}</span>
+              <span className="block text-slate-400 text-[10px] uppercase tracking-wider mb-1">{tx('المرضى', 'Patients', "Patients")}</span>
               <div className="font-bold text-slate-700 text-lg">{(doctor.patientCount || 0)}</div>
             </div>
           </div>
@@ -475,14 +496,18 @@ export default function DoctorDetail() {
         {/* Reviews Section */}
         <div id="reviewsSection" className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 scroll-mt-24">
           <h2 className="text-lg font-bold text-slate-700 mb-5 flex items-center">
-            <Star className={`w-5 h-5 fill-amber-500 text-amber-500 ${language === 'ar' ? 'mr-2' : 'mr-2'}`} />
-            {language === 'ar' ? 'آراء وتقييمات المرضى' : 'Avis des patients'}
+            <Star className={`w-5 h-5 fill-amber-500 text-amber-500 ${tx('mr-2', 'mr-2', "mr-2")}`} />
+            {tx('آراء وتقييمات المرضى', 'Avis des patients', "Patient Reviews and Ratings")}
           </h2>
 
           <div className="space-y-4 mb-8">
             {reviews.length === 0 ? (
               <p className="text-slate-500 text-sm text-center py-4 bg-slate-50 rounded-2xl border border-slate-100 items-center justify-center">
-                {language === 'ar' ? 'لا توجد تقييمات لهذا الطبيب حتى الآن.' : 'Aucun avis pour le moment.'}
+                {tx(
+                  'لا توجد تقييمات لهذا الطبيب حتى الآن.',
+                  'Aucun avis pour le moment.',
+                  "No reviews yet for this doctor."
+                )}
               </p>
             ) : (
               reviews.map(review => (
@@ -497,7 +522,7 @@ export default function DoctorDetail() {
                   </div>
                   <p className="text-slate-600 text-sm leading-relaxed">{review.comment}</p>
                   <div className="text-slate-400 text-[10px] mt-2">
-                    {new Date(review.createdAt).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'fr-FR')}
+                    {new Date(review.createdAt).toLocaleDateString(tx('ar-EG', 'fr-FR', "en-US"))}
                   </div>
                 </div>
               ))
@@ -505,7 +530,7 @@ export default function DoctorDetail() {
           </div>
 
           <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100">
-            <h3 className="text-md font-bold text-slate-700 mb-4">{language === 'ar' ? 'أضف تقييمك' : 'Ajouter un avis'}</h3>
+            <h3 className="text-md font-bold text-slate-700 mb-4">{tx('أضف تقييمك', 'Ajouter un avis', "Add Your Review")}</h3>
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div className="flex justify-center gap-2 py-2" dir="ltr">
                 {[1, 2, 3, 4, 5].map(star => (
@@ -526,7 +551,7 @@ export default function DoctorDetail() {
                   value={reviewName}
                   onChange={(e) => setReviewName(e.target.value)}
                   className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-400 focus:outline-none text-sm" 
-                  placeholder={language === 'ar' ? "اسمك الكريم" : "Votre nom"}
+                  placeholder={tx("اسمك الكريم", "Votre nom", "Your Name")}
                 />
               </div>
               <div>
@@ -536,7 +561,11 @@ export default function DoctorDetail() {
                   onChange={(e) => setReviewComment(e.target.value)}
                   rows={3}
                   className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-400 focus:outline-none text-sm resize-none" 
-                  placeholder={language === 'ar' ? "كيف كانت تجربتك مع هذا الطبيب؟" : "Parlez-nous de votre expérience..."}
+                  placeholder={tx(
+                    "كيف كانت تجربتك مع هذا الطبيب؟",
+                    "Parlez-nous de votre expérience...",
+                    "How was your experience with this doctor?"
+                  )}
                 />
               </div>
               <button 
@@ -545,14 +574,13 @@ export default function DoctorDetail() {
                 className="w-full bg-slate-800 text-white font-bold rounded-xl py-3 shadow-sm hover:bg-slate-900 transition disabled:opacity-70 disabled:cursor-not-allowed text-sm"
               >
                 {isSubmittingReview 
-                  ? (language === 'ar' ? "جاري الإرسال..." : "Envoi en cours...") 
-                  : (language === 'ar' ? "نشر التقييم" : "Publier l'avis")}
+                  ? (tx("جاري الإرسال...", "Envoi en cours...", "Submitting...")) 
+                  : (tx("نشر التقييم", "Publier l'avis", "Post Review"))}
               </button>
             </form>
           </div>
         </div>
       </div>
-
       {showQRModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-[1.5rem] w-full max-w-[320px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
@@ -569,13 +597,15 @@ export default function DoctorDetail() {
               </div>
               
               <h3 className="text-lg font-bold text-slate-800 mb-1">
-                {language === "ar" ? "تبادل صفحة الحجز" : "Partager la page"}
+                {tx("تبادل صفحة الحجز", "Partager la page", "Share Booking Page")}
               </h3>
               
               <p className="text-slate-500 text-xs mb-4 leading-relaxed px-2">
-                {language === "ar" 
-                  ? "امسح الرمز للوصول لصفحة الحجز الخاصة بهذا الطبيب." 
-                  : "Scannez ce code pour accéder à la page de réservation de ce médecin."}
+                {tx(
+                  "امسح الرمز للوصول لصفحة الحجز الخاصة بهذا الطبيب.",
+                  "Scannez ce code pour accéder à la page de réservation de ce médecin.",
+                  "Scan the code to access this doctor's booking page."
+                )}
               </p>
 
               <div className="bg-white p-3 rounded-xl border-2 border-indigo-50 shadow-sm mb-5 inline-flex justify-center w-auto">
@@ -592,17 +622,20 @@ export default function DoctorDetail() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  alert(language === 'ar' ? 'تم نسخ الرابط بنجاح!' : 'Lien copié avec succès !');
+                  alert(tx(
+                    'تم نسخ الرابط بنجاح!',
+                    'Lien copié avec succès !',
+                    "Link copied successfully!"
+                  ));
                 }}
                 className="w-full bg-slate-100 text-indigo-600 font-bold text-sm py-3 rounded-xl transition hover:bg-slate-200"
               >
-                {language === 'ar' ? 'نسخ الرابط المباشر' : 'Copier le lien direct'}
+                {tx('نسخ الرابط المباشر', 'Copier le lien direct', "Copy Direct Link")}
               </button>
             </div>
           </div>
         </div>
       )}
-
       {showTermsModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md">
           <div className="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
@@ -614,10 +647,18 @@ export default function DoctorDetail() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-800 text-lg leading-tight">
-                    {language === 'ar' ? 'شروط الاستخدام وسياسة الخصوصية' : 'Conditions Générales & Confidentialité'}
+                    {tx(
+                      'شروط الاستخدام وسياسة الخصوصية',
+                      'Conditions Générales & Confidentialité',
+                      "Terms of Use & Privacy Policy"
+                    )}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    {language === 'ar' ? 'تاريخ آخر تحديث: مايو 2026' : 'Dernière mise à jour: Mai 2026'}
+                    {tx(
+                      'تاريخ آخر تحديث: مايو 2026',
+                      'Dernière mise à jour: Mai 2026',
+                      "Last updated: May 2026"
+                    )}
                   </p>
                 </div>
               </div>
@@ -631,183 +672,250 @@ export default function DoctorDetail() {
             </div>
             
             <div className="p-5 sm:p-8 overflow-y-auto text-sm text-slate-600 flex-1 relative custom-scrollbar bg-slate-50/30">
-              {language === 'ar' ? (
-                <div className="space-y-8">
-                  <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
-                    تمثل هذه الشروط اتفاقية ملزمة بين مستخدم خدمة داويني (Dawini) والمنصة. باستخدامك للمنصة، فإنك توافق على الالتزام بهذه الشروط والأحكام.
-                  </p>
-
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                        <Info className="w-4 h-4" />
-                      </div>
-                      1. طبيعة الخدمات المقدمة
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed">
-                        داويني هي منصة وساطة رقمية تهدف إلى تسهيل عملية الربط بين المرضى ومقدمي الرعاية الصحية. المدرجين في الدليل.
-                      </p>
-                      <ul className="list-disc pr-5 space-y-1 text-slate-500 marker:text-slate-300">
-                        <li>لا تقدم المنصة استشارات طبية، تشخيصاً، أو علاجاً.</li>
-                        <li>المعلومات المتوفرة على المنصة هي للاسترشاد فقط ولا تغني بأي حال من الأحوال عن الزيارة الطبية المتخصصة.</li>
-                      </ul>
+              {tx((<div className="space-y-8">
+                <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                  تمثل هذه الشروط اتفاقية ملزمة بين مستخدم خدمة داويني (Dawini) والمنصة. باستخدامك للمنصة، فإنك توافق على الالتزام بهذه الشروط والأحكام.
+                </p>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                      <Info className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
-                        <CalendarClock className="w-4 h-4" />
-                      </div>
-                      2. سياسة حجز المواعيد والالتزام
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                       <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
-                        <li>المواعيد المحجوزة عبر المنصة هي مواعيد تنظيمية مبدئية وتخضع لظروف وطبيعة عمل العيادة.</li>
-                        <li>يُقر المريض بضرورة <strong className="text-slate-700">الحضور قبل الموعد بـ 15 دقيقة على الأقل</strong> لتأكيد الوصول وضمان حقه في الفحص.</li>
-                        <li>المنصة غير مسؤولة عن التأخير الناتج عن الحالات الطارئة في العيادة والتي قد تؤدي لتغيير ترتيب الأدوار.</li>
-                      </ul>
+                    1. طبيعة الخدمات المقدمة
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed">
+                      داويني هي منصة وساطة رقمية تهدف إلى تسهيل عملية الربط بين المرضى ومقدمي الرعاية الصحية. المدرجين في الدليل.
+                    </p>
+                    <ul className="list-disc pr-5 space-y-1 text-slate-500 marker:text-slate-300">
+                      <li>لا تقدم المنصة استشارات طبية، تشخيصاً، أو علاجاً.</li>
+                      <li>المعلومات المتوفرة على المنصة هي للاسترشاد فقط ولا تغني بأي حال من الأحوال عن الزيارة الطبية المتخصصة.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                      <CalendarClock className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      3. الخصوصية وحماية البيانات (GDPR)
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed text-slate-600">
-                        نحن نأخذ خصوصيتك بصرامة بالغة. تُجمع البيانات بطريقة آمنة لغرض واحد فقط.
-                      </p>
-                      <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
-                        <li>تجمع المنصة البيانات الأساسية (الاسم، رقم الهاتف) حصرياً لغرض إدارة الحجز الطبي وإرسالها للطبيب.</li>
-                        <li>نلتزم بأعلى معايير التشفير والأمان لمنع اختراق أو تسريب معلوماتك، ولا يمكن إستخدامها للبحث عنك عبر محركات البحث.</li>
-                        <li><strong>لن يتم بيع، تأجير، أو مشاركة</strong> بياناتك الشخصية مع أي أطراف ثالثة أو شركات إعلانية تحت أي ظرف.</li>
-                      </ul>
+                    2. سياسة حجز المواعيد والالتزام
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>المواعيد المحجوزة عبر المنصة هي مواعيد تنظيمية مبدئية وتخضع لظروف وطبيعة عمل العيادة.</li>
+                      <li>يُقر المريض بضرورة <strong className="text-slate-700">الحضور قبل الموعد بـ 15 دقيقة على الأقل</strong> لتأكيد الوصول وضمان حقه في الفحص.</li>
+                      <li>المنصة غير مسؤولة عن التأخير الناتج عن الحالات الطارئة في العيادة والتي قد تؤدي لتغيير ترتيب الأدوار.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <ShieldCheck className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                        <Scale className="w-4 h-4" />
-                      </div>
-                      4. الاستخدام العادل والمحظورات
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed text-slate-600">
-                        تُمنع الحجوزات الوهمية أو المتكررة بغرض التخريب أو حجز مواعيد لأشخاص غير موجودين. 
-                        يحق للمنصة تتبع عناوين IP وحظر الأرقام التي يثبت قيامها بنشاط مشبوه دون إشعار مسبق لضمان جودة الخدمة للمرضى الحقيقيين.
-                      </p>
+                    3. الخصوصية وحماية البيانات (GDPR)
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      نحن نأخذ خصوصيتك بصرامة بالغة. تُجمع البيانات بطريقة آمنة لغرض واحد فقط.
+                    </p>
+                    <ul className="list-disc pr-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>تجمع المنصة البيانات الأساسية (الاسم، رقم الهاتف) حصرياً لغرض إدارة الحجز الطبي وإرسالها للطبيب.</li>
+                      <li>نلتزم بأعلى معايير التشفير والأمان لمنع اختراق أو تسريب معلوماتك، ولا يمكن إستخدامها للبحث عنك عبر محركات البحث.</li>
+                      <li><strong>لن يتم بيع، تأجير، أو مشاركة</strong> بياناتك الشخصية مع أي أطراف ثالثة أو شركات إعلانية تحت أي ظرف.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                      <Scale className="w-4 h-4" />
                     </div>
-                  </section>
-
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
-                        <AlertTriangle className="w-4 h-4" />
-                      </div>
-                      5. إخلاء المسؤولية (Disclaimer)
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                       <p className="leading-relaxed text-slate-600">
-                        المنصة تُخلي مسؤوليتها التامة عن أي مضاعفات طبية، أخطاء في التشخيص، أو خلافات مادية أو معنوية تنشأ بين المريض والطبيب. العلاقة الطبية والتعاقدية هي حصراً بين المريض ومقدم الرعاية الصحية المختار.
-                      </p>
+                    4. الاستخدام العادل والمحظورات
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      تُمنع الحجوزات الوهمية أو المتكررة بغرض التخريب أو حجز مواعيد لأشخاص غير موجودين. 
+                      يحق للمنصة تتبع عناوين IP وحظر الأرقام التي يثبت قيامها بنشاط مشبوه دون إشعار مسبق لضمان جودة الخدمة للمرضى الحقيقيين.
+                    </p>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                      <AlertTriangle className="w-4 h-4" />
                     </div>
-                  </section>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
-                    Ces conditions représentent un accord contraignant entre l'utilisateur du service Dawini et la plateforme. En utilisant la plateforme, vous acceptez de respecter ces termes et conditions.
-                  </p>
-
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                        <Info className="w-4 h-4" />
-                      </div>
-                      1. Nature des Services Fournis
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed">
-                        Dawini est une plateforme d'intermédiation numérique visant à faciliter la mise en relation entre les patients et les professionnels de la santé.
-                      </p>
-                      <ul className="list-disc pl-5 space-y-1 text-slate-500 marker:text-slate-300">
-                        <li>La plateforme ne fournit pas de consultations médicales, de diagnostics ou de traitements.</li>
-                        <li>Les informations disponibles sur la plateforme sont fournies à titre indicatif et ne remplacent en aucun cas une visite médicale spécialisée.</li>
-                      </ul>
+                    5. إخلاء المسؤولية (Disclaimer)
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <p className="leading-relaxed text-slate-600">
+                      المنصة تُخلي مسؤوليتها التامة عن أي مضاعفات طبية، أخطاء في التشخيص، أو خلافات مادية أو معنوية تنشأ بين المريض والطبيب. العلاقة الطبية والتعاقدية هي حصراً بين المريض ومقدم الرعاية الصحية المختار.
+                    </p>
+                  </div>
+                </section>
+              </div>), (<div className="space-y-8">
+                <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                  Ces conditions représentent un accord contraignant entre l'utilisateur du service Dawini et la plateforme. En utilisant la plateforme, vous acceptez de respecter ces termes et conditions.
+                </p>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                      <Info className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
-                        <CalendarClock className="w-4 h-4" />
-                      </div>
-                      2. Politique de Prise de Rendez-vous
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                       <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
-                        <li>Les rendez-vous pris via la plateforme sont des rendez-vous organisationnels préliminaires.</li>
-                        <li>Le patient s'engage à <strong className="text-slate-700">se présenter au moins 15 minutes avant</strong> le rendez-vous pour confirmer son arrivée.</li>
-                        <li>La plateforme n'est pas responsable des retards dus à des urgences à la clinique qui pourraient modifier l'ordre des patients.</li>
-                      </ul>
+                    1. Nature des Services Fournis
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed">
+                      Dawini est une plateforme d'intermédiation numérique visant à faciliter la mise en relation entre les patients et les professionnels de la santé.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-slate-500 marker:text-slate-300">
+                      <li>La plateforme ne fournit pas de consultations médicales, de diagnostics ou de traitements.</li>
+                      <li>Les informations disponibles sur la plateforme sont fournies à titre indicatif et ne remplacent en aucun cas une visite médicale spécialisée.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                      <CalendarClock className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <ShieldCheck className="w-4 h-4" />
-                      </div>
-                      3. Confidentialité et Protection des Données (RGPD)
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed text-slate-600">
-                        Nous prenons votre vie privée très au sérieux. Les données sont collectées en toute sécurité dans un seul but.
-                      </p>
-                      <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
-                        <li>La plateforme collecte les données essentielles (nom, numéro) exclusivement pour la gestion de la réservation médicale.</li>
-                        <li>Nous nous engageons à respecter les normes de cryptage et de sécurité les plus élevées.</li>
-                        <li>Vos données personnelles ne seront <strong>jamais vendues, louées ou partagées</strong> avec des tiers ou des sociétés publicitaires.</li>
-                      </ul>
+                    2. Politique de Prise de Rendez-vous
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>Les rendez-vous pris via la plateforme sont des rendez-vous organisationnels préliminaires.</li>
+                      <li>Le patient s'engage à <strong className="text-slate-700">se présenter au moins 15 minutes avant</strong> le rendez-vous pour confirmer son arrivée.</li>
+                      <li>La plateforme n'est pas responsable des retards dus à des urgences à la clinique qui pourraient modifier l'ordre des patients.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <ShieldCheck className="w-4 h-4" />
                     </div>
-                  </section>
-                  
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                        <Scale className="w-4 h-4" />
-                      </div>
-                      4. Utilisation Raisonnable
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                      <p className="leading-relaxed text-slate-600">
-                        Il est interdit d'utiliser la plateforme pour des réservations fictives ou des abus. 
-                        La plateforme a le droit de tracer les adresses IP et de bloquer automatiquement les numéros dont il est prouvé qu'ils ont une activité suspecte sans préavis.
-                      </p>
+                    3. Confidentialité et Protection des Données (RGPD)
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      Nous prenons votre vie privée très au sérieux. Les données sont collectées en toute sécurité dans un seul but.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>La plateforme collecte les données essentielles (nom, numéro) exclusivement pour la gestion de la réservation médicale.</li>
+                      <li>Nous nous engageons à respecter les normes de cryptage et de sécurité les plus élevées.</li>
+                      <li>Vos données personnelles ne seront <strong>jamais vendues, louées ou partagées</strong> avec des tiers ou des sociétés publicitaires.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                      <Scale className="w-4 h-4" />
                     </div>
-                  </section>
-
-                  <section className="space-y-3">
-                    <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
-                        <AlertTriangle className="w-4 h-4" />
-                      </div>
-                      5. Clause de Non-responsabilité
-                    </h4>
-                    <div className="pl-11 pr-4 space-y-2">
-                       <p className="leading-relaxed text-slate-600">
-                        La plateforme décline toute responsabilité pour toute complication médicale, erreur de diagnostic ou litige survenant entre le patient et le médecin. La relation médicale et contractuelle est exclusivement entre le patient et le professionnel de la santé.
-                      </p>
+                    4. Utilisation Raisonnable
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      Il est interdit d'utiliser la plateforme pour des réservations fictives ou des abus. 
+                      La plateforme a le droit de tracer les adresses IP et de bloquer automatiquement les numéros dont il est prouvé qu'ils ont une activité suspecte sans préavis.
+                    </p>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                      <AlertTriangle className="w-4 h-4" />
                     </div>
-                  </section>
-                </div>
-              )}
+                    5. Clause de Non-responsabilité
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <p className="leading-relaxed text-slate-600">
+                      La plateforme décline toute responsabilité pour toute complication médicale, erreur de diagnostic ou litige survenant entre le patient et le médecin. La relation médicale et contractuelle est exclusivement entre le patient et le professionnel de la santé.
+                    </p>
+                  </div>
+                </section>
+              </div>), (<div className="space-y-8">
+                <p className="text-sm leading-relaxed text-slate-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50">
+                  Ces conditions représentent un accord contraignant entre l'utilisateur du service Dawini et la plateforme. En utilisant la plateforme, vous acceptez de respecter ces termes et conditions.
+                </p>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                      <Info className="w-4 h-4" />
+                    </div>
+                    1. Nature des Services Fournis
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed">
+                      Dawini est une plateforme d'intermédiation numérique visant à faciliter la mise en relation entre les patients et les professionnels de la santé.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-slate-500 marker:text-slate-300">
+                      <li>La plateforme ne fournit pas de consultations médicales, de diagnostics ou de traitements.</li>
+                      <li>Les informations disponibles sur la plateforme sont fournies à titre indicatif et ne remplacent en aucun cas une visite médicale spécialisée.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                      <CalendarClock className="w-4 h-4" />
+                    </div>
+                    2. Politique de Prise de Rendez-vous
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>Les rendez-vous pris via la plateforme sont des rendez-vous organisationnels préliminaires.</li>
+                      <li>Le patient s'engage à <strong className="text-slate-700">se présenter au moins 15 minutes avant</strong> le rendez-vous pour confirmer son arrivée.</li>
+                      <li>La plateforme n'est pas responsable des retards dus à des urgences à la clinique qui pourraient modifier l'ordre des patients.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    3. Confidentialité et Protection des Données (RGPD)
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      Nous prenons votre vie privée très au sérieux. Les données sont collectées en toute sécurité dans un seul but.
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2 text-slate-500 marker:text-slate-300">
+                      <li>La plateforme collecte les données essentielles (nom, numéro) exclusivement pour la gestion de la réservation médicale.</li>
+                      <li>Nous nous engageons à respecter les normes de cryptage et de sécurité les plus élevées.</li>
+                      <li>Vos données personnelles ne seront <strong>jamais vendues, louées ou partagées</strong> avec des tiers ou des sociétés publicitaires.</li>
+                    </ul>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                      <Scale className="w-4 h-4" />
+                    </div>
+                    4. Utilisation Raisonnable
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                    <p className="leading-relaxed text-slate-600">
+                      Il est interdit d'utiliser la plateforme pour des réservations fictives ou des abus. 
+                      La plateforme a le droit de tracer les adresses IP et de bloquer automatiquement les numéros dont il est prouvé qu'ils ont une activité suspecte sans préavis.
+                    </p>
+                  </div>
+                </section>
+                <section className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-base flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                      <AlertTriangle className="w-4 h-4" />
+                    </div>
+                    5. Clause de Non-responsabilité
+                  </h4>
+                  <div className="pl-11 pr-4 space-y-2">
+                     <p className="leading-relaxed text-slate-600">
+                      La plateforme décline toute responsabilité pour toute complication médicale, erreur de diagnostic ou litige survenant entre le patient et le médecin. La relation médicale et contractuelle est exclusivement entre le patient et le professionnel de la santé.
+                    </p>
+                  </div>
+                </section>
+              </div>))}
             </div>
             
             <div className="p-5 sm:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-10 flex flex-col sm:flex-row items-center gap-4 mt-auto">
@@ -819,7 +927,11 @@ export default function DoctorDetail() {
                 className="w-full bg-slate-900 text-white font-bold rounded-2xl py-3.5 px-6 shadow-md shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-0.5 transition-all text-[15px] flex items-center justify-center gap-2"
               >
                 <ShieldCheck className="w-5 h-5" />
-                {language === 'ar' ? 'أوافق على الشروط والسياسة بشكل كامل' : 'J\'accepte les conditions et la politique'}
+                {tx(
+                  'أوافق على الشروط والسياسة بشكل كامل',
+                  'J\'accepte les conditions et la politique',
+                  "I fully agree to the terms and policy"
+                )}
               </button>
             </div>
           </div>
