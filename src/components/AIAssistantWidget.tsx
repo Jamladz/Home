@@ -8,10 +8,7 @@ import { db } from "../lib/firebase";
 import { DoctorProfile } from "../types";
 
 export function AIAssistantWidget() {
-  const {
-    language,
-    tx: tx
-  } = useLanguage();
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<
     { role: "user" | "model"; text: string; image?: string }[]
@@ -56,11 +53,9 @@ export function AIAssistantWidget() {
         {
           role: "model",
           text:
-            tx(
-              "مرحباً بك! أنا مساعدك الطبي الذكي. واش نقدر نعاونك اليوم بخصوص صحتك؟",
-              "Bonjour ! Je suis votre assistant médical intelligent. Comment puis-je vous aider aujourd'hui ?",
-              "Hello! I am your smart medical assistant. How can I held you with your health today?"
-            ),
+            language === "ar"
+              ? "مرحباً بك! أنا مساعدك الطبي الذكي. واش نقدر نعاونك اليوم بخصوص صحتك؟"
+              : "Bonjour ! Je suis votre assistant médical intelligent. Comment puis-je vous aider aujourd'hui ?",
         },
       ]);
     }
@@ -85,11 +80,7 @@ export function AIAssistantWidget() {
         };
         reader.readAsDataURL(file);
       } else {
-        alert(tx(
-          "الرجاء اختيار صورة صالحة.",
-          "Veuillez sélectionner une image valide.",
-          "Please specify a valid image."
-        ));
+        alert(language === "ar" ? "الرجاء اختيار صورة صالحة." : "Veuillez sélectionner une image valide.");
       }
     }
   };
@@ -133,11 +124,9 @@ export function AIAssistantWidget() {
     }
 
     if (!apiKey) {
-      const errorText = tx(
-        "عذراً، المساعد الذكي غير متوفر حالياً. يرجى مراجعة الإدارة للتحقق من إعدادات الذكاء الاصطناعي.",
-        "Désolé, l'assistant est indisponible. Veuillez vérifier les paramètres avec l'administration.",
-        "Sorry, the smart assistant is currently unavailable. Please check the AI settings with administration."
-      );
+      const errorText = language === "ar"
+        ? "عذراً، المساعد الذكي غير متوفر حالياً. يرجى مراجعة الإدارة للتحقق من إعدادات الذكاء الاصطناعي."
+        : "Désolé, l'assistant est indisponible. Veuillez vérifier les paramètres avec l'administration.";
       
       setMessages((prev) => [
         ...prev,
@@ -217,11 +206,9 @@ Assistant:`;
         ]);
       } else {
         setError(
-          tx(
-            "عذراً، حدث خطأ ما حاول مجدداً.",
-            "Désolé, une erreur s'est produite. Veuillez réessayer.",
-            "Sorry, an error occurred. Please try again."
-          ),
+          language === "ar"
+            ? "عذراً، حدث خطأ ما حاول مجدداً."
+            : "Désolé, une erreur s'est produite. Veuillez réessayer.",
         );
       }
     } catch (error: any) {
@@ -230,16 +217,10 @@ Assistant:`;
       const isQuotaError = error?.message?.includes('exceeded') || error?.status === 429;
       
       const errorMsg = isQuotaError 
-        ? (tx(
-        "المعذرة، يوجد ضغط كبير على الخدمة حالياً. حاول بعد قليل.",
-        "Le service est saturé. Veuillez réessayer plus tard.",
-        "Sorry, the service is currently under heavy load. Please try again later."
-      ))
-        : (tx(
-        "عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.",
-        "Désolé, une erreur de connexion s'est produite. Veuillez réessayer plus tard.",
-        "Sorry, a connection error occurred. Please try again later."
-      ));
+        ? (language === "ar" ? "المعذرة، يوجد ضغط كبير على الخدمة حالياً. حاول بعد قليل." : "Le service est saturé. Veuillez réessayer plus tard.")
+        : (language === "ar"
+          ? "عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً."
+          : "Désolé, une erreur de connexion s'est produite. Veuillez réessayer plus tard.");
           
       setError(errorMsg);
     } finally {
@@ -258,20 +239,21 @@ Assistant:`;
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className={`fixed bottom-20 ${tx("left-6", "right-6", "right-6")} z-[9990] bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-4 rounded-full shadow-[0_8px_30px_rgba(24,197,181,0.25)] hover:shadow-lg transition flex items-center justify-center border-4 border-white`}
+            className={`fixed bottom-20 ${language === "ar" ? "left-6" : "right-6"} z-[9990] bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-4 rounded-full shadow-[0_8px_30px_rgba(24,197,181,0.25)] hover:shadow-lg transition flex items-center justify-center border-4 border-white`}
             aria-label="Open Medical Assistant"
           >
             <Bot className="w-6 h-6" />
           </motion.button>
         )}
       </AnimatePresence>
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className={`fixed bottom-20 ${tx("left-4 md:left-6", "right-4 md:right-6", "right-4 md:right-6")} z-[9995] w-[calc(100vw-32px)] md:w-[380px] h-[550px] max-h-[85vh] bg-white rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.15)] overflow-hidden flex flex-col border border-slate-200`}
+            className={`fixed bottom-20 ${language === "ar" ? "left-4 md:left-6" : "right-4 md:right-6"} z-[9995] w-[calc(100vw-32px)] md:w-[380px] h-[550px] max-h-[85vh] bg-white rounded-3xl shadow-[0_10px_40px_rgb(0,0,0,0.15)] overflow-hidden flex flex-col border border-slate-200`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-4 flex justify-between items-center shrink-0">
@@ -281,11 +263,13 @@ Assistant:`;
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">
-                    {tx("المساعد الطبي المباشر", "Assistant Médical", "Live Medical Assistant")}
+                    {language === "ar"
+                      ? "المساعد الطبي المباشر"
+                      : "Assistant Médical"}
                   </h3>
                   <p className="text-indigo-100 text-[10px] flex items-center">
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 inline-block"></span>
-                    {tx("متصل الآن", "En ligne", "Online")}
+                    {language === "ar" ? "متصل الآن" : "En ligne"}
                   </p>
                 </div>
               </div>
@@ -304,7 +288,7 @@ Assistant:`;
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`flex ${msg.role === "user" ? (tx("justify-end", "justify-end", "justify-end")) : tx("justify-start", "justify-start", "justify-start")}`}
+                  className={`flex ${msg.role === "user" ? (language === "ar" ? "justify-end" : "justify-end") : language === "ar" ? "justify-start" : "justify-start"}`}
                   dir={
                     msg.role === "model" && language === "ar"
                       ? "rtl"
@@ -329,7 +313,7 @@ Assistant:`;
               ))}
               {isLoading && (
                 <div
-                  className={`flex ${tx("justify-start", "justify-start", "justify-start")}`}
+                  className={`flex ${language === "ar" ? "justify-start" : "justify-start"}`}
                 >
                   <div className="bg-white text-slate-500 border border-slate-100 shadow-sm rounded-2xl rounded-br-sm p-4 flex gap-1.5 items-center">
                     <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
@@ -378,11 +362,7 @@ Assistant:`;
                       setInput(e.target.value);
                     }}
                     placeholder={
-                      tx(
-                        "أرفق صورة، أو اكتب سؤالك هنا...",
-                        "Joignez une image ou écrivez votre question...",
-                        "Attach an image or type your question here..."
-                      )
+                      language === "ar" ? "أرفق صورة، أو اكتب سؤالك هنا..." : "Joignez une image ou écrivez votre question..."
                     }
                     className="w-full max-h-32 min-h-[40px] bg-transparent resize-none outline-none text-sm px-2 py-2.5 text-slate-700 placeholder:text-slate-400"
                     rows={1}
@@ -399,7 +379,7 @@ Assistant:`;
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition"
-                      title={tx("أرفق صورة طبية", "Joindre une image", "Attach medical image")}
+                      title={language === "ar" ? "أرفق صورة طبية" : "Joindre une image"}
                     >
                       <ImageIcon className="w-5 h-5" />
                     </button>
@@ -417,18 +397,16 @@ Assistant:`;
                       className="bg-gradient-to-r from-[#1E6DFF] to-[#18C5B5] text-white p-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send
-                        className={`w-4 h-4 ${tx("-scale-x-100", "", "")}`}
+                        className={`w-4 h-4 ${language === "ar" ? "-scale-x-100" : ""}`}
                       />
                     </button>
                   </div>
                 </div>
               </div>
               <div className="text-[9px] text-center text-slate-400 mt-2 flex justify-center items-center gap-1">
-                <span>⚠️ {tx(
-                  "المساعد للإرشاد فقط ولا يغني عن الطبيب المختص.",
-                  "Résultats à titre indicatif, consultez un médecin.",
-                  "Assistant is for guidance only, consult a doctor."
-                )}</span>
+                <span>⚠️ {language === "ar"
+                  ? "المساعد للإرشاد فقط ولا يغني عن الطبيب المختص."
+                  : "Résultats à titre indicatif, consultez un médecin."}</span>
               </div>
             </form>
           </motion.div>
