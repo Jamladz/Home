@@ -7,10 +7,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function DoctorLogin() {
   const navigate = useNavigate();
-  const {
-    language,
-    tx: tx
-  } = useLanguage();
+  const { language } = useLanguage();
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,11 +31,7 @@ export default function DoctorLogin() {
     e.preventDefault();
     setMessage(null);
     if (!email || !password) {
-      setMessage({ type: 'error', text: tx(
-        "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
-        "Please enter email and password.",
-        "Please enter your email and password."
-      ) });
+      setMessage({ type: 'error', text: language === 'ar' ? "يرجى إدخال البريد الإلكتروني وكلمة المرور." : "Please enter email and password." });
       return;
     }
     
@@ -46,44 +39,26 @@ export default function DoctorLogin() {
     try {
       if (isRegistering) {
         await createUserWithEmailAndPassword(auth, email, password);
-        setMessage({ type: 'success', text: tx(
-          "تم إنشاء الحساب بنجاح! جاري التوجيه...",
-          "Account created! Redirecting...",
-          "Account created successfully! Redirecting..."
-        ) });
+        setMessage({ type: 'success', text: language === 'ar' ? "تم إنشاء الحساب بنجاح! جاري التوجيه..." : "Account created! Redirecting..." });
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        setMessage({ type: 'success', text: tx('جاري تسجيل الدخول...', 'Signing in...', "Signing in...") });
+        setMessage({ type: 'success', text: language === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing in...' });
       }
     } catch (error: any) {
       console.error("Email Auth Error:", error);
-      let errorMessage = tx("حدث خطأ.", "An error occurred.", "An error occurred.");
+      let errorMessage = language === 'ar' ? "حدث خطأ." : "An error occurred.";
       
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = tx(
-          "البريد الإلكتروني مستخدم بالفعل، يرجى تسجيل الدخول بدلاً من ذلك.",
-          "Email already in use. Please sign in instead.",
-          "Email is already in use, please sign in instead."
-        );
+        errorMessage = language === 'ar' ? "البريد الإلكتروني مستخدم بالفعل، يرجى تسجيل الدخول بدلاً من ذلك." : "Email already in use. Please sign in instead.";
         setIsRegistering(false); // Switch back to login mode automatically
       } else if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        errorMessage = tx(
-          "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
-          "Invalid email or password.",
-          "Incorrect email or password."
-        );
+        errorMessage = language === 'ar' ? "البريد الإلكتروني أو كلمة المرور غير صحيحة." : "Invalid email or password.";
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = tx(
-          "كلمة المرور ضعيفة جداً. استخدم 6 أحرف على الأقل.",
-          "Password should be at least 6 characters.",
-          "Password is too weak. Use at least 6 characters."
-        );
+        errorMessage = language === 'ar' ? "كلمة المرور ضعيفة جداً. استخدم 6 أحرف على الأقل." : "Password should be at least 6 characters.";
       } else if (error.code === 'auth/operation-not-allowed') {
-        errorMessage = tx(
-          "تسجيل الدخول بالبريد الإلكتروني غير مفعل. يرجى تفعيله من لوحة تحكم Firebase.",
-          "Email/Password sign-in is disabled. Please enable it in Firebase console.",
-          "Email login is disabled. Please enable it in the Firebase dashboard."
-        );
+        errorMessage = language === 'ar' 
+          ? "تسجيل الدخول بالبريد الإلكتروني غير مفعل. يرجى تفعيله من لوحة تحكم Firebase." 
+          : "Email/Password sign-in is disabled. Please enable it in Firebase console.";
       } else {
         errorMessage += `\n${error.code || error.message}`;
       }
@@ -101,14 +76,10 @@ export default function DoctorLogin() {
           <Stethoscope className="w-10 h-10 text-indigo-700" />
         </div>
         <h1 className="text-2xl font-bold text-slate-800 mb-2">
-          {tx('بوابة الأطباء', 'Doctor Portal', "Doctor Portal")}
+          {language === 'ar' ? 'بوابة الأطباء' : 'Doctor Portal'}
         </h1>
         <p className="text-slate-500 text-sm mb-8">
-          {tx(
-            'سجل دخولك لإدارة مواعيدك وعيادتك في داويني.',
-            'Sign in to manage your clinic and appointments.',
-            "Sign in to manage your appointments and clinic in Dawini."
-          )}
+          {language === 'ar' ? 'سجل دخولك لإدارة مواعيدك وعيادتك في داويني.' : 'Sign in to manage your clinic and appointments.'}
         </p>
 
         {message && (
@@ -120,7 +91,7 @@ export default function DoctorLogin() {
         <form onSubmit={handleEmailAuth} className="space-y-4 mb-6 text-start">
           <div>
             <label className="block text-slate-700 text-sm font-semibold mb-1.5">
-              {tx('البريد الإلكتروني', 'Email Address', "Email")}
+              {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
             </label>
             <div className="relative">
               <Mail className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
@@ -138,7 +109,7 @@ export default function DoctorLogin() {
 
           <div>
             <label className="block text-slate-700 text-sm font-semibold mb-1.5">
-              {tx('كلمة المرور', 'Password', "Password")}
+              {language === 'ar' ? 'كلمة المرور' : 'Password'}
             </label>
             <div className="relative">
               <Lock className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
@@ -164,8 +135,8 @@ export default function DoctorLogin() {
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
               isRegistering 
-                ? (tx('إنشاء حساب جديد', 'Create Account', "Create new account")) 
-                : (tx('تسجيل الدخول', 'Sign In', "Sign in"))
+                ? (language === 'ar' ? 'إنشاء حساب جديد' : 'Create Account') 
+                : (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')
             )}
           </button>
         </form>
@@ -176,16 +147,8 @@ export default function DoctorLogin() {
             className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition mx-auto"
           >
             {isRegistering 
-              ? (tx(
-              'لدي حساب بالفعل؟ تسجيل الدخول',
-              'Already have an account? Sign in',
-              "Already have an account? Sign in"
-            )) 
-              : (tx(
-              'ليس لدي حساب؟ إنشاء حساب',
-              'Need an account? Sign up',
-              "Don't have an account? Create one"
-            ))}
+              ? (language === 'ar' ? 'لدي حساب بالفعل؟ تسجيل الدخول' : 'Already have an account? Sign in') 
+              : (language === 'ar' ? 'ليس لدي حساب؟ إنشاء حساب' : 'Need an account? Sign up')}
           </button>
         </div>
       </div>
