@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
   Stethoscope,
@@ -22,6 +22,7 @@ import { DoctorAvatar } from "../components/DoctorAvatar";
 import { medicalSpecialties } from "../lib/medical_specialties";
 
 export default function Home() {
+  const navigate = useNavigate();
   const {
     t,
     language,
@@ -192,10 +193,10 @@ export default function Home() {
         ) : topDoctors.length > 0 ? (
           <div className="space-y-4">
             {topDoctors.map((doctor) => (
-              <Link
+              <div
                 key={doctor.userId}
-                to={`/doctors/${doctor.userId}`}
-                className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex items-center gap-4 transition hover:border-indigo-300 hover:shadow-md"
+                onClick={() => navigate(`/doctors/${doctor.userId}`)}
+                className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex items-center gap-4 transition hover:border-indigo-300 hover:shadow-md cursor-pointer"
               >
                 <div className="w-16 h-16 shrink-0 relative">
                   <DoctorAvatar gender={doctor.gender} className="w-16 h-16" />
@@ -226,7 +227,7 @@ export default function Home() {
                     <Star className="w-3 h-3 fill-amber-400 mr-0.5" />
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
