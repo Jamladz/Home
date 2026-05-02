@@ -62,7 +62,7 @@ export function CustomSelect({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className={`absolute z-[999] w-full mt-1.5 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-slate-100 max-h-60 overflow-y-auto ${dropdownClassName}`}
+            className={`absolute z-[999] w-full mt-1.5 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/60 max-h-60 overflow-y-auto custom-scrollbar ${dropdownClassName}`}
             style={{ minWidth: 'max-content' }}
           >
             <div className="p-1.5 flex flex-col gap-0.5 relative z-[999]">
