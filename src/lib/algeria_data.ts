@@ -6,7 +6,9 @@ export const algeriaData = [
     wilaya_id: "43",
     wilaya_name: "ميلة",
     communes: [
-      "فرجيوة"
+      "فرجيوة",
+      "ميلة",
+      "شلغوم العيد"
     ]
   }
 ];
