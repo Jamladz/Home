@@ -11,6 +11,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
 import { medicalSpecialties } from "../../lib/medical_specialties";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { CustomSelect } from "../../components/CustomSelect";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
