@@ -68,7 +68,8 @@ function AppContent() {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (
         user &&
-        user.email?.toLowerCase().trim() === "sekanedrmessaif@gmail.com"
+        (user.email?.toLowerCase().trim() === "sekanedrmessaif@gmail.com" ||
+         user.email?.toLowerCase().trim() === "mohamedben.aissa@yahoo.fr")
       ) {
         setIsAdmin(true);
       } else {
