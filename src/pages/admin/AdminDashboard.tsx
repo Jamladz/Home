@@ -6,7 +6,7 @@ import { initializeApp, deleteApp } from "firebase/app";
 import firebaseConfig from "../../../firebase-applet-config.json";
 import { auth, db } from "../../lib/firebase";
 import { DoctorProfile, Permanence, DirectoryDoctor } from "../../types";
-import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck, Users } from "lucide-react";
+import { LogOut, LayoutDashboard, Stethoscope, Microscope, Trash2, MapPin, Plus, CheckCircle, Clock, Settings, Wrench, BadgeCheck, Users, Pencil } from "lucide-react";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getWilayas, getCommunesByWilaya } from "../../lib/algeria_data";
 import { medicalSpecialties } from "../../lib/medical_specialties";
@@ -41,12 +41,14 @@ export default function AdminDashboard() {
   // Add Directory Doctor Form
   const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
   const [isAddingDirDoctor, setIsAddingDirDoctor] = useState(false);
+  const [editingDirDoctor, setEditingDirDoctor] = useState<DirectoryDoctor | null>(null);
 
   // Add Platform Doctor Form
   const [newPlatformDoctor, setNewPlatformDoctor] = useState({
     name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male' as 'male'|'female', email: '', password: ''
   });
   const [isAddingPlatformDoctor, setIsAddingPlatformDoctor] = useState(false);
+  const [editingPlatformDoctor, setEditingPlatformDoctor] = useState<DoctorProfile | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -216,7 +218,9 @@ export default function AdminDashboard() {
         phone: newPlatformDoctor.phone,
         gender: newPlatformDoctor.gender,
         status: 'approved',
-        isVerified: true
+        isVerified: true,
+        rating: 5,
+        patientCount: 0
       };
       
       await setDoc(doc(db, "doctors", uid), doctorData);
@@ -232,6 +236,51 @@ export default function AdminDashboard() {
     } catch (e: any) {
       console.error(e);
       alert("حدث خطأ أثناء الإضافة: " + e.message);
+    }
+  };
+
+  const handleUpdateDirDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDirDoctor || !editingDirDoctor.id) return;
+    try {
+      await updateDoc(doc(db, "directory_doctors", editingDirDoctor.id), {
+        name: editingDirDoctor.name,
+        specialty: editingDirDoctor.specialty,
+        wilaya: editingDirDoctor.wilaya,
+        commune: editingDirDoctor.commune,
+        address: editingDirDoctor.address,
+        googleMapsLink: editingDirDoctor.googleMapsLink,
+        phone: editingDirDoctor.phone,
+      });
+      setDirectoryDoctors(directoryDoctors.map(d => d.id === editingDirDoctor.id ? editingDirDoctor : d));
+      setEditingDirDoctor(null);
+      alert("تم تحديث بيانات طبيب الدليل بنجاح.");
+    } catch (e: any) {
+      console.error(e);
+      alert("حدث خطأ أثناء التحديث: " + e.message);
+    }
+  };
+
+  const handleUpdatePlatformDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPlatformDoctor || !editingPlatformDoctor.userId) return;
+    try {
+      await updateDoc(doc(db, "doctors", editingPlatformDoctor.userId), {
+        name: editingPlatformDoctor.name,
+        specialty: editingPlatformDoctor.specialty,
+        wilaya: editingPlatformDoctor.wilaya,
+        commune: editingPlatformDoctor.commune,
+        clinicAddress: editingPlatformDoctor.clinicAddress,
+        googleMapsLink: editingPlatformDoctor.googleMapsLink,
+        phone: editingPlatformDoctor.phone,
+        gender: editingPlatformDoctor.gender,
+      });
+      setDoctors(doctors.map(d => d.userId === editingPlatformDoctor.userId ? editingPlatformDoctor : d));
+      setEditingPlatformDoctor(null);
+      alert("تم تحديث بيانات الطبيب بنجاح.");
+    } catch (e: any) {
+      console.error(e);
+      alert("حدث خطأ أثناء التحديث: " + e.message);
     }
   };
 
@@ -532,6 +581,100 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
+                  {editingPlatformDoctor && (
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-blue-200/80 mb-6">
+                      <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+                        <h3 className="font-bold text-blue-800">تعديل بيانات الطبيب (د. {editingPlatformDoctor.name})</h3>
+                        <button onClick={() => setEditingPlatformDoctor(null)} className="text-slate-400 hover:text-slate-600 text-sm font-semibold">إلغاء (Cancel)</button>
+                      </div>
+                      <form onSubmit={handleUpdatePlatformDoctor} className="space-y-4 text-start">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <input required type="text" value={editingPlatformDoctor.name} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, name: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
+                            <CustomSelect 
+                              value={editingPlatformDoctor.gender} 
+                              onChange={val => setEditingPlatformDoctor({...editingPlatformDoctor, gender: val as 'male'|'female'})}
+                              placeholder="اختر الجنس..."
+                              options={[
+                                { value: 'male', label: 'ذكر (Male)' },
+                                { value: 'female', label: 'أنثى (Female)' }
+                              ]}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الهاتف / Phone</label>
+                            <input required type="text" value={editingPlatformDoctor.phone} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, phone: e.target.value})}
+                              dir="ltr"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
+                            <CustomSelect 
+                              value={editingPlatformDoctor.specialty || ""} 
+                              onChange={val => setEditingPlatformDoctor({...editingPlatformDoctor, specialty: val})}
+                              placeholder="اختر التخصص..."
+                              options={medicalSpecialties.map(spec => ({ value: spec.ar, label: `${spec.ar} / ${spec.fr}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
+                            <CustomSelect 
+                              value={editingPlatformDoctor.wilaya || ""} 
+                              onChange={val => setEditingPlatformDoctor({...editingPlatformDoctor, wilaya: val, commune: ""})}
+                              placeholder="اختر الولاية..."
+                              options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
+                            <CustomSelect 
+                              value={editingPlatformDoctor.commune || ""} 
+                              onChange={val => setEditingPlatformDoctor({...editingPlatformDoctor, commune: val})}
+                              disabled={!editingPlatformDoctor.wilaya}
+                              placeholder="اختر البلدية..."
+                              options={editingPlatformDoctor.wilaya ? getCommunesByWilaya(editingPlatformDoctor.wilaya).map(c => ({ value: c, label: c })) : []}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                            <input required type="text" value={editingPlatformDoctor.clinicAddress || ''} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, clinicAddress: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">رابط جوجل ماب (اختياري) / Google Maps Link</label>
+                            <input type="url" value={editingPlatformDoctor.googleMapsLink || ''} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, googleMapsLink: e.target.value})}
+                              dir="ltr"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" />
+                          </div>
+                        </div>
+
+                        <div className="pt-2 flex justify-end">
+                          <button type="submit" className="bg-blue-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-blue-700 shadow-sm transition-all">
+                            تحديث البيانات (Update)
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
                 <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
                   {doctors.length === 0 ? (
                     <div className="p-12 text-center text-slate-500">{t('admin.no_doctors')}</div>
@@ -599,6 +742,13 @@ export default function AdminDashboard() {
                                     className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all border ${doctor.status === 'approved' ? 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}
                                   >
                                     {doctor.status === 'approved' ? t('admin.revoke') : t('admin.approve')}
+                                  </button>
+                                  <button 
+                                    onClick={() => setEditingPlatformDoctor(doctor)}
+                                    className="p-2 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition border border-slate-200 hover:border-blue-200 flex items-center justify-center shrink-0"
+                                    title="تعديل (Edit)"
+                                  >
+                                    <Pencil className="w-4 h-4" />
                                   </button>
                                   <button 
                                     onClick={() => handleDeleteDoctor(doctor.userId)}
@@ -705,6 +855,85 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
+                  {editingDirDoctor && (
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-blue-200/80 mb-6">
+                      <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+                        <h3 className="font-bold text-blue-800">تعديل بيانات طبيب الدليل (د. {editingDirDoctor.name})</h3>
+                        <button onClick={() => setEditingDirDoctor(null)} className="text-slate-400 hover:text-slate-600 text-sm font-semibold">إلغاء (Cancel)</button>
+                      </div>
+                      <form onSubmit={handleUpdateDirDoctor} className="space-y-4 text-start">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <input required type="text" value={editingDirDoctor.name} onChange={e => setEditingDirDoctor({...editingDirDoctor, name: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
+                            <CustomSelect 
+                              value={editingDirDoctor.specialty || ""} 
+                              onChange={val => setEditingDirDoctor({...editingDirDoctor, specialty: val})}
+                              placeholder="اختر التخصص..."
+                              options={medicalSpecialties.map(spec => ({ value: spec.ar, label: `${spec.ar} / ${spec.fr}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
+                            <CustomSelect 
+                              value={editingDirDoctor.wilaya || ""} 
+                              onChange={val => setEditingDirDoctor({...editingDirDoctor, wilaya: val, commune: ""})}
+                              placeholder="اختر الولاية..."
+                              options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
+                            <CustomSelect 
+                              value={editingDirDoctor.commune || ""} 
+                              onChange={val => setEditingDirDoctor({...editingDirDoctor, commune: val})}
+                              disabled={!editingDirDoctor.wilaya}
+                              placeholder="اختر البلدية..."
+                              options={editingDirDoctor.wilaya ? getCommunesByWilaya(editingDirDoctor.wilaya).map(c => ({ value: c, label: c })) : []}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
+                            <input required type="text" value={editingDirDoctor.address || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, address: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">رقم الهاتف (اختياري) / Phone (Optional)</label>
+                            <input type="text" value={editingDirDoctor.phone || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, phone: e.target.value})}
+                              dir="ltr"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">رابط جوجل ماب (اختياري) / Google Maps Link (Optional)</label>
+                          <input type="url" value={editingDirDoctor.googleMapsLink || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, googleMapsLink: e.target.value})}
+                            dir="ltr"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" />
+                        </div>
+
+                        <div className="pt-2 flex justify-end">
+                          <button type="submit" className="bg-blue-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-blue-700 shadow-sm transition-all">
+                            تحديث البيانات (Update)
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
                   <div className="bg-white rounded-3xl shadow-sm border border-slate-200/60 overflow-hidden">
                     {directoryDoctors.length === 0 ? (
                       <div className="p-12 text-center text-slate-500">لا يوجد أطباء في الدليل حالياً.</div>
@@ -745,6 +974,13 @@ export default function AdminDashboard() {
                                 </td>
                                 <td className="py-4 px-6">
                                   <div className="flex items-center justify-center gap-2">
+                                    <button 
+                                      onClick={() => setEditingDirDoctor(doctor as DirectoryDoctor)}
+                                      className="p-2 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition border border-slate-200 hover:border-blue-200 flex items-center justify-center shrink-0"
+                                      title="تعديل (Edit)"
+                                    >
+                                      <Pencil className="w-4 h-4" />
+                                    </button>
                                     <button 
                                       onClick={() => handleDeleteDirDoctor(doctor.id!)}
                                       className="p-2 bg-white text-rose-600 rounded-xl hover:bg-rose-50 transition border border-slate-200 hover:border-rose-200 flex items-center justify-center shrink-0"
