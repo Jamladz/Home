@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, getDocs, deleteDoc, doc, addDoc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import { initializeApp, deleteApp } from "firebase/app";
 import firebaseConfig from "../../../firebase-applet-config.json";
 import { auth, db } from "../../lib/firebase";
 import { DoctorProfile, Permanence, DirectoryDoctor } from "../../types";
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.email?.toLowerCase().trim() === 'sekanedrmessaif@gmail.com') {
+      if (user && (user.email?.toLowerCase().trim() === 'sekanedrmessaif@gmail.com' || user.email?.toLowerCase().trim() === 'mohamedben.aissa@yahoo.fr')) {
         setIsAdmin(true);
         fetchData();
       } else {
@@ -205,6 +205,7 @@ export default function AdminDashboard() {
       const uid = userCredential.user.uid;
       
       const doctorData: DoctorProfile = {
+        userId: uid,
         name: newPlatformDoctor.name,
         specialty: newPlatformDoctor.specialty,
         wilaya: newPlatformDoctor.wilaya,
@@ -220,6 +221,7 @@ export default function AdminDashboard() {
       await setDoc(doc(db, "doctors", uid), doctorData);
       
       await signOut(secondaryAuth);
+      await deleteApp(secondaryApp);
       
       setDoctors([{ ...doctorData, userId: uid }, ...doctors]);
       setIsAddingPlatformDoctor(false);
