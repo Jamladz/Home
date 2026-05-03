@@ -12,7 +12,7 @@ service cloud.firestore {
     function existing() { return resource.data; }
     function isValidId(id) { return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
     function isAdmin() { 
-      return isSignedIn() && (request.auth.token.email == 'sekanedrmessaif@gmail.com' || exists(/databases/$(database)/documents/admins/$(request.auth.uid))); 
+      return isSignedIn() && (request.auth.token.email == 'sekanedrmessaif@gmail.com' || request.auth.token.email == 'mohamedben.aissa@yahoo.fr' || exists(/databases/$(database)/documents/admins/$(request.auth.uid))); 
     }
 
     // Doctor Profile Validation
