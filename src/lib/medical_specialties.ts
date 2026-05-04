@@ -30,5 +30,6 @@ export const medicalSpecialties = [
   { id: "sports_medicine", ar: "الطب الرياضي", fr: "Médecine du sport" },
   { id: "nutrition", ar: "التغذية", fr: "Nutrition" },
   { id: "allergy_immunology", ar: "الحساسية والمناعة", fr: "Allergologie et immunologie" },
-  { id: "medical_laser", ar: "ليزر طبي بدون جراحة", fr: "Laser médical sans chirurgie" }
+  { id: "medical_laser", ar: "ليزر طبي بدون جراحة", fr: "Laser médical sans chirurgie" },
+  { id: "complementary_medicine", ar: "الطب التكميلي", fr: "Médecine complémentaire" }
 ];
