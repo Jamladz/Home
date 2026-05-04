@@ -35,17 +35,17 @@ export default function AdminDashboard() {
   const [doctorSubTab, setDoctorSubTab] = useState<'platform' | 'directory'>('platform');
 
   // Add Permanence Form
-  const [newPerm, setNewPerm] = useState<Partial<Permanence>>({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
+  const [newPerm, setNewPerm] = useState<Partial<Permanence>>({ type: 'pharmacy', name: '', address: '', wilaya: '', commune: '', phone: '', openUntil: '', workingHours: { start: '', end: '' }, workingDays: [], isOnDuty: false, dutyDate: '', dutyHours: '' });
   const [isAddingPerm, setIsAddingPerm] = useState(false);
 
   // Add Directory Doctor Form
-  const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
+  const [newDirDoctor, setNewDirDoctor] = useState<Partial<DirectoryDoctor>>({ name: '', nameAr: '', nameFr: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
   const [isAddingDirDoctor, setIsAddingDirDoctor] = useState(false);
   const [editingDirDoctor, setEditingDirDoctor] = useState<DirectoryDoctor | null>(null);
 
   // Add Platform Doctor Form
   const [newPlatformDoctor, setNewPlatformDoctor] = useState({
-    name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male' as 'male'|'female', email: '', password: ''
+    name: '', nameAr: '', nameFr: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male' as 'male'|'female', email: '', password: ''
   });
   const [isAddingPlatformDoctor, setIsAddingPlatformDoctor] = useState(false);
   const [editingPlatformDoctor, setEditingPlatformDoctor] = useState<DoctorProfile | null>(null);
@@ -163,10 +163,14 @@ export default function AdminDashboard() {
   const handleAddPermanence = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const docRef = await addDoc(collection(db, "permanences"), newPerm);
-      setPermanences([{ ...newPerm, id: docRef.id } as Permanence, ...permanences]);
+      const payload: Partial<Permanence> = { ...newPerm };
+      if (payload.isOnDuty) {
+        payload.openUntil = undefined;
+      }
+      const docRef = await addDoc(collection(db, "permanences"), payload);
+      setPermanences([{ ...payload, id: docRef.id } as Permanence, ...permanences]);
       setIsAddingPerm(false);
-      setNewPerm({ type: 'pharmacy', name: '', address: '', phone: '', openUntil: '' });
+      setNewPerm({ type: 'pharmacy', name: '', address: '', wilaya: '', commune: '', phone: '', openUntil: '', workingHours: { start: '', end: '' }, workingDays: [], isOnDuty: false, dutyDate: '', dutyHours: '' });
     } catch (e) {
       console.error(e);
       alert("حدث خطأ أثناء الإضافة.");
@@ -190,7 +194,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, "directory_doctors"), newDirDoctor);
       setDirectoryDoctors([{ ...newDirDoctor, id: docRef.id } as DirectoryDoctor, ...directoryDoctors]);
       setIsAddingDirDoctor(false);
-      setNewDirDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
+      setNewDirDoctor({ name: '', nameAr: '', nameFr: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '' });
     } catch (e) {
       console.error(e);
       alert("حدث خطأ أثناء الإضافة.");
@@ -210,6 +214,8 @@ export default function AdminDashboard() {
       const doctorData: DoctorProfile = {
         userId: uid,
         name: newPlatformDoctor.name,
+        nameAr: newPlatformDoctor.nameAr,
+        nameFr: newPlatformDoctor.nameFr,
         specialty: newPlatformDoctor.specialty,
         wilaya: newPlatformDoctor.wilaya,
         commune: newPlatformDoctor.commune,
@@ -230,7 +236,7 @@ export default function AdminDashboard() {
       
       setDoctors([{ ...doctorData, userId: uid }, ...doctors]);
       setIsAddingPlatformDoctor(false);
-      setNewPlatformDoctor({ name: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male', email: '', password: '' });
+      setNewPlatformDoctor({ name: '', nameAr: '', nameFr: '', specialty: '', wilaya: '', commune: '', address: '', phone: '', googleMapsLink: '', gender: 'male', email: '', password: '' });
       
       alert("تمت إضافة الطبيب بنجاح. يمكنه الآن تسجيل الدخول.");
     } catch (e: any) {
@@ -245,6 +251,8 @@ export default function AdminDashboard() {
     try {
       await updateDoc(doc(db, "directory_doctors", editingDirDoctor.id), {
         name: editingDirDoctor.name,
+        nameAr: editingDirDoctor.nameAr,
+        nameFr: editingDirDoctor.nameFr,
         specialty: editingDirDoctor.specialty,
         wilaya: editingDirDoctor.wilaya,
         commune: editingDirDoctor.commune,
@@ -267,6 +275,8 @@ export default function AdminDashboard() {
     try {
       await updateDoc(doc(db, "doctors", editingPlatformDoctor.userId), {
         name: editingPlatformDoctor.name,
+        nameAr: editingPlatformDoctor.nameAr,
+        nameFr: editingPlatformDoctor.nameFr,
         specialty: editingPlatformDoctor.specialty,
         wilaya: editingPlatformDoctor.wilaya,
         commune: editingPlatformDoctor.commune,
@@ -495,10 +505,25 @@ export default function AdminDashboard() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي (بالفرنسية أو الإنجليزية) / Primary Name (Fr/En)</label>
                             <input required type="text" value={newPlatformDoctor.name} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, name: e.target.value})}
-                              placeholder="مثال: محمد امين"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                              placeholder="e.g. Dr. Messaif"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic (Optional)</label>
+                            <input type="text" value={newPlatformDoctor.nameAr || ''} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, nameAr: e.target.value})}
+                              placeholder="مثال: د. مصيف"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-right" dir="rtl" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French (Optional)</label>
+                            <input type="text" value={newPlatformDoctor.nameFr || ''} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, nameFr: e.target.value})}
+                              placeholder="e.g. Dr. Messaif"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
@@ -590,9 +615,22 @@ export default function AdminDashboard() {
                       <form onSubmit={handleUpdatePlatformDoctor} className="space-y-4 text-start">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي / Primary Name</label>
                             <input required type="text" value={editingPlatformDoctor.name} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, name: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic</label>
+                            <input type="text" value={editingPlatformDoctor.nameAr || ''} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, nameAr: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-right" dir="rtl" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French</label>
+                            <input type="text" value={editingPlatformDoctor.nameFr || ''} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, nameFr: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
@@ -788,10 +826,24 @@ export default function AdminDashboard() {
                       <form onSubmit={handleAddDirDoctor} className="space-y-4 text-start">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي (بالفرنسية أو الإنجليزية) / Primary Name</label>
                             <input required type="text" value={newDirDoctor.name} onChange={e => setNewDirDoctor({...newDirDoctor, name: e.target.value})}
-                              placeholder="مثال: محمد امين"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                              placeholder="e.g. Dr. Messaif"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic (Optional)</label>
+                            <input type="text" value={newDirDoctor.nameAr || ''} onChange={e => setNewDirDoctor({...newDirDoctor, nameAr: e.target.value})}
+                              placeholder="مثال: د. مصيف"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-right" dir="rtl" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French (Optional)</label>
+                            <input type="text" value={newDirDoctor.nameFr || ''} onChange={e => setNewDirDoctor({...newDirDoctor, nameFr: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
@@ -864,9 +916,22 @@ export default function AdminDashboard() {
                       <form onSubmit={handleUpdateDirDoctor} className="space-y-4 text-start">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم / Name</label>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي / Primary Name</label>
                             <input required type="text" value={editingDirDoctor.name} onChange={e => setEditingDirDoctor({...editingDirDoctor, name: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
+                          </div>
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic</label>
+                            <input type="text" value={editingDirDoctor.nameAr || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, nameAr: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-right" dir="rtl" />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French</label>
+                            <input type="text" value={editingDirDoctor.nameFr || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, nameFr: e.target.value})}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
@@ -1040,23 +1105,93 @@ export default function AdminDashboard() {
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                       </div>
                     </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-slate-600 text-xs font-semibold mb-1.5">الولاية / Wilaya</label>
+                        <CustomSelect 
+                          value={newPerm.wilaya || ""} 
+                          onChange={val => setNewPerm({...newPerm, wilaya: val, commune: ''})}
+                          placeholder="اختر الولاية..."
+                          options={getWilayas().map(w => ({ value: w.id, label: `${w.id} - ${w.name}` }))}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-slate-600 text-xs font-semibold mb-1.5">البلدية / Commune</label>
+                        <CustomSelect 
+                          value={newPerm.commune || ""} 
+                          onChange={val => setNewPerm({...newPerm, commune: val})}
+                          placeholder="اختر البلدية..."
+                          options={newPerm.wilaya ? getCommunesByWilaya(newPerm.wilaya).map(c => ({ value: c, label: c })) : []}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        />
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-slate-600 text-xs font-semibold mb-1.5">العنوان / Address</label>
                       <input required type="text" value={newPerm.address} onChange={e => setNewPerm({...newPerm, address: e.target.value})}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                     </div>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-slate-600 text-xs font-semibold mb-1.5">الرقم / Phone</label>
                         <input required type="text" value={newPerm.phone} onChange={e => setNewPerm({...newPerm, phone: e.target.value})} dir="ltr"
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" />
                       </div>
+                      
                       <div>
-                        <label className="block text-slate-600 text-xs font-semibold mb-1.5">مفتوح حتى / Open Until</label>
-                        <input required type="text" value={newPerm.openUntil} onChange={e => setNewPerm({...newPerm, openUntil: e.target.value})}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                        <label className="block text-slate-600 text-xs font-semibold mb-1.5">أيام العمل / Working Days</label>
+                        <input type="text" value={newPerm.workingDays?.[0] || ''} onChange={e => setNewPerm({...newPerm, workingDays: [e.target.value]})}
+                          placeholder="مثال: من الأحد إلى الخميس"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-right" dir="rtl" />
                       </div>
                     </div>
+                    
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                      <h4 className="text-sm font-semibold mb-3 text-slate-700">ساعات العمل</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">من (ساعة)</label>
+                          <input required type="time" value={newPerm.workingHours?.start || ''} onChange={e => setNewPerm({...newPerm, workingHours: {...newPerm.workingHours, start: e.target.value} as any})}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
+                        </div>
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">إلى (ساعة)</label>
+                          <input required type="time" value={newPerm.workingHours?.end || ''} onChange={e => setNewPerm({...newPerm, workingHours: {...newPerm.workingHours, end: e.target.value} as any})}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-bold text-emerald-800 mb-1">تفعيل كصيدلية مناوبة؟</h4>
+                        <p className="text-xs text-emerald-600">سيتم عرضها في قسم الصيدليات المناوبة وتحديد الوقت</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" checked={newPerm.isOnDuty || false} onChange={e => setNewPerm({...newPerm, isOnDuty: e.target.checked})} />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                      </label>
+                    </div>
+
+                    {newPerm.isOnDuty && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">يوم المناوبة</label>
+                          <input required type="date" value={newPerm.dutyDate || ''} onChange={e => setNewPerm({...newPerm, dutyDate: e.target.value})}
+                            className="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                        </div>
+                        <div>
+                          <label className="block text-slate-600 text-xs font-semibold mb-1.5">عدد الساعات</label>
+                          <input required type="text" value={newPerm.dutyHours || ''} onChange={e => setNewPerm({...newPerm, dutyHours: e.target.value})}
+                            placeholder="مثال: 24 ساعة أو 12 ساعة"
+                            className="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+                        </div>
+                      </div>
+                    )}
                     <div className="pt-2 flex justify-end">
                       <button type="submit" className="bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-700 shadow-sm transition-all">
                         {tx('حفظ البيانات', 'Save Data', "Save Data")}
@@ -1076,34 +1211,78 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                  {permanences.map(perm => (
-                    <div key={perm.id} className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex items-start justify-between group hover:border-indigo-200 transition-colors">
-                      <div className="flex gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${perm.type === 'pharmacy' ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'}`}>
-                          <Microscope className="w-6 h-6" />
-                        </div>
-                        <div className="text-start">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-slate-800">{perm.name}</h3>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${perm.type === 'pharmacy' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
-                              {perm.type === 'pharmacy' ? (tx('صيدلية', 'Pharmacist', "Pharmacy")) : (tx('مخبر', 'Laboratory', "Laboratory"))}
-                            </span>
+                  {permanences.map(perm => {
+                    let typeBadge = '';
+                    let bgColor = '';
+                    let imgIcon = null;
+
+                    if (perm.type === 'pharmacy') {
+                      bgColor = 'bg-emerald-100 text-emerald-600';
+                      typeBadge = tx('صيدلية', 'Pharmacy', 'Pharmacy');
+                      imgIcon = <Microscope className="w-6 h-6" />;
+                      
+                      if (perm.isOnDuty) {
+                        typeBadge = tx('صيدلية مناوبة', 'Pharmacy on Duty', 'Pharmacy on duty');
+                        imgIcon = <div className="text-2xl">⚕️</div>;
+                        bgColor = 'bg-red-100 text-red-600';
+                      }
+                    } else {
+                      bgColor = 'bg-blue-100 text-blue-600';
+                      typeBadge = tx('مخبر', 'Laboratory', 'Laboratory');
+                      imgIcon = <Microscope className="w-6 h-6" />;
+                    }
+
+                    return (
+                      <div key={perm.id} className={`bg-white rounded-3xl p-5 shadow-sm border ${perm.isOnDuty ? 'border-red-200 shadow-red-100' : 'border-slate-200/60'} flex items-start justify-between group hover:border-indigo-200 transition-colors`}>
+                        <div className="flex gap-4">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${bgColor}`}>
+                            {imgIcon}
                           </div>
-                          <p className="text-slate-500 text-sm mb-1">{perm.address}</p>
-                          <div className="text-xs text-slate-400 font-medium">
-                            {tx('مفتوح حتى: ', 'Open until: ', "Open until: ")} {perm.openUntil}
+                          <div className="text-start flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h3 className="font-bold text-slate-800 truncate max-w-[200px]">{perm.name}</h3>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider shrink-0 ${perm.isOnDuty ? 'bg-red-50 text-red-700 border border-red-100' : perm.type === 'pharmacy' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
+                                {typeBadge}
+                              </span>
+                            </div>
+                            <p className="text-slate-500 text-sm mb-1 line-clamp-2">{perm.wilaya} - {perm.commune} - {perm.address}</p>
+                            
+                            <div className="text-xs text-slate-400 font-medium space-y-1 mt-2">
+                              {perm.phone && (
+                                <div className="flex items-center gap-1"><span dir="ltr">{perm.phone}</span></div>
+                              )}
+                              {perm.workingDays?.[0] && (
+                                <div>
+                                  {tx('أيام العمل: ', 'Working Days: ', 'Working Days: ')}
+                                  {perm.workingDays?.[0]}
+                                </div>
+                              )}
+                              {perm.workingHours?.start && perm.workingHours?.end && (
+                                <div className="text-indigo-600 font-semibold bg-indigo-50 inline-block px-2 py-0.5 rounded mt-1">
+                                  {tx('ساعات العمل: ', 'Working Hours: ', "Working Hours: ")}
+                                  {perm.workingHours?.start} - {perm.workingHours?.end}
+                                </div>
+                              )}
+                              
+                              {perm.isOnDuty && perm.dutyDate && (
+                                <div className="mt-2 bg-red-50 text-red-700 border border-red-100 rounded-lg p-2 text-xs font-semibold">
+                                  تاريخ المناوبة: {perm.dutyDate} <br />
+                                  المدة: {perm.dutyHours}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <button 
+                          onClick={() => handleDeletePermanence(perm.id!)}
+                          className="p-2 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all opacity-100 md:opacity-0 group-hover:opacity-100"
+                          title={t('admin.delete')}
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
-                      <button 
-                        onClick={() => handleDeletePermanence(perm.id!)}
-                        className="p-2 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all opacity-100 md:opacity-0 group-hover:opacity-100"
-                        title={t('admin.delete')}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
