@@ -101,8 +101,8 @@ export default function DoctorsList() {
     if (item.type !== viewMode) return false;
 
     const doc = item.data;
-    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+    const searchTarget = `${doc.name} ${doc.nameAr || ''} ${doc.nameFr || ''} ${doc.specialty}`.toLowerCase();
+    const matchesSearch = searchTarget.includes(searchQuery.toLowerCase());
                           
     let matchesSpecialty = true;
     if (selectedSpecialty) {
