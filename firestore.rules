@@ -20,6 +20,8 @@ service cloud.firestore {
       return data.keys().hasAll(['userId', 'name', 'specialty', 'clinicAddress']) &&
              data.userId == request.auth.uid &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.get('nameAr', '') is string && data.get('nameAr', '').size() <= 100 &&
+             data.get('nameFr', '') is string && data.get('nameFr', '').size() <= 100 &&
              data.get('gender', '') in ['', 'male', 'female'] &&
              data.specialty is string && data.specialty.size() > 0 && data.specialty.size() <= 100 &&
              data.clinicAddress is string && data.clinicAddress.size() > 0 && data.clinicAddress.size() <= 200 &&
@@ -88,14 +90,14 @@ service cloud.firestore {
                     doctorId == request.auth.uid && 
                     isValidDoctorProfile(incoming()) && 
                     incoming().get('status', 'pending') == 'pending' &&
-                    incoming().keys().size() <= 27) || isAdmin();
+                    incoming().keys().size() <= 29) || isAdmin();
                     
       allow update: if (isSignedIn() && 
                         doctorId == request.auth.uid && 
                         isValidDoctorProfile(incoming()) && 
                         incoming().userId == existing().userId &&
                         incoming().get('status', 'pending') == existing().get('status', 'pending') && // Block self-approval
-                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'gender', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status', 'workingHours', 'workingDays', 'bookingWindow', 'isBookingOpenAllDay', 'isAcceptingAppointments', 'noticeMessage'])) ||
+                        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'nameAr', 'nameFr', 'gender', 'specialty', 'clinicAddress', 'phone', 'wilaya', 'commune', 'googleSheetWebhookUrl', 'maxPatientsPerDay', 'rating', 'reviewCount', 'patientCount', 'status', 'workingHours', 'workingDays', 'bookingWindow', 'isBookingOpenAllDay', 'isAcceptingAppointments', 'noticeMessage'])) ||
                        (incoming().diff(existing()).affectedKeys().hasOnly(['rating', 'reviewCount', 'patientCount']) &&
                         incoming().rating is number && incoming().rating >= 0 && incoming().rating <= 5 &&
                         incoming().reviewCount is number && incoming().patientCount is number) || isAdmin();
@@ -131,16 +133,18 @@ service cloud.firestore {
                     isValidId(doctorId) && 
                     incoming().keys().hasAll(['name', 'specialty', 'wilaya', 'commune', 'address']) &&
                     incoming().name is string && incoming().name.size() > 0 &&
+                    incoming().get('nameAr', '') is string &&
+                    incoming().get('nameFr', '') is string &&
                     incoming().specialty is string && incoming().specialty.size() > 0 &&
                     incoming().wilaya is string && incoming().wilaya.size() > 0 &&
                     incoming().commune is string && incoming().commune.size() > 0 &&
                     incoming().address is string && incoming().address.size() > 0 &&
                     incoming().get('phone', '') is string &&
                     incoming().get('googleMapsLink', '') is string &&
-                    incoming().keys().size() <= 7;
+                    incoming().keys().size() <= 9;
       
       allow update: if isAdmin() &&
-                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'specialty', 'wilaya', 'commune', 'address', 'phone', 'googleMapsLink']);
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'nameAr', 'nameFr', 'specialty', 'wilaya', 'commune', 'address', 'phone', 'googleMapsLink']);
       allow delete: if isAdmin();
     }
     
@@ -150,8 +154,15 @@ service cloud.firestore {
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
              data.type in ['pharmacy', 'laboratory'] &&
              data.address is string && data.address.size() > 0 && data.address.size() <= 200 &&
+             data.get('wilaya', '') is string && data.get('wilaya', '').size() <= 100 &&
+             data.get('commune', '') is string && data.get('commune', '').size() <= 100 &&
              data.get('phone', '') is string && data.get('phone', '').size() <= 20 &&
-             data.get('openUntil', '') is string && data.get('openUntil', '').size() <= 50;
+             data.get('openUntil', '') is string && data.get('openUntil', '').size() <= 50 &&
+             data.get('workingDays', []) is list &&
+             data.get('workingHours', {}) is map &&
+             data.get('isOnDuty', false) is bool &&
+             data.get('dutyDate', '') is string &&
+             data.get('dutyHours', '') is string;
     }
 
     // Permanences Collection
@@ -162,11 +173,11 @@ service cloud.firestore {
       allow create: if isAdmin() && 
                     isValidId(permanenceId) && 
                     isValidPermanence(incoming()) &&
-                    incoming().keys().size() <= 5;
+                    incoming().keys().size() <= 13;
       
       allow update: if isAdmin() &&
                     isValidPermanence(incoming()) &&
-                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'address', 'phone', 'openUntil']);
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'address', 'wilaya', 'commune', 'phone', 'openUntil', 'workingDays', 'workingHours', 'isOnDuty', 'dutyDate', 'dutyHours']);
                     
       allow delete: if isAdmin();
     }
