@@ -1,6 +1,8 @@
 export interface DoctorProfile {
   userId: string;
   name: string;
+  nameAr?: string;
+  nameFr?: string;
   gender?: 'male' | 'female';
   specialty: string;
   clinicAddress: string;
@@ -52,6 +54,8 @@ export interface Appointment {
 export interface DirectoryDoctor {
   id?: string;
   name: string;
+  nameAr?: string;
+  nameFr?: string;
   specialty: string;
   wilaya: string;
   commune: string;
@@ -65,6 +69,16 @@ export interface Permanence {
   name: string;
   type: 'pharmacy' | 'laboratory';
   address: string;
+  wilaya?: string;
+  commune?: string;
   phone: string;
-  openUntil: string;
+  openUntil?: string;
+  workingDays?: string[];
+  workingHours?: {
+    start: string;
+    end: string;
+  };
+  isOnDuty?: boolean;
+  dutyDate?: string;
+  dutyHours?: string;
 }
