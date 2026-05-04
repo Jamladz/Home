@@ -135,9 +135,12 @@ service cloud.firestore {
                     incoming().wilaya is string && incoming().wilaya.size() > 0 &&
                     incoming().commune is string && incoming().commune.size() > 0 &&
                     incoming().address is string && incoming().address.size() > 0 &&
-                    incoming().keys().size() <= 5;
+                    incoming().get('phone', '') is string &&
+                    incoming().get('googleMapsLink', '') is string &&
+                    incoming().keys().size() <= 7;
       
-      allow update: if false; // Add this if needed
+      allow update: if isAdmin() &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'specialty', 'wilaya', 'commune', 'address', 'phone', 'googleMapsLink']);
       allow delete: if isAdmin();
     }
     
