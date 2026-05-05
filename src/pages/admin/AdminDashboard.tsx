@@ -507,24 +507,18 @@ export default function AdminDashboard() {
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي (بالفرنسية أو الإنجليزية) / Primary Name (Fr/En)</label>
                             <input required type="text" value={newPlatformDoctor.name} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, name: e.target.value})}
-                              placeholder="e.g. Dr. Messaif"
+                              placeholder="e.g. Dr. exm"
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic (Optional)</label>
                             <input type="text" value={newPlatformDoctor.nameAr || ''} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, nameAr: e.target.value})}
-                              placeholder="مثال: د. مصيف"
+                              placeholder="مثال: د. أحمد"
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-right" dir="rtl" />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French (Optional)</label>
-                            <input type="text" value={newPlatformDoctor.nameFr || ''} onChange={e => setNewPlatformDoctor({...newPlatformDoctor, nameFr: e.target.value})}
-                              placeholder="e.g. Dr. Messaif"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
-                          </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
                             <CustomSelect 
@@ -627,11 +621,6 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French</label>
-                            <input type="text" value={editingPlatformDoctor.nameFr || ''} onChange={e => setEditingPlatformDoctor({...editingPlatformDoctor, nameFr: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
-                          </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الجنس / Gender</label>
                             <CustomSelect 
@@ -828,23 +817,18 @@ export default function AdminDashboard() {
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم الأساسي (بالفرنسية أو الإنجليزية) / Primary Name</label>
                             <input required type="text" value={newDirDoctor.name} onChange={e => setNewDirDoctor({...newDirDoctor, name: e.target.value})}
-                              placeholder="e.g. Dr. Messaif"
+                              placeholder="e.g. Dr. exm"
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
                           </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالعربية (اختياري) / Name in Arabic (Optional)</label>
                             <input type="text" value={newDirDoctor.nameAr || ''} onChange={e => setNewDirDoctor({...newDirDoctor, nameAr: e.target.value})}
-                              placeholder="مثال: د. مصيف"
+                              placeholder="مثال: د. أحمد"
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-right" dir="rtl" />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French (Optional)</label>
-                            <input type="text" value={newDirDoctor.nameFr || ''} onChange={e => setNewDirDoctor({...newDirDoctor, nameFr: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-left" dir="ltr" />
-                          </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
                             <CustomSelect 
@@ -928,11 +912,6 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-slate-600 text-xs font-semibold mb-1.5">الاسم بالفرنسية (اختياري) / Name in French</label>
-                            <input type="text" value={editingDirDoctor.nameFr || ''} onChange={e => setEditingDirDoctor({...editingDirDoctor, nameFr: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-left" dir="ltr" />
-                          </div>
                           <div>
                             <label className="block text-slate-600 text-xs font-semibold mb-1.5">التخصص / Specialty (الاسم بالعربية أو الفرنسية)</label>
                             <CustomSelect 
