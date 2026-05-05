@@ -34,6 +34,7 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 }
 
 import { AIAssistantWidget } from "./components/AIAssistantWidget";
+import { SupportWidget } from "./components/SupportWidget";
 
 // Inner App component to use location
 function AppContent() {
@@ -186,6 +187,8 @@ function AppContent() {
       </AnimatePresence>
       {/* AI Assistant Widget */}
       <AIAssistantWidget />
+      {/* Support Widget */}
+      <SupportWidget />
       <Toaster position="bottom-center" />
       {/* Fixed Navigation for Mobile */}
       <BottomNav />
