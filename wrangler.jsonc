@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "react-example",
+  "name": "dawini",
   "compatibility_date": "2026-05-02",
   "observability": {
     "enabled": true
